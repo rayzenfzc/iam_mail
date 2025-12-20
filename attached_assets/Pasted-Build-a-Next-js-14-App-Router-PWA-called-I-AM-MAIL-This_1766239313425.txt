@@ -1,0 +1,59 @@
+Build a Next.js 14 (App Router) PWA called "I AM MAIL".
+This is a "Superhuman-class" AI Email Client that integrates into a Sales CRM.
+
+### 1. DESIGN SYSTEM (STRICT SLATE THEME)
+- **Palette:** 
+  - Bg Main: `bg-slate-50` (#f8fafc)
+  - Bg Surface: `bg-white` (#ffffff)
+  - Text Primary: `text-slate-900` (#0f172a)
+  - Text Secondary: `text-slate-500` (#64748b)
+  - Borders: `border-slate-200` (#e2e8f0)
+  - Accent: `bg-slate-900` (#0f172a) (Black/Slate Buttons)
+- **Typography:** Inter (Body), Inter Tight (Headings).
+- **Style:** Minimalist, Dense, High-End. No Rounding > 12px.
+
+### 2. PWA CONFIGURATION
+- Install `next-pwa`.
+- Configure `next.config.js`.
+- Manifest Theme Color: #ffffff.
+
+### 3. LAYOUT ARCHITECTURE (The "3-Pane" View)
+**A. LEFT SIDEBAR (Navigation)**
+- Fixed, 260px, White.
+- Items: Inbox, Sent, Drafts, **"The Shield"** (Spam/Gatekeeper).
+- Bottom: **"Video Room"** Status (Online/Offline switch).
+
+**B. MIDDLE PANE (Inbox List)**
+- Scrollable List.
+- **Card Design:** Sender (Bold), Subject, Time.
+- **AI Triage:** Add a visual tab system: [Focus] [Other].
+- **Status Indicators:** 
+  - Green Dot (Client Online).
+  - "Quote Open" Icon (If they are viewing a quote).
+
+**C. RIGHT PANE (Reading View + AI)**
+- **Header:** Email Subject + Actions [Reply] [Forward] [📞 Video Call].
+- **Body:** The email content.
+- **The "Whisper" Layer:** A side-drawer or overlay comment section for "Internal Team Chat".
+- **AI "Analyst" Bar:** A collapsible top bar: [Summarize] [Extract Tasks].
+
+### 4. THE COMPOSER (Ghostwriter)
+- A Modal for writing emails.
+- **Bottom Toolbar:**
+  - [✨ AI Draft] (Tone/Grammar).
+  - [📅 Insert Calendar] (Embeds grid).
+  - [💰 Insert Quote] (Embeds dynamic card).
+
+### 5. THE FLOATING COMMAND BAR
+- Bottom Center. Pill Shape. White. Shadow-XL.
+- Inputs: "Search with AI..." (Semantic Search).
+- Button: "Compose" (Slate-900 Circle).
+
+### 6. EXECUTION PLAN (MVP)
+1. Setup Project (Next.js + Tailwind + Lucide + PWA).
+2. Build the 3-Pane Layout with Mock Data (10 emails).
+3. Implement the "Whisper" Chat UI (Mock).
+4. Implement the "Analyst" Bar UI.
+5. Create the Floating Command Bar.
+
+Start by setting up the project structure and the Slate Design System.
