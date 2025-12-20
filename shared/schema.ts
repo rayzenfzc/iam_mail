@@ -36,7 +36,24 @@ export const emails = pgTable("emails", {
   isOnline: boolean("is_online").notNull().default(false),
   hasQuoteOpen: boolean("has_quote_open").notNull().default(false),
   summary: text("summary"),
+  trackingToken: text("tracking_token"),
+  readAt: timestamp("read_at"),
 });
+
+// Snippets table for email templates
+export const snippets = pgTable("snippets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  shortcut: text("shortcut").notNull(),
+  body: text("body").notNull(),
+});
+
+export const insertSnippetSchema = createInsertSchema(snippets).omit({
+  id: true,
+});
+
+export type InsertSnippet = z.infer<typeof insertSnippetSchema>;
+export type Snippet = typeof snippets.$inferSelect;
 
 export const insertEmailSchema = createInsertSchema(emails).omit({
   id: true,
