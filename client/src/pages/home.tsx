@@ -13,9 +13,11 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState<"focus" | "other">("focus");
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
+  const [useImap, setUseImap] = useState(true);
 
-  const { data: emails = [], isLoading } = useQuery<Email[]>({
-    queryKey: ["/api/emails"],
+  const { data: emails = [], isLoading, error } = useQuery<Email[]>({
+    queryKey: [useImap ? "/api/imap/emails" : "/api/emails"],
+    retry: false,
   });
 
   const filteredEmails = emails.filter(
@@ -40,6 +42,7 @@ export default function Home() {
         activeCategory={activeCategory}
         onCategoryChange={setActiveCategory}
         isLoading={isLoading}
+        error={error as Error | null}
       />
 
       <ReadingPane

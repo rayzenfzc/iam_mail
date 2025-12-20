@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { Circle, FileText, Loader2 } from "lucide-react";
+import { Circle, FileText, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Email } from "@shared/schema";
@@ -11,6 +11,7 @@ interface InboxListProps {
   activeCategory: "focus" | "other";
   onCategoryChange: (category: "focus" | "other") => void;
   isLoading: boolean;
+  error?: Error | null;
 }
 
 export function InboxList({
@@ -20,6 +21,7 @@ export function InboxList({
   activeCategory,
   onCategoryChange,
   isLoading,
+  error,
 }: InboxListProps) {
   return (
     <div
@@ -70,6 +72,18 @@ export function InboxList({
                 </div>
               </div>
             ))}
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
+              <AlertTriangle className="w-8 h-8 text-amber-500" />
+            </div>
+            <p className="text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">
+              Connection Error
+            </p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs max-w-[200px]">
+              Check your IMAP credentials in Secrets panel
+            </p>
           </div>
         ) : emails.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
