@@ -34,16 +34,21 @@ export const CommandBar = forwardRef<CommandBarRef, CommandBarProps>(function Co
     >
       <div
         className={cn(
-          "flex items-center gap-2 bg-white dark:bg-slate-800 rounded-full px-2 py-1.5 shadow-xl border border-slate-200 dark:border-slate-700 transition-all duration-200",
-          isFocused && "ring-2 ring-slate-900/10 dark:ring-slate-100/10"
+          "flex items-center gap-2 bg-black/80 backdrop-blur-2xl rounded-full px-2 py-1.5 border border-white/10 transition-all duration-200",
+          isFocused && "ring-2 ring-violet-500/30 border-violet-500/30 glow-purple"
         )}
+        style={{
+          boxShadow: isFocused 
+            ? "0 0 40px rgba(139, 92, 246, 0.2), 0 10px 40px rgba(0, 0, 0, 0.5)"
+            : "0 10px 40px rgba(0, 0, 0, 0.5)"
+        }}
       >
         <form onSubmit={handleSearch} className="flex items-center">
           <div className="flex items-center gap-2 px-3">
             {isSearching ? (
-              <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />
+              <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
             ) : (
-              <Search className="w-4 h-4 text-slate-400" />
+              <Search className="w-4 h-4 text-gray-500" />
             )}
             <input
               ref={inputRef}
@@ -53,7 +58,7 @@ export const CommandBar = forwardRef<CommandBarRef, CommandBarProps>(function Co
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder="Search with AI..."
-              className="w-64 bg-transparent text-sm text-slate-700 dark:text-slate-300 placeholder:text-slate-400 focus:outline-none"
+              className="w-64 bg-transparent text-sm text-white placeholder:text-gray-500 focus:outline-none"
               data-testid="input-search"
             />
           </div>
@@ -61,7 +66,7 @@ export const CommandBar = forwardRef<CommandBarRef, CommandBarProps>(function Co
 
         <button
           onClick={onCompose}
-          className="w-9 h-9 rounded-full bg-slate-900 dark:bg-slate-100 flex items-center justify-center text-white dark:text-slate-900 transition-transform hover:scale-105 active:scale-95 flex-shrink-0"
+          className="w-9 h-9 rounded-full bg-violet-500 flex items-center justify-center text-white transition-all duration-200 hover:bg-violet-400 active:scale-95 flex-shrink-0 glow-purple"
           data-testid="button-compose"
         >
           <Plus className="w-5 h-5" />

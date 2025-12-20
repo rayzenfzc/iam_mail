@@ -44,13 +44,14 @@ export function WhisperPanel({ emailId, onClose }: WhisperPanelProps) {
 
   return (
     <div
-      className="absolute right-0 top-0 bottom-0 w-80 bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 flex flex-col shadow-lg"
+      className="absolute right-0 top-0 bottom-0 w-80 bg-[#0F0F12] border-l border-white/5 flex flex-col"
+      style={{ boxShadow: "-10px 0 40px rgba(0, 0, 0, 0.5)" }}
       data-testid="whisper-panel"
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/[0.02]">
         <div className="flex items-center gap-2">
-          <AtSign className="w-4 h-4 text-slate-500" />
-          <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+          <AtSign className="w-4 h-4 text-violet-400" />
+          <h3 className="font-semibold text-white text-sm">
             The Whisper
           </h3>
         </div>
@@ -58,15 +59,15 @@ export function WhisperPanel({ emailId, onClose }: WhisperPanelProps) {
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="h-7 w-7"
+          className="h-7 w-7 text-gray-400 active-press"
           data-testid="button-close-whisper"
         >
           <X className="w-4 h-4" />
         </Button>
       </div>
 
-      <div className="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-800/30">
-        <p className="text-xs text-amber-700 dark:text-amber-400">
+      <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20">
+        <p className="text-xs text-amber-400">
           Internal comments - clients cannot see this
         </p>
       </div>
@@ -77,10 +78,10 @@ export function WhisperPanel({ emailId, onClose }: WhisperPanelProps) {
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
                 <div className="flex items-start gap-2">
-                  <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700" />
+                  <div className="w-7 h-7 rounded-full bg-white/5" />
                   <div className="flex-1 space-y-1">
-                    <div className="h-3 w-20 bg-slate-200 dark:bg-slate-700 rounded" />
-                    <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded" />
+                    <div className="h-3 w-20 bg-white/5 rounded" />
+                    <div className="h-4 w-full bg-white/5 rounded" />
                   </div>
                 </div>
               </div>
@@ -88,11 +89,11 @@ export function WhisperPanel({ emailId, onClose }: WhisperPanelProps) {
           </div>
         ) : comments.length === 0 ? (
           <div className="text-center py-8">
-            <AtSign className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <AtSign className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+            <p className="text-sm text-gray-400">
               No internal comments yet
             </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Use @mentions to notify team members
             </p>
           </div>
@@ -100,19 +101,19 @@ export function WhisperPanel({ emailId, onClose }: WhisperPanelProps) {
           <div className="space-y-4">
             {comments.map((comment) => (
               <div key={comment.id} className="flex items-start gap-2">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 dark:from-slate-400 dark:to-slate-600 flex items-center justify-center text-white dark:text-slate-900 text-xs font-medium flex-shrink-0">
+                <div className="w-7 h-7 rounded-full gradient-avatar flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
                   {comment.author.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    <span className="text-xs font-medium text-gray-300">
                       {comment.author}
                     </span>
-                    <span className="text-xs text-slate-400 dark:text-slate-500">
+                    <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{comment.content}</p>
+                  <p className="text-sm text-gray-400">{comment.content}</p>
                 </div>
               </div>
             ))}
@@ -122,20 +123,21 @@ export function WhisperPanel({ emailId, onClose }: WhisperPanelProps) {
 
       <form
         onSubmit={handleSubmit}
-        className="p-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+        className="p-3 border-t border-white/10 bg-white/[0.02]"
       >
         <div className="flex items-center gap-2">
           <Input
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="@Team Can we discount this?"
-            className="flex-1 h-9 text-sm"
+            className="flex-1 h-9 text-sm bg-white/5 border-white/10 text-white placeholder:text-gray-500"
             data-testid="input-whisper-comment"
           />
           <Button
             type="submit"
             size="icon"
             disabled={!newComment.trim() || addComment.isPending}
+            className="bg-violet-500 text-white active-press"
             data-testid="button-send-whisper"
           >
             <Send className="w-4 h-4" />
