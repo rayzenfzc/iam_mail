@@ -36,17 +36,17 @@ export function InboxList({
 }: InboxListProps) {
   return (
     <div
-      className="flex flex-col w-[380px] h-full bg-[#0F0F12] border-r border-white/5 flex-shrink-0"
+      className="flex flex-col w-[380px] h-full bg-white dark:bg-slate-950 border-r pane-border flex-shrink-0 z-10"
       data-testid="email-list-container"
     >
-      <div className="flex items-center gap-2 p-4 border-b border-white/5">
+      <div className="flex items-center gap-2 p-4 border-b pane-border">
         <button
           onClick={() => onCategoryChange("focus")}
           className={cn(
             "px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 active-press",
             activeCategory === "focus"
-              ? "bg-violet-500 text-white glow-purple"
-              : "text-gray-400 hover:text-white hover:bg-white/5"
+              ? "bg-primary text-white glow-accent"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
           )}
           data-testid="tab-focus"
         >
@@ -57,8 +57,8 @@ export function InboxList({
           className={cn(
             "px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 active-press",
             activeCategory === "other"
-              ? "bg-violet-500 text-white glow-purple"
-              : "text-gray-400 hover:text-white hover:bg-white/5"
+              ? "bg-primary text-white glow-accent"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
           )}
           data-testid="tab-other"
         >
@@ -72,12 +72,12 @@ export function InboxList({
             {[...Array(8)].map((_, i) => (
               <div key={i} className="p-4 rounded-lg glass-card space-y-3">
                 <div className="flex items-center gap-3">
-                  <Skeleton className="w-10 h-10 rounded-full bg-white/5" />
+                  <Skeleton className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/5" />
                   <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-32 bg-white/5" />
-                    <Skeleton className="h-3 w-48 bg-white/5" />
+                    <Skeleton className="h-4 w-32 bg-slate-200 dark:bg-white/5" />
+                    <Skeleton className="h-3 w-48 bg-slate-200 dark:bg-white/5" />
                   </div>
-                  <Skeleton className="h-3 w-12 bg-white/5" />
+                  <Skeleton className="h-3 w-12 bg-slate-200 dark:bg-white/5" />
                 </div>
               </div>
             ))}
@@ -87,19 +87,19 @@ export function InboxList({
             <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
               <AlertTriangle className="w-8 h-8 text-amber-400" />
             </div>
-            <p className="text-white text-sm font-medium mb-2">
+            <p className="text-slate-900 dark:text-white text-sm font-medium mb-2">
               Connection Error
             </p>
-            <p className="text-gray-500 text-xs max-w-[200px]">
+            <p className="text-slate-500 text-xs max-w-[200px]">
               Check your IMAP credentials in Secrets panel
             </p>
           </div>
         ) : emails.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-              <FileText className="w-8 h-8 text-gray-600" />
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-4">
+              <FileText className="w-8 h-8 text-slate-400 dark:text-slate-600" />
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-slate-500 text-sm">
               No emails in this folder
             </p>
           </div>
@@ -136,9 +136,9 @@ function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
       className={cn(
         "w-full text-left p-4 rounded-lg transition-all duration-200 active-press group",
         isSelected 
-          ? "bg-violet-500/10 border-l-2 border-violet-500 -ml-[2px] pl-[14px]" 
-          : "hover:bg-white/[0.03] border-l-2 border-transparent",
-        !email.isRead && !isSelected && "bg-white/[0.02]"
+          ? "bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[14px]" 
+          : "hover:bg-slate-100 dark:hover:bg-white/[0.03] border-l-2 border-transparent",
+        !email.isRead && !isSelected && "bg-slate-50 dark:bg-white/[0.02]"
       )}
       data-testid={`email-item-${email.id}`}
     >
@@ -151,7 +151,7 @@ function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
             {email.sender.charAt(0).toUpperCase()}
           </div>
           {email.isOnline && (
-            <Circle className="absolute -bottom-0.5 -right-0.5 w-3 h-3 fill-emerald-400 text-emerald-400 stroke-[#0F0F12] stroke-2" />
+            <Circle className="absolute -bottom-0.5 -right-0.5 w-3 h-3 fill-emerald-400 text-emerald-400 stroke-white dark:stroke-slate-950 stroke-2" />
           )}
         </div>
 
@@ -161,8 +161,8 @@ function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
               className={cn(
                 "text-sm truncate",
                 !email.isRead
-                  ? "font-semibold text-white"
-                  : "font-medium text-gray-300"
+                  ? "font-semibold text-slate-900 dark:text-white"
+                  : "font-medium text-slate-700 dark:text-slate-300"
               )}
             >
               {email.sender}
@@ -172,11 +172,11 @@ function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
                 <CheckCheck className="w-3.5 h-3.5 text-emerald-400" data-testid={`read-receipt-${email.id}`} />
               )}
               {email.hasQuoteOpen && (
-                <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 font-medium">
+                <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500 dark:text-amber-400 font-medium">
                   Quote
                 </span>
               )}
-              <span className="text-xs text-gray-500 whitespace-nowrap">
+              <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
                 {timeAgo.replace(" ago", "")}
               </span>
             </div>
@@ -186,14 +186,14 @@ function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
             className={cn(
               "text-sm truncate mb-1",
               !email.isRead
-                ? "text-gray-200"
-                : "text-gray-400"
+                ? "text-slate-700 dark:text-slate-200"
+                : "text-slate-500 dark:text-slate-400"
             )}
           >
             {email.subject}
           </p>
 
-          <p className="text-xs text-gray-500 truncate">
+          <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
             {email.preview}
           </p>
         </div>

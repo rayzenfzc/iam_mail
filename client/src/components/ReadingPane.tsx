@@ -53,14 +53,14 @@ export function ReadingPane({ email, onClose }: ReadingPaneProps) {
   if (!email) {
     return (
       <div
-        className="flex-1 flex items-center justify-center bg-[#0F0F12]"
+        className="flex-1 flex items-center justify-center bg-white dark:bg-slate-950"
         data-testid="email-view-empty"
       >
         <div className="text-center">
-          <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
-            <MessageSquare className="w-10 h-10 text-gray-600" />
+          <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-4">
+            <MessageSquare className="w-10 h-10 text-slate-400 dark:text-slate-600" />
           </div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
             Select an email to read
           </p>
         </div>
@@ -84,20 +84,20 @@ export function ReadingPane({ email, onClose }: ReadingPaneProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0F0F12] relative" data-testid="email-view-container">
+    <div className="flex-1 flex flex-col bg-white dark:bg-slate-950 relative" data-testid="email-view-container">
       <div
         className={cn(
-          "border-b border-white/5 transition-all duration-200",
-          isAnalystOpen ? "bg-white/[0.02]" : ""
+          "border-b pane-border transition-all duration-200",
+          isAnalystOpen ? "bg-slate-50 dark:bg-white/[0.02]" : ""
         )}
       >
         <button
           onClick={() => setIsAnalystOpen(!isAnalystOpen)}
-          className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-gray-400 hover:text-white transition-colors duration-200"
+          className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-200"
           data-testid="button-analyst-toggle"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-violet-400" />
+            <Sparkles className="w-4 h-4 text-violet-500 dark:text-violet-400" />
             <span>AI Analyst</span>
           </div>
           {isAnalystOpen ? (
@@ -114,38 +114,38 @@ export function ReadingPane({ email, onClose }: ReadingPaneProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleSummarize}
-                className="border-white/10 bg-white/5 text-white active-press"
+                className="pane-border bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white active-press"
                 data-testid="button-summarize"
               >
-                <Sparkles className="w-3.5 h-3.5 mr-1.5 text-violet-400" />
+                <Sparkles className="w-3.5 h-3.5 mr-1.5 text-violet-500 dark:text-violet-400" />
                 Summarize
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExtractTasks}
-                className="border-white/10 bg-white/5 text-white active-press"
+                className="pane-border bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white active-press"
                 data-testid="button-extract-tasks"
               >
-                <ListTodo className="w-3.5 h-3.5 mr-1.5 text-violet-400" />
+                <ListTodo className="w-3.5 h-3.5 mr-1.5 text-violet-500 dark:text-violet-400" />
                 Extract Tasks
               </Button>
             </div>
 
             {(email.summary || aiSummary) && (
-              <div className="p-4 rounded-lg glass-card">
-                <p className="text-xs font-medium text-gray-500 mb-2">Summary</p>
-                <p className="text-sm text-gray-300 leading-relaxed">{email.summary || aiSummary}</p>
+              <div className="p-4 rounded-lg bg-slate-100 dark:bg-slate-900 pane-border border">
+                <p className="text-xs font-medium text-slate-500 mb-2">Summary</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{email.summary || aiSummary}</p>
               </div>
             )}
 
             {aiTasks && (
-              <div className="p-4 rounded-lg glass-card">
-                <p className="text-xs font-medium text-gray-500 mb-3">Extracted Tasks</p>
+              <div className="p-4 rounded-lg bg-slate-100 dark:bg-slate-900 pane-border border">
+                <p className="text-xs font-medium text-slate-500 mb-3">Extracted Tasks</p>
                 <ul className="space-y-2">
                   {aiTasks.map((task, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
-                      <span className="w-5 h-5 rounded bg-violet-500/20 flex items-center justify-center text-xs font-medium text-violet-400 flex-shrink-0">
+                    <li key={i} className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+                      <span className="w-5 h-5 rounded bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-xs font-medium text-violet-600 dark:text-violet-400 flex-shrink-0">
                         {i + 1}
                       </span>
                       {task}
@@ -158,23 +158,23 @@ export function ReadingPane({ email, onClose }: ReadingPaneProps) {
         )}
       </div>
 
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-        <h2 className="text-lg font-semibold text-white truncate flex-1 mr-4">
+      <div className="flex items-center justify-between px-5 py-4 border-b pane-border">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white truncate flex-1 mr-4">
           {email.subject}
         </h2>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="text-gray-400 active-press" data-testid="button-reply">
+          <Button variant="ghost" size="icon" className="text-slate-500 dark:text-slate-400 active-press" data-testid="button-reply">
             <Reply className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-gray-400 active-press" data-testid="button-forward">
+          <Button variant="ghost" size="icon" className="text-slate-500 dark:text-slate-400 active-press" data-testid="button-forward">
             <Forward className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             className={cn(
-              "text-gray-400 hover:text-white hover:bg-white/5 active-press",
-              email.isOnline && "text-emerald-400"
+              "text-slate-500 dark:text-slate-400 active-press",
+              email.isOnline && "text-emerald-500 dark:text-emerald-400"
             )}
             data-testid="button-video-call"
           >
@@ -185,14 +185,14 @@ export function ReadingPane({ email, onClose }: ReadingPaneProps) {
             size="icon"
             onClick={() => setIsWhisperOpen(!isWhisperOpen)}
             className={cn(
-              "text-gray-400 hover:text-white hover:bg-white/5 active-press",
-              isWhisperOpen && "bg-violet-500/20 text-violet-400"
+              "text-slate-500 dark:text-slate-400 active-press",
+              isWhisperOpen && "bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400"
             )}
             data-testid="button-whisper-toggle"
           >
             <MessageSquare className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-gray-400 active-press" data-testid="button-more-options">
+          <Button variant="ghost" size="icon" className="text-slate-500 dark:text-slate-400 active-press" data-testid="button-more-options">
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </div>
@@ -209,31 +209,31 @@ export function ReadingPane({ email, onClose }: ReadingPaneProps) {
                 {email.sender.charAt(0).toUpperCase()}
               </div>
               {email.isOnline && (
-                <Circle className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 fill-emerald-400 text-emerald-400 stroke-[#0F0F12] stroke-2" />
+                <Circle className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 fill-emerald-400 text-emerald-400 stroke-white dark:stroke-slate-950 stroke-2" />
               )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-slate-900 dark:text-white">
                   {email.sender}
                 </span>
                 {email.isOnline && (
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                     Online
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 {email.senderEmail}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                 {format(new Date(email.timestamp), "MMMM d, yyyy 'at' h:mm a")}
               </p>
             </div>
           </div>
 
           <div
-            className="prose prose-invert prose-sm max-w-none prose-p:text-gray-300 prose-headings:text-white prose-a:text-violet-400"
+            className="prose prose-slate dark:prose-invert prose-sm max-w-none prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-headings:text-slate-900 dark:prose-headings:text-white prose-a:text-violet-600 dark:prose-a:text-violet-400"
             dangerouslySetInnerHTML={{ __html: email.body }}
             data-testid="email-body"
           />

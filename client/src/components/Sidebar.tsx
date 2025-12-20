@@ -24,12 +24,12 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className="flex flex-col w-[260px] h-full glass border-r border-white/5 flex-shrink-0"
+      className="flex flex-col w-[260px] h-full glass border-r pane-border flex-shrink-0 z-10"
       data-testid="sidebar-container"
     >
-      <div className="p-5 border-b border-white/5">
-        <h1 className="text-xl font-semibold text-white tracking-tight">
-          <span className="text-violet-400">i</span>.M
+      <div className="p-5 border-b pane-border">
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">
+          <span className="text-primary">i</span>.M
         </h1>
       </div>
       
@@ -44,20 +44,20 @@ export function Sidebar({
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 active-press",
                 isActive
-                  ? "bg-violet-500/15 text-white border-l-2 border-violet-500 -ml-[2px] pl-[14px]"
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  ? "bg-primary/10 text-slate-900 dark:text-white border-l-2 border-primary -ml-[2px] pl-[14px]"
+                  : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
               )}
               data-testid={`nav-${item.id}`}
             >
-              <Icon className={cn("w-4 h-4 flex-shrink-0", isActive && "text-violet-400")} />
+              <Icon className={cn("w-4 h-4 flex-shrink-0", isActive && "text-primary")} />
               <span className="flex-1 text-left">{item.label}</span>
               {item.count !== undefined && (
                 <span
                   className={cn(
                     "text-xs px-2 py-0.5 rounded-md font-medium",
                     isActive
-                      ? "bg-violet-500/20 text-violet-300"
-                      : "bg-white/5 text-gray-500"
+                      ? "bg-primary/20 text-primary"
+                      : "bg-slate-200 dark:bg-white/5 text-slate-500 dark:text-slate-500"
                   )}
                 >
                   {item.count}
@@ -68,11 +68,11 @@ export function Sidebar({
         })}
       </nav>
       
-      <div className="p-4 border-t border-white/5">
+      <div className="p-4 border-t pane-border">
         <div className="flex items-center gap-3 p-3 rounded-lg glass-card">
           <div className="flex items-center gap-2 flex-1">
-            <Video className="w-4 h-4 text-gray-400" />
-            <span className="text-sm font-medium text-gray-300">
+            <Video className="w-4 h-4 text-slate-400 dark:text-slate-400" />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Video Room
             </span>
           </div>
@@ -80,7 +80,7 @@ export function Sidebar({
             <Circle
               className={cn(
                 "w-2.5 h-2.5 fill-current transition-colors duration-200",
-                isOnline ? "text-emerald-400" : "text-gray-600"
+                isOnline ? "text-emerald-400" : "text-slate-400 dark:text-slate-600"
               )}
             />
             <Switch
@@ -90,7 +90,7 @@ export function Sidebar({
             />
           </div>
         </div>
-        <p className="text-xs text-gray-500 mt-2 text-center">
+        <p className="text-xs text-slate-500 mt-2 text-center">
           {isOnline ? "You're visible to clients" : "Offline mode"}
         </p>
       </div>
