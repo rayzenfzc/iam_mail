@@ -34,24 +34,16 @@ export function Composer({ isOpen, onClose }: ComposerProps) {
 
   const sendEmail = useMutation({
     mutationFn: async () => {
-      return apiRequest("POST", "/api/emails", {
-        sender: "You",
-        senderEmail: "you@company.com",
-        recipient: to,
-        recipientEmail: to,
+      return apiRequest("POST", "/api/smtp/send", {
+        to,
         subject,
-        body: `<p>${body.replace(/\n/g, "</p><p>")}</p>`,
-        preview: body.slice(0, 100),
-        isRead: true,
-        isStarred: false,
-        folder: "sent",
-        category: "focus",
-        isOnline: false,
-        hasQuoteOpen: false,
+        body: body,
+        html: `<p>${body.replace(/\n/g, "</p><p>")}</p>`,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/emails"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["/api/imap/emails"], exact: false });
       handleClose();
     },
   });
