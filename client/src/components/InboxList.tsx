@@ -116,7 +116,10 @@ interface EmailListItemProps {
 }
 
 function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
-  const timeAgo = formatDistanceToNow(new Date(email.timestamp), { addSuffix: true });
+  const emailDate = email.timestamp;
+  const timeAgo = emailDate 
+    ? formatDistanceToNow(new Date(emailDate), { addSuffix: true })
+    : "";
 
   return (
     <button
