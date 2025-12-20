@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { InboxList } from "@/components/InboxList";
 import { ReadingPane } from "@/components/ReadingPane";
-import { CommandBar } from "@/components/CommandBar";
+import { CommandBar, CommandBarRef } from "@/components/CommandBar";
 import { Composer } from "@/components/composer";
+import { useHotkeys } from "@/hooks/useHotkeys";
 import type { Email } from "@shared/schema";
 
 export default function Home() {
@@ -14,6 +15,16 @@ export default function Home() {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [useImap, setUseImap] = useState(true);
+  
+  const commandBarRef = useRef<CommandBarRef>(null);
+
+  useHotkeys([
+    { key: "k", ctrl: true, handler: () => commandBarRef.current?.focus() },
+    { key: "c", handler: () => setIsComposerOpen(true) },
+    { key: "e", handler: () => console.log("Archive action") },
+    { key: "r", handler: () => console.log("Reply action") },
+    { key: "f", handler: () => console.log("Forward action") },
+  ]);
 
   const { data: emails = [], isLoading, error } = useQuery<Email[]>({
     queryKey: [useImap ? "/api/imap/emails" : "/api/emails"],
@@ -50,7 +61,7 @@ export default function Home() {
         onClose={() => setSelectedEmailId(null)}
       />
 
-      <CommandBar onCompose={() => setIsComposerOpen(true)} />
+      <CommandBar ref={commandBarRef} onCompose={() => setIsComposerOpen(true)} />
 
       <Composer
         isOpen={isComposerOpen}
