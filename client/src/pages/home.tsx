@@ -38,7 +38,10 @@ export default function Home() {
   const selectedEmail = emails.find((e) => e.id === selectedEmailId);
 
   return (
-    <div className="flex h-screen w-full bg-[#0F0F12]" data-testid="main-container">
+    <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-950 transition-colors duration-300" data-testid="main-container">
+      <div className="desktop-bg" />
+      <div className="grain-overlay" />
+      
       <Sidebar
         activeFolder={activeFolder}
         onFolderChange={setActiveFolder}

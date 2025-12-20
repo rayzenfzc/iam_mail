@@ -1,5 +1,5 @@
 import { useState, forwardRef, useImperativeHandle, useRef } from "react";
-import { Search, Plus, Loader2 } from "lucide-react";
+import { Command, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CommandBarProps {
@@ -29,36 +29,40 @@ export const CommandBar = forwardRef<CommandBarRef, CommandBarProps>(function Co
 
   return (
     <div
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+      className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-lg px-6 z-50 pointer-events-none"
       data-testid="command-bar"
     >
       <div
         className={cn(
-          "flex items-center gap-2 bg-black/80 backdrop-blur-2xl rounded-full px-2 py-1.5 border border-white/10 transition-all duration-200",
-          isFocused && "ring-2 ring-violet-500/30 border-violet-500/30 glow-purple"
+          "pointer-events-auto glass-sexy rounded-full p-1.5 pl-7 flex items-center gap-4 transition-all duration-500",
+          isFocused && "ring-2 ring-primary/30"
         )}
         style={{
           boxShadow: isFocused 
-            ? "0 0 40px rgba(139, 92, 246, 0.2), 0 10px 40px rgba(0, 0, 0, 0.5)"
-            : "0 10px 40px rgba(0, 0, 0, 0.5)"
+            ? "0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.2)"
+            : undefined
         }}
       >
-        <form onSubmit={handleSearch} className="flex items-center">
-          <div className="flex items-center gap-2 px-3">
+        <form onSubmit={handleSearch} className="flex items-center flex-1">
+          <div className="flex items-center gap-3 flex-1">
             {isSearching ? (
-              <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
+              <Loader2 className="w-4 h-4 text-primary animate-spin" />
             ) : (
-              <Search className="w-4 h-4 text-gray-500" />
+              <Command size={16} className={cn(
+                "text-slate-400 dark:text-slate-500 transition-colors",
+                isFocused && "text-primary"
+              )} />
             )}
             <input
               ref={inputRef}
+              id="command-bar"
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder="Search with AI..."
-              className="w-64 bg-transparent text-sm text-white placeholder:text-gray-500 focus:outline-none"
+              placeholder="Synthesize command..."
+              className="flex-1 bg-transparent text-[14px] font-light outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 h-9"
               data-testid="input-search"
             />
           </div>
@@ -66,7 +70,7 @@ export const CommandBar = forwardRef<CommandBarRef, CommandBarProps>(function Co
 
         <button
           onClick={onCompose}
-          className="w-9 h-9 rounded-full bg-violet-500 flex items-center justify-center text-white transition-all duration-200 hover:bg-violet-400 active:scale-95 flex-shrink-0 glow-purple"
+          className="h-9 w-9 bg-slate-900 dark:bg-primary text-white rounded-full flex items-center justify-center hover:scale-105 active:scale-95 shadow-xl transition-all"
           data-testid="button-compose"
         >
           <Plus className="w-5 h-5" />
