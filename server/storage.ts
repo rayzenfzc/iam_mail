@@ -47,6 +47,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: true,
         hasQuoteOpen: true,
+        summary: "Partnership proposal for Q4 with 30% lead generation increase, dedicated account management, quarterly reviews, and priority support. Requests a 30-minute call this week.",
       },
       {
         id: "2",
@@ -65,6 +66,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: true,
         hasQuoteOpen: false,
+        summary: "Legal team reviewed contract renewal. Needs clarification on Tier 1 support response time guarantees to align with their internal SLAs.",
       },
       {
         id: "3",
@@ -83,6 +85,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: false,
         hasQuoteOpen: false,
+        summary: null,
       },
       {
         id: "4",
@@ -101,6 +104,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: false,
         hasQuoteOpen: false,
+        summary: "NextStep Ventures interested in Series A/B investment opportunity. Requests introductory call to discuss partnership.",
       },
       {
         id: "5",
@@ -119,6 +123,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: true,
         hasQuoteOpen: false,
+        summary: null,
       },
       {
         id: "6",
@@ -137,6 +142,7 @@ export class MemStorage implements IStorage {
         category: "other",
         isOnline: false,
         hasQuoteOpen: false,
+        summary: null,
       },
       {
         id: "7",
@@ -155,6 +161,7 @@ export class MemStorage implements IStorage {
         category: "other",
         isOnline: false,
         hasQuoteOpen: false,
+        summary: null,
       },
       {
         id: "8",
@@ -173,6 +180,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: false,
         hasQuoteOpen: true,
+        summary: null,
       },
       {
         id: "9",
@@ -191,6 +199,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: true,
         hasQuoteOpen: false,
+        summary: null,
       },
       {
         id: "10",
@@ -209,6 +218,7 @@ export class MemStorage implements IStorage {
         category: "focus",
         isOnline: false,
         hasQuoteOpen: false,
+        summary: null,
       },
     ];
 
@@ -282,6 +292,8 @@ export class MemStorage implements IStorage {
       ...insertEmail,
       id,
       timestamp: new Date(),
+      senderAvatar: insertEmail.senderAvatar ?? null,
+      summary: insertEmail.summary ?? null,
     };
     this.emails.set(id, email);
     return email;
@@ -307,6 +319,7 @@ export class MemStorage implements IStorage {
       ...insertComment,
       id,
       timestamp: new Date(),
+      authorAvatar: insertComment.authorAvatar ?? null,
     };
     this.comments.set(id, comment);
     return comment;

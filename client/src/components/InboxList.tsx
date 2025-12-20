@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Email } from "@shared/schema";
 
-interface EmailListProps {
+interface InboxListProps {
   emails: Email[];
   selectedEmailId: string | null;
   onSelectEmail: (id: string) => void;
@@ -13,17 +13,17 @@ interface EmailListProps {
   isLoading: boolean;
 }
 
-export function EmailList({
+export function InboxList({
   emails,
   selectedEmailId,
   onSelectEmail,
   activeCategory,
   onCategoryChange,
   isLoading,
-}: EmailListProps) {
+}: InboxListProps) {
   return (
     <div
-      className="flex flex-col w-[380px] h-full bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
+      className="flex flex-col w-[350px] h-full bg-[#f8fafc] dark:bg-slate-800 border-r border-[#e2e8f0] dark:border-slate-700 flex-shrink-0"
       data-testid="email-list-container"
     >
       <div className="flex items-center gap-1 p-3 border-b border-slate-200 dark:border-slate-700">
