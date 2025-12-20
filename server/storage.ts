@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Email, type InsertEmail, type Comment, type InsertComment } from "@shared/schema";
+import { type User, type InsertUser, type Email, type InsertEmail, type Comment, type InsertComment, type Snippet, type InsertSnippet } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -9,22 +9,28 @@ export interface IStorage {
   getEmails(): Promise<Email[]>;
   getEmailsByFolder(folder: string): Promise<Email[]>;
   getEmail(id: string): Promise<Email | undefined>;
+  getEmailByTrackingToken(token: string): Promise<Email | undefined>;
   createEmail(email: InsertEmail): Promise<Email>;
   updateEmail(id: string, updates: Partial<Email>): Promise<Email | undefined>;
   
   getCommentsByEmail(emailId: string): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
+  
+  getSnippets(): Promise<Snippet[]>;
+  createSnippet(snippet: InsertSnippet): Promise<Snippet>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private emails: Map<string, Email>;
   private comments: Map<string, Comment>;
+  private snippets: Map<string, Snippet>;
 
   constructor() {
     this.users = new Map();
     this.emails = new Map();
     this.comments = new Map();
+    this.snippets = new Map();
     this.seedMockData();
   }
 
@@ -48,6 +54,8 @@ export class MemStorage implements IStorage {
         isOnline: true,
         hasQuoteOpen: true,
         summary: "Partnership proposal for Q4 with 30% lead generation increase, dedicated account management, quarterly reviews, and priority support. Requests a 30-minute call this week.",
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "2",
@@ -67,6 +75,8 @@ export class MemStorage implements IStorage {
         isOnline: true,
         hasQuoteOpen: false,
         summary: "Legal team reviewed contract renewal. Needs clarification on Tier 1 support response time guarantees to align with their internal SLAs.",
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "3",
@@ -86,6 +96,8 @@ export class MemStorage implements IStorage {
         isOnline: false,
         hasQuoteOpen: false,
         summary: null,
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "4",
@@ -105,6 +117,8 @@ export class MemStorage implements IStorage {
         isOnline: false,
         hasQuoteOpen: false,
         summary: "NextStep Ventures interested in Series A/B investment opportunity. Requests introductory call to discuss partnership.",
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "5",
@@ -124,6 +138,8 @@ export class MemStorage implements IStorage {
         isOnline: true,
         hasQuoteOpen: false,
         summary: null,
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "6",
@@ -143,6 +159,8 @@ export class MemStorage implements IStorage {
         isOnline: false,
         hasQuoteOpen: false,
         summary: null,
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "7",
@@ -162,6 +180,8 @@ export class MemStorage implements IStorage {
         isOnline: false,
         hasQuoteOpen: false,
         summary: null,
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "8",
@@ -181,6 +201,8 @@ export class MemStorage implements IStorage {
         isOnline: false,
         hasQuoteOpen: true,
         summary: null,
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "9",
@@ -200,6 +222,8 @@ export class MemStorage implements IStorage {
         isOnline: true,
         hasQuoteOpen: false,
         summary: null,
+        trackingToken: null,
+        readAt: null,
       },
       {
         id: "10",
@@ -219,10 +243,21 @@ export class MemStorage implements IStorage {
         isOnline: false,
         hasQuoteOpen: false,
         summary: null,
+        trackingToken: null,
+        readAt: null,
       },
     ];
 
     mockEmails.forEach((email) => this.emails.set(email.id, email));
+    
+    const defaultSnippets: Snippet[] = [
+      { id: "s1", title: "Intro", shortcut: "intro", body: "Hi there,\n\nI hope this email finds you well. I wanted to reach out regarding..." },
+      { id: "s2", title: "Follow Up", shortcut: "followup", body: "I wanted to follow up on my previous email. Have you had a chance to review the information I sent?" },
+      { id: "s3", title: "Thanks", shortcut: "thanks", body: "Thank you for your time and consideration. Please let me know if you have any questions." },
+      { id: "s4", title: "Meeting Request", shortcut: "meeting", body: "Would you be available for a quick call this week? I'd love to discuss this further with you." },
+      { id: "s5", title: "Closing", shortcut: "close", body: "Best regards,\n\nLooking forward to hearing from you." },
+    ];
+    defaultSnippets.forEach((s) => this.snippets.set(s.id, s));
 
     const mockComments: Comment[] = [
       {
@@ -286,14 +321,32 @@ export class MemStorage implements IStorage {
     return this.emails.get(id);
   }
 
+  async getEmailByTrackingToken(token: string): Promise<Email | undefined> {
+    return Array.from(this.emails.values()).find((e) => e.trackingToken === token);
+  }
+
   async createEmail(insertEmail: InsertEmail): Promise<Email> {
     const id = randomUUID();
     const email: Email = {
-      ...insertEmail,
       id,
       timestamp: new Date(),
+      sender: insertEmail.sender,
+      senderEmail: insertEmail.senderEmail,
       senderAvatar: insertEmail.senderAvatar ?? null,
+      recipient: insertEmail.recipient,
+      recipientEmail: insertEmail.recipientEmail,
+      subject: insertEmail.subject,
+      body: insertEmail.body,
+      preview: insertEmail.preview,
+      isRead: insertEmail.isRead ?? false,
+      isStarred: insertEmail.isStarred ?? false,
+      folder: insertEmail.folder ?? "inbox",
+      category: insertEmail.category ?? "focus",
+      isOnline: insertEmail.isOnline ?? false,
+      hasQuoteOpen: insertEmail.hasQuoteOpen ?? false,
       summary: insertEmail.summary ?? null,
+      trackingToken: insertEmail.trackingToken ?? null,
+      readAt: insertEmail.readAt ?? null,
     };
     this.emails.set(id, email);
     return email;
@@ -323,6 +376,17 @@ export class MemStorage implements IStorage {
     };
     this.comments.set(id, comment);
     return comment;
+  }
+
+  async getSnippets(): Promise<Snippet[]> {
+    return Array.from(this.snippets.values());
+  }
+
+  async createSnippet(insertSnippet: InsertSnippet): Promise<Snippet> {
+    const id = randomUUID();
+    const snippet: Snippet = { ...insertSnippet, id };
+    this.snippets.set(id, snippet);
+    return snippet;
   }
 }
 

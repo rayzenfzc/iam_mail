@@ -185,6 +185,11 @@ export async function registerRoutes(
       return res.status(400).json({ error: "Missing required fields: to, subject" });
     }
 
+    const trackingToken = require("crypto").randomUUID();
+    const baseUrl = process.env.BASE_URL || `https://${req.get("host")}`;
+    const trackingPixel = `<img src="${baseUrl}/api/track?id=${trackingToken}" width="1" height="1" style="display:none" alt="" />`;
+    const htmlWithTracking = (html || `<p>${body.replace(/\n/g, "</p><p>")}</p>`) + trackingPixel;
+
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port: parseInt(SMTP_PORT || "587"),
@@ -201,7 +206,21 @@ export async function registerRoutes(
         to,
         subject,
         text: body,
-        html: html || body,
+        html: htmlWithTracking,
+      });
+
+      await storage.createEmail({
+        sender: "You",
+        senderEmail: SMTP_USER,
+        recipient: to.split("@")[0] || to,
+        recipientEmail: to,
+        subject,
+        body: htmlWithTracking,
+        preview: body.slice(0, 150),
+        folder: "sent",
+        category: "focus",
+        isRead: true,
+        trackingToken,
       });
 
       res.json({ 
@@ -215,6 +234,38 @@ export async function registerRoutes(
         error: "Failed to send email",
         message: error.message || "Unknown error"
       });
+    }
+  });
+
+  const TRANSPARENT_PNG = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+    "base64"
+  );
+
+  app.get("/api/track", async (req, res) => {
+    const token = req.query.id as string;
+    if (token && token.length >= 32) {
+      const email = await storage.getEmailByTrackingToken(token);
+      if (email && !email.readAt) {
+        await storage.updateEmail(email.id, { readAt: new Date() });
+      }
+    }
+    res.set({
+      "Content-Type": "image/png",
+      "Content-Length": TRANSPARENT_PNG.length,
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+    });
+    res.send(TRANSPARENT_PNG);
+  });
+
+  app.get("/api/snippets", async (req, res) => {
+    try {
+      const snippets = await storage.getSnippets();
+      res.json(snippets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch snippets" });
     }
   });
 
