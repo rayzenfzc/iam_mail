@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { Search, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -6,10 +6,19 @@ interface CommandBarProps {
   onCompose: () => void;
 }
 
-export function CommandBar({ onCompose }: CommandBarProps) {
+export interface CommandBarRef {
+  focus: () => void;
+}
+
+export const CommandBar = forwardRef<CommandBarRef, CommandBarProps>(function CommandBar({ onCompose }, ref) {
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+  }));
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +46,7 @@ export function CommandBar({ onCompose }: CommandBarProps) {
               <Search className="w-4 h-4 text-slate-400" />
             )}
             <input
+              ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -59,4 +69,4 @@ export function CommandBar({ onCompose }: CommandBarProps) {
       </div>
     </div>
   );
-}
+});

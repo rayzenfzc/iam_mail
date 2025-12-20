@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { Circle, FileText, AlertTriangle } from "lucide-react";
+import { Circle, FileText, AlertTriangle, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Email } from "@shared/schema";
@@ -155,6 +155,9 @@ function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
               {email.sender}
             </span>
             <div className="flex items-center gap-1.5 flex-shrink-0">
+              {email.folder === "sent" && email.readAt && (
+                <CheckCheck className="w-3.5 h-3.5 text-green-500" data-testid={`read-receipt-${email.id}`} />
+              )}
               {email.hasQuoteOpen && (
                 <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium">
                   Quote Open
