@@ -28,7 +28,7 @@ export function Sidebar({
       data-testid="sidebar-container"
     >
       <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">i>M</h1>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">I AM MAIL</h1>
       </div>
       <nav className="flex-1 p-2" data-testid="nav-container">
         {navItems.map((item) => {
