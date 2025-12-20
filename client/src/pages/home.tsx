@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { MailSidebar } from "@/components/mail-sidebar";
-import { EmailList } from "@/components/email-list";
-import { EmailView } from "@/components/email-view";
-import { CommandBar } from "@/components/command-bar";
+import { Sidebar } from "@/components/Sidebar";
+import { InboxList } from "@/components/InboxList";
+import { ReadingPane } from "@/components/ReadingPane";
+import { CommandBar } from "@/components/CommandBar";
 import { Composer } from "@/components/composer";
 import type { Email } from "@shared/schema";
 
@@ -26,14 +26,14 @@ export default function Home() {
 
   return (
     <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-900" data-testid="main-container">
-      <MailSidebar
+      <Sidebar
         activeFolder={activeFolder}
         onFolderChange={setActiveFolder}
         isOnline={isOnline}
         onToggleOnline={() => setIsOnline(!isOnline)}
       />
 
-      <EmailList
+      <InboxList
         emails={filteredEmails}
         selectedEmailId={selectedEmailId}
         onSelectEmail={setSelectedEmailId}
@@ -42,7 +42,7 @@ export default function Home() {
         isLoading={isLoading}
       />
 
-      <EmailView
+      <ReadingPane
         email={selectedEmail}
         onClose={() => setSelectedEmailId(null)}
       />

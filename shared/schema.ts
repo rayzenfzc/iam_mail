@@ -35,6 +35,7 @@ export const emails = pgTable("emails", {
   category: text("category").notNull().default("focus"),
   isOnline: boolean("is_online").notNull().default(false),
   hasQuoteOpen: boolean("has_quote_open").notNull().default(false),
+  summary: text("summary"),
 });
 
 export const insertEmailSchema = createInsertSchema(emails).omit({

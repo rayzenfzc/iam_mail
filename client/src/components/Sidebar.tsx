@@ -2,7 +2,7 @@ import { Inbox, Send, FileText, Shield, Video, Circle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-interface MailSidebarProps {
+interface SidebarProps {
   activeFolder: string;
   onFolderChange: (folder: string) => void;
   isOnline: boolean;
@@ -16,15 +16,15 @@ const navItems = [
   { id: "shield", label: "The Shield", icon: Shield, count: 5 },
 ];
 
-export function MailSidebar({
+export function Sidebar({
   activeFolder,
   onFolderChange,
   isOnline,
   onToggleOnline,
-}: MailSidebarProps) {
+}: SidebarProps) {
   return (
     <aside
-      className="flex flex-col w-[260px] h-full bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
+      className="flex flex-col w-[260px] h-full bg-[#f8fafc] dark:bg-slate-800 border-r border-[#e2e8f0] dark:border-slate-700 flex-shrink-0"
       data-testid="sidebar-container"
     >
       <div className="p-4 border-b border-slate-200 dark:border-slate-700">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import {
   Reply,
@@ -18,16 +18,26 @@ import { cn } from "@/lib/utils";
 import { WhisperPanel } from "@/components/whisper-panel";
 import type { Email } from "@shared/schema";
 
-interface EmailViewProps {
+interface ReadingPaneProps {
   email: Email | undefined;
   onClose: () => void;
 }
 
-export function EmailView({ email, onClose }: EmailViewProps) {
+export function ReadingPane({ email, onClose }: ReadingPaneProps) {
   const [isAnalystOpen, setIsAnalystOpen] = useState(false);
   const [isWhisperOpen, setIsWhisperOpen] = useState(false);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiTasks, setAiTasks] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    if (email?.summary) {
+      setIsAnalystOpen(true);
+    } else {
+      setIsAnalystOpen(false);
+    }
+    setAiSummary(null);
+    setAiTasks(null);
+  }, [email?.id]);
 
   if (!email) {
     return (
@@ -109,10 +119,10 @@ export function EmailView({ email, onClose }: EmailViewProps) {
               </Button>
             </div>
 
-            {aiSummary && (
+            {(email.summary || aiSummary) && (
               <div className="p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600">
                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Summary</p>
-                <p className="text-sm text-slate-700 dark:text-slate-300">{aiSummary}</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">{email.summary || aiSummary}</p>
               </div>
             )}
 
