@@ -133,15 +133,14 @@ export async function registerRoutes(
           const flags = message.flags || new Set<string>();
           
           const fromAddr = parsed.from?.value?.[0];
-          const toAddresses = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
-          const toAddr = toAddresses?.value?.[0];
+          const toAddrObj = Array.isArray(parsed.to) ? parsed.to[0]?.value?.[0] : parsed.to?.value?.[0];
           
           emails.push({
             id: message.uid.toString(),
             sender: fromAddr?.name || fromAddr?.address || "Unknown",
             senderEmail: fromAddr?.address || "",
-            recipient: toAddr?.name || toAddr?.address || "",
-            recipientEmail: toAddr?.address || "",
+            recipient: toAddrObj?.name || toAddrObj?.address || "",
+            recipientEmail: toAddrObj?.address || "",
             subject: parsed.subject || "(No Subject)",
             preview: (parsed.text || "").slice(0, 150).replace(/\n/g, " "),
             body: parsed.html || parsed.textAsHtml || `<p>${parsed.text || ""}</p>`,
