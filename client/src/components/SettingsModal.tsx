@@ -88,8 +88,10 @@ export function SettingsModal({ isOpen, onClose, isDarkMode }: SettingsModalProp
         setIsTestingConnection(true);
         setTestResult(null);
 
+        const API_URL = import.meta.env.VITE_API_URL || '';
+
         try {
-            const response = await fetch('/api/email/test-connection', {
+            const response = await fetch(`${API_URL}/api/email/test-connection`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -119,8 +121,10 @@ export function SettingsModal({ isOpen, onClose, isDarkMode }: SettingsModalProp
     const handleSave = async () => {
         setIsSaving(true);
 
+        const API_URL = import.meta.env.VITE_API_URL || '';
+
         try {
-            const response = await fetch('/api/email/save-config', {
+            const response = await fetch(`${API_URL}/api/email/save-config`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -272,8 +276,8 @@ export function SettingsModal({ isOpen, onClose, isDarkMode }: SettingsModalProp
                     {/* Test Result */}
                     {testResult && (
                         <div className={`p-4 rounded-xl flex items-center gap-3 ${testResult.success
-                                ? 'bg-green-500/10 border border-green-500/20'
-                                : 'bg-red-500/10 border border-red-500/20'
+                            ? 'bg-green-500/10 border border-green-500/20'
+                            : 'bg-red-500/10 border border-red-500/20'
                             }`}>
                             {testResult.success ? (
                                 <Check size={20} className="text-green-500" />
