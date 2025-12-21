@@ -94,6 +94,7 @@ const ThreePaneLayout: React.FC<ThreePaneLayoutProps> = ({ isDarkMode, toggleThe
     const [isIntelligenceOpen, setIsIntelligenceOpen] = useState(false);
     const [isBriefingLoading, setIsBriefingLoading] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isLoadingEmails, setIsLoadingEmails] = useState(false);
 
     // Tab counts
     const [focusCount, setFocusCount] = useState(0);
@@ -107,6 +108,33 @@ const ThreePaneLayout: React.FC<ThreePaneLayoutProps> = ({ isDarkMode, toggleThe
     const composerRef = useRef<HTMLTextAreaElement>(null);
 
     const audioContextRef = useRef<AudioContext | null>(null);
+
+    const API_URL = import.meta.env.VITE_API_URL || '';
+
+    // Fetch real emails from API on mount
+    useEffect(() => {
+        const fetchEmails = async () => {
+            setIsLoadingEmails(true);
+            try {
+                const response = await fetch(`${API_URL}/api/emails/imap?limit=50`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        setEmails(data);
+                        console.log(`Loaded ${data.length} real emails from IMAP`);
+                    }
+                } else {
+                    console.log('Could not fetch real emails, using mock data');
+                }
+            } catch (error) {
+                console.log('Email fetch failed, using mock data:', error);
+            } finally {
+                setIsLoadingEmails(false);
+            }
+        };
+
+        fetchEmails();
+    }, [API_URL]);
 
     // Update counts whenever emails change
     useEffect(() => {

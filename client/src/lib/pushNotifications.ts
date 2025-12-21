@@ -4,11 +4,13 @@ export async function subscribeToPushNotifications() {
         return false;
     }
 
+    const API_URL = import.meta.env.VITE_API_URL || '';
+
     try {
         const registration = await navigator.serviceWorker.ready;
 
         // Get the VAPID public key from the server
-        const response = await fetch('/api/notifications/vapid-public-key');
+        const response = await fetch(`${API_URL}/api/notifications/vapid-public-key`);
         const { publicKey } = await response.json();
 
         const convertedVapidKey = urlBase64ToUint8Array(publicKey);
@@ -19,7 +21,7 @@ export async function subscribeToPushNotifications() {
         });
 
         // Send the subscription to the server
-        await fetch('/api/notifications/subscribe', {
+        await fetch(`${API_URL}/api/notifications/subscribe`, {
             method: 'POST',
             body: JSON.stringify(subscription),
             headers: {
