@@ -1,13 +1,11 @@
-```typescript
 import express, { type Request, Response, NextFunction } from "express";
-import fs from "fs";
-import path from "path";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { serveStatic } from "./static";
 import { createServer } from "http";
 import cors from "cors";
 
 const app = express();
+
 // CORS configuration - allow Firebase hosting and localhost
 app.use(cors({
   origin: [
@@ -20,6 +18,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 const httpServer = createServer(app);
 
 declare module "http" {
@@ -46,7 +45,7 @@ export function log(message: string, source = "express") {
     hour12: true,
   });
 
-  console.log(`${ formattedTime } [${ source }] ${ message } `);
+  console.log(`${formattedTime} [${source}] ${message} `);
 }
 
 app.use((req, res, next) => {
@@ -63,9 +62,9 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${ req.method } ${ path } ${ res.statusCode } in ${ duration } ms`;
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration} ms`;
       if (capturedJsonResponse) {
-        logLine += ` :: ${ JSON.stringify(capturedJsonResponse) } `;
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)} `;
       }
 
       log(logLine);
@@ -107,7 +106,7 @@ app.use((req, res, next) => {
       host: "0.0.0.0",
     },
     () => {
-      log(`serving on port ${ port } `);
+      log(`serving on port ${port} `);
     },
   );
 })();
