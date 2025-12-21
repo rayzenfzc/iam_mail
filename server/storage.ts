@@ -5,17 +5,17 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   getEmails(): Promise<Email[]>;
   getEmailsByFolder(folder: string): Promise<Email[]>;
   getEmail(id: string): Promise<Email | undefined>;
   getEmailByTrackingToken(token: string): Promise<Email | undefined>;
   createEmail(email: InsertEmail): Promise<Email>;
   updateEmail(id: string, updates: Partial<Email>): Promise<Email | undefined>;
-  
+
   getCommentsByEmail(emailId: string): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
-  
+
   getSnippets(): Promise<Snippet[]>;
   createSnippet(snippet: InsertSnippet): Promise<Snippet>;
 }
@@ -249,7 +249,7 @@ export class MemStorage implements IStorage {
     ];
 
     mockEmails.forEach((email) => this.emails.set(email.id, email));
-    
+
     const defaultSnippets: Snippet[] = [
       { id: "s1", title: "Intro", shortcut: "intro", body: "Hi there,\n\nI hope this email finds you well. I wanted to reach out regarding..." },
       { id: "s2", title: "Follow Up", shortcut: "followup", body: "I wanted to follow up on my previous email. Have you had a chance to review the information I sent?" },
@@ -347,6 +347,9 @@ export class MemStorage implements IStorage {
       summary: insertEmail.summary ?? null,
       trackingToken: insertEmail.trackingToken ?? null,
       readAt: insertEmail.readAt ?? null,
+      readCount: insertEmail.readCount ?? 0,
+      userAgent: insertEmail.userAgent ?? null,
+      ip: insertEmail.ip ?? null,
     };
     this.emails.set(id, email);
     return email;

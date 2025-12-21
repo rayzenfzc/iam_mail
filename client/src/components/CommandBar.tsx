@@ -1,6 +1,15 @@
-import { useState, forwardRef, useImperativeHandle, useRef } from "react";
-import { Command, Plus, Loader2 } from "lucide-react";
+import { useState, forwardRef, useImperativeHandle, useRef, useEffect } from "react";
+import { Plus, Search, Mail, Clock, Calendar, Archive, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+} from "@/components/ui/command";
 
 interface CommandBarProps {
   onCompose: () => void;
@@ -11,70 +20,80 @@ export interface CommandBarRef {
 }
 
 export const CommandBar = forwardRef<CommandBarRef, CommandBarProps>(function CommandBar({ onCompose }, ref) {
-  const [query, setQuery] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+  const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useImperativeHandle(ref, () => ({
-    focus: () => inputRef.current?.focus(),
+    focus: () => {
+      inputRef.current?.focus();
+      setOpen(true);
+    },
   }));
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    setIsSearching(true);
-    setTimeout(() => setIsSearching(false), 1500);
-  };
 
   return (
     <div
-      className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-lg px-6 z-50 pointer-events-none"
+      className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-lg z-50 px-4"
       data-testid="command-bar"
     >
-      <div
-        className={cn(
-          "pointer-events-auto glass-sexy rounded-full p-1.5 pl-7 flex items-center gap-4 transition-all duration-500",
-          isFocused && "ring-2 ring-primary/30"
-        )}
-        style={{
-          boxShadow: isFocused 
-            ? "0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.2)"
-            : undefined
-        }}
-      >
-        <form onSubmit={handleSearch} className="flex items-center flex-1">
-          <div className="flex items-center gap-3 flex-1">
-            {isSearching ? (
-              <Loader2 className="w-4 h-4 text-primary animate-spin" />
-            ) : (
-              <Command size={16} className={cn(
-                "text-slate-400 dark:text-slate-500 transition-colors",
-                isFocused && "text-primary"
-              )} />
-            )}
-            <input
-              ref={inputRef}
-              id="command-bar"
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              placeholder="Synthesize command..."
-              className="flex-1 bg-transparent text-[14px] font-light outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 h-9"
-              data-testid="input-search"
-            />
+      <div className="relative">
+        {open && (
+          <div className="absolute bottom-full left-0 w-full mb-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+            <Command className="bg-transparent border-none">
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup heading="Actions">
+                  <CommandItem onSelect={() => console.log("Snooze")}>
+                    <Clock className="mr-2 h-4 w-4" />
+                    <span>Snooze 3h</span>
+                    <CommandShortcut>⌘S</CommandShortcut>
+                  </CommandItem>
+                  <CommandItem onSelect={() => console.log("Remind")}>
+                    <Calendar className="mr-2 h-4 w-4" />
+                    <span>Remind tomorrow 9am</span>
+                    <CommandShortcut>⌘R</CommandShortcut>
+                  </CommandItem>
+                  <CommandItem onSelect={() => console.log("Archive All")}>
+                    <Archive className="mr-2 h-4 w-4" />
+                    <span>Archive all from newsletters</span>
+                  </CommandItem>
+                </CommandGroup>
+                <CommandGroup heading="Navigation">
+                  <CommandItem onSelect={onCompose}>
+                    <Mail className="mr-2 h-4 w-4" />
+                    <span>Compose new email</span>
+                    <CommandShortcut>C</CommandShortcut>
+                  </CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </Command>
           </div>
-        </form>
+        )}
 
-        <button
-          onClick={onCompose}
-          className="h-9 w-9 bg-slate-900 dark:bg-primary text-white rounded-full flex items-center justify-center hover:scale-105 active:scale-95 shadow-xl transition-all"
-          data-testid="button-compose"
+        <div
+          className={cn(
+            "glass-sexy rounded-full p-1.5 pl-5 flex items-center gap-2 transition-all duration-500",
+            open ? "ring-2 ring-primary/30 shadow-[0_8px_32px_rgba(0,0,0,0.15)]" : "shadow-xl"
+          )}
         >
-          <Plus className="w-5 h-5" />
-        </button>
+          <Search className={cn("w-4 h-4 text-slate-400 dark:text-slate-500 transition-colors", open && "text-primary")} />
+          <Command className="bg-transparent border-none flex-1">
+            <CommandInput
+              ref={inputRef}
+              placeholder="Synthesize command..."
+              className="h-9 border-none focus:ring-0 text-[14px] font-light bg-transparent"
+              onFocus={() => setOpen(true)}
+              onBlur={() => setTimeout(() => setOpen(false), 200)} // Delay to allow click
+            />
+          </Command>
+
+          <button
+            onClick={onCompose}
+            className="h-9 w-9 bg-slate-900 dark:bg-primary text-white rounded-full flex items-center justify-center hover:scale-105 active:scale-95 shadow-lg transition-all flex-shrink-0"
+            data-testid="button-compose"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );

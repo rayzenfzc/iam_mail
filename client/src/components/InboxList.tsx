@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
-import { Circle, FileText, AlertTriangle, CheckCheck } from "lucide-react";
+import { Circle, FileText, AlertTriangle, CheckCheck, Archive } from "lucide-react";
+import { useSwipeable } from "react-swipeable";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Email } from "@shared/schema";
@@ -16,7 +17,7 @@ interface InboxListProps {
 
 const avatarGradients = [
   "gradient-avatar",
-  "gradient-avatar-alt", 
+  "gradient-avatar-alt",
   "gradient-avatar-green",
 ];
 
@@ -124,80 +125,96 @@ interface EmailListItemProps {
   onSelect: () => void;
 }
 
+// ... imports moved to top ...
+
 function EmailListItem({ email, isSelected, onSelect }: EmailListItemProps) {
   const emailDate = email.timestamp;
-  const timeAgo = emailDate 
+  const timeAgo = emailDate
     ? formatDistanceToNow(new Date(emailDate), { addSuffix: true })
     : "";
 
-  return (
-    <button
-      onClick={onSelect}
-      className={cn(
-        "w-full text-left p-4 rounded-lg transition-all duration-200 active-press group",
-        isSelected 
-          ? "bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[14px]" 
-          : "hover:bg-slate-100 dark:hover:bg-white/[0.03] border-l-2 border-transparent",
-        !email.isRead && !isSelected && "bg-slate-50 dark:bg-white/[0.02]"
-      )}
-      data-testid={`email-item-${email.id}`}
-    >
-      <div className="flex items-start gap-3">
-        <div className="relative flex-shrink-0">
-          <div className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold",
-            getAvatarGradient(email.sender)
-          )}>
-            {email.sender.charAt(0).toUpperCase()}
-          </div>
-          {email.isOnline && (
-            <Circle className="absolute -bottom-0.5 -right-0.5 w-3 h-3 fill-emerald-400 text-emerald-400 stroke-white dark:stroke-slate-950 stroke-2" />
-          )}
-        </div>
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+      console.log("Archive", email.id);
+      // Logic to archive would go here, probably passed via props
+    },
+    trackMouse: true
+  });
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <span
+  return (
+    <div {...handlers} className="relative overflow-hidden group">
+      <div className="absolute inset-y-0 right-0 w-16 bg-red-500 flex items-center justify-center translate-x-full transition-transform group-hover:translate-x-0">
+        <Archive className="text-white w-5 h-5" />
+      </div>
+      <button
+        onClick={onSelect}
+        className={cn(
+          "w-full text-left p-4 rounded-lg transition-all duration-200 active-press relative z-10 bg-white dark:bg-slate-950",
+          isSelected
+            ? "bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[14px]"
+            : "hover:bg-slate-100 dark:hover:bg-white/[0.03] border-l-2 border-transparent",
+          !email.isRead && !isSelected && "bg-slate-50 dark:bg-white/[0.02]"
+        )}
+        data-testid={`email-item-${email.id}`}
+      >
+        {/* ... existing content ... */}
+        <div className="flex items-start gap-3">
+          <div className="relative flex-shrink-0">
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold",
+              getAvatarGradient(email.sender)
+            )}>
+              {email.sender.charAt(0).toUpperCase()}
+            </div>
+            {email.isOnline && (
+              <Circle className="absolute -bottom-0.5 -right-0.5 w-3 h-3 fill-emerald-400 text-emerald-400 stroke-white dark:stroke-slate-950 stroke-2" />
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span
+                className={cn(
+                  "text-sm truncate",
+                  !email.isRead
+                    ? "font-semibold text-slate-900 dark:text-white"
+                    : "font-medium text-slate-700 dark:text-slate-300"
+                )}
+              >
+                {email.sender}
+              </span>
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                {email.folder === "sent" && email.readAt && (
+                  <CheckCheck className="w-3.5 h-3.5 text-emerald-400" data-testid={`read-receipt-${email.id}`} />
+                )}
+                {email.hasQuoteOpen && (
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500 dark:text-amber-400 font-medium">
+                    Quote
+                  </span>
+                )}
+                <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
+                  {timeAgo.replace(" ago", "")}
+                </span>
+              </div>
+            </div>
+
+            <p
               className={cn(
-                "text-sm truncate",
+                "text-sm truncate mb-1",
                 !email.isRead
-                  ? "font-semibold text-slate-900 dark:text-white"
-                  : "font-medium text-slate-700 dark:text-slate-300"
+                  ? "text-slate-700 dark:text-slate-200"
+                  : "text-slate-500 dark:text-slate-400"
               )}
             >
-              {email.sender}
-            </span>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              {email.folder === "sent" && email.readAt && (
-                <CheckCheck className="w-3.5 h-3.5 text-emerald-400" data-testid={`read-receipt-${email.id}`} />
-              )}
-              {email.hasQuoteOpen && (
-                <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500 dark:text-amber-400 font-medium">
-                  Quote
-                </span>
-              )}
-              <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
-                {timeAgo.replace(" ago", "")}
-              </span>
-            </div>
+              {email.subject}
+            </p>
+
+            <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
+              {email.preview}
+            </p>
           </div>
-
-          <p
-            className={cn(
-              "text-sm truncate mb-1",
-              !email.isRead
-                ? "text-slate-700 dark:text-slate-200"
-                : "text-slate-500 dark:text-slate-400"
-            )}
-          >
-            {email.subject}
-          </p>
-
-          <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
-            {email.preview}
-          </p>
         </div>
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, boolean, timestamp, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -38,6 +38,9 @@ export const emails = pgTable("emails", {
   summary: text("summary"),
   trackingToken: text("tracking_token"),
   readAt: timestamp("read_at"),
+  readCount: integer("read_count").default(0),
+  userAgent: text("user_agent"),
+  ip: text("ip"),
 });
 
 // Snippets table for email templates
