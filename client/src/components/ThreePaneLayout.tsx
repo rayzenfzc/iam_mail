@@ -77,7 +77,7 @@ const EmailItem = ({ email, selectedEmail, setSelectedEmail }: { email: Email, s
             <div className={`absolute left-0 top-0 bottom-0 w-1 animate-neural ${email.category === 'focus' ? 'bg-accent' : 'bg-slate-200 dark:bg-slate-800'}`}></div>
             <div className="flex justify-between items-start mb-4">
                 <span className={`text-[12px] uppercase tracking-[0.2em] font-bold ${!email.isRead ? 'text-slate-800 dark:text-slate-100' : 'text-slate-500'}`}>{email.sender}</span>
-                <span className="text-[10px] text-slate-400 font-bold uppercase">{email.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="text-[10px] text-slate-400 font-bold uppercase">{new Date(email.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <h4 className={`text-[17px] mb-3 line-clamp-1 ${!email.isRead ? 'font-bold text-slate-800 dark:text-white' : 'font-light text-slate-600 dark:text-slate-400'}`}>{email.subject}</h4>
             <p className="text-[14px] text-slate-500 dark:text-slate-400 line-clamp-2 font-light leading-relaxed mb-4">{email.snippet}</p>
