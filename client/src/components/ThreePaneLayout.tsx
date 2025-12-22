@@ -116,7 +116,7 @@ const ThreePaneLayout: React.FC<ThreePaneLayoutProps> = ({ isDarkMode, toggleThe
         const fetchEmails = async () => {
             setIsLoadingEmails(true);
             try {
-                const response = await fetch(`${API_URL}/api/emails/imap?limit=50`);
+                const response = await fetch(`${API_URL}/api/imap/emails?limit=50`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.length > 0) {
