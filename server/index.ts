@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
@@ -11,6 +12,7 @@ app.use(cors({
   origin: [
     'https://iammail-a2c4d.web.app',
     'https://iammail-a2c4d.firebaseapp.com',
+    'https://api.iammail.cloud',
     'http://localhost:5001',
     'http://localhost:5173'
   ],
