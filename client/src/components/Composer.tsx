@@ -2,11 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
     X, Paperclip, Send, Sparkles, Mic, UserPlus, ArrowUp,
     CornerDownLeft, RefreshCw, Check, Trash2, Maximize2, Minimize2,
-    ChevronUp, ChevronDown, AlignLeft, Bot, AtSign, Link, Loader2
+    ChevronUp, ChevronDown, AlignLeft, Bot, AtSign, Link, Loader2,
+    Plus, Image, FileText, MessageSquare, Edit3
 } from 'lucide-react';
 
 // --- Types ---
 export type ComposerMode = 'new' | 'reply' | 'forward';
+type ComposeView = 'manual' | 'ai';
 
 interface ComposerProps {
     isOpen: boolean;
@@ -63,41 +65,62 @@ const Composer: React.FC<ComposerProps> = ({
     initialData,
     onSend
 }) => {
-    // --- State ---
-    const [input, setInput] = useState('');
+    // --- View Mode ---
+    const [composeView, setComposeView] = useState<ComposeView>('manual');
+
+    // --- Email Draft State (shared between both views) ---
+    const [to, setTo] = useState(initialData?.to || '');
+    const [cc, setCc] = useState('');
+    const [bcc, setBcc] = useState('');
+    const [subject, setSubject] = useState(initialData?.subject || '');
+    const [body, setBody] = useState(initialData?.body || '');
+    const [showCcBcc, setShowCcBcc] = useState(false);
+    const [enableTracking, setEnableTracking] = useState(true);
+
+    // AI Chat State
+    const [aiInput, setAiInput] = useState('');
     const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false);
-    const [isListening, setIsListening] = useState(false);
+
+    // Contact Suggestions
+    const [showContacts, setShowContacts] = useState(false);
+    const [contactQuery, setContactQuery] = useState('');
+
+    // Sending State
+    const [isSending, setIsSending] = useState(false);
+    const [sendError, setSendError] = useState('');
 
     // Refs
+    const toInputRef = useRef<HTMLInputElement>(null);
+    const bodyRef = useRef<HTMLTextAreaElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const aiInputRef = useRef<HTMLInputElement>(null);
 
     // --- Init ---
     useEffect(() => {
         if (isOpen) {
-            // Initial Greeting
+            setTo(initialData?.to || '');
+            setSubject(initialData?.subject || '');
+            setBody(initialData?.body || '');
+            setSendError('');
+
+            // Initialize AI chat
             const greeting = mode === 'new'
-                ? "Ready to compose. Who are we emailing, or paste rough notes?"
+                ? "Ready to compose. Who are we emailing, or describe what you want to write?"
                 : `Replying to "${initialData?.subject}". What would you like to say?`;
+            setMessages([{ id: 'init', role: 'ai', text: greeting }]);
 
-            setMessages([{
-                id: 'init',
-                role: 'ai',
-                text: greeting
-            }]);
-
-            // If reply, preload context
-            if (mode === 'reply' || mode === 'forward') {
-                // We don't auto-create a draft yet, we wait for user intent
-            }
-        } else {
-            setMessages([]);
-            setInput('');
+            // Focus based on view
+            setTimeout(() => {
+                if (composeView === 'manual') {
+                    toInputRef.current?.focus();
+                } else {
+                    aiInputRef.current?.focus();
+                }
+            }, 100);
         }
-    }, [isOpen, mode, initialData]);
+    }, [isOpen, initialData, mode]);
 
-    // Auto-scroll
+    // Auto-scroll AI messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
@@ -111,38 +134,32 @@ const Composer: React.FC<ComposerProps> = ({
         };
     };
 
-    // --- AI Core: Use Backend API ---
+    // --- AI Chat Processing ---
     const processAICommand = async (userText: string) => {
-        // 1. Add User Message
         const userMsgId = Date.now().toString();
         setMessages(prev => [...prev, { id: userMsgId, role: 'user', text: userText }]);
-        setInput('');
+        setAiInput('');
 
-        // 2. Add AI Typing Indicator
         const typingId = 'typing-' + Date.now();
         setMessages(prev => [...prev, { id: typingId, role: 'ai', isTyping: true }]);
 
         try {
-            // Call backend /api/ai/compose
             const response = await fetch(`${API_URL}/api/ai/compose`, {
                 method: 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify({
                     context: userText,
-                    to: initialData?.to,
-                    subject: initialData?.subject,
+                    to: to || initialData?.to,
+                    subject: subject || initialData?.subject,
                     tone: 'professional',
                     length: 'medium'
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('AI composition failed');
-            }
+            if (!response.ok) throw new Error('AI composition failed');
 
             const data = await response.json();
 
-            // 3. Update Messages with AI response
             setMessages(prev => {
                 const filtered = prev.filter(m => m.id !== typingId);
                 return [...filtered, {
@@ -150,15 +167,14 @@ const Composer: React.FC<ComposerProps> = ({
                     role: 'ai',
                     text: 'Here\'s your draft:',
                     draft: {
-                        to: initialData?.to ? [initialData.to] : [],
-                        subject: data.subject || initialData?.subject || 'New Email',
+                        to: to ? [to] : (initialData?.to ? [initialData.to] : []),
+                        subject: data.subject || subject || 'New Email',
                         body: data.body || '',
                         attachments: [],
-                        status: 'drafting'
+                        status: 'ready'
                     }
                 }];
             });
-
         } catch (error) {
             console.error("AI Error", error);
             setMessages(prev => {
@@ -172,302 +188,399 @@ const Composer: React.FC<ComposerProps> = ({
         }
     };
 
-    const handleSendAction = (draft: EmailDraft) => {
-        onSend?.({
-            to: draft.to.join(', '),
-            subject: draft.subject,
-            body: draft.body,
-            tracking: true
-        });
-        onClose();
+    // --- Use AI Draft ---
+    const useDraft = (draft: EmailDraft) => {
+        if (draft.to.length > 0) setTo(draft.to.join(', '));
+        if (draft.subject) setSubject(draft.subject);
+        if (draft.body) setBody(draft.body);
+        setComposeView('manual'); // Switch to manual view to review/send
     };
 
-    const handleDraftUpdate = (msgId: string, updates: Partial<EmailDraft>) => {
-        setMessages(prev => prev.map(m => {
-            if (m.id === msgId && m.draft) {
-                return { ...m, draft: { ...m.draft, ...updates } };
-            }
-            return m;
-        }));
-    };
+    // --- Send Email ---
+    const handleSend = async () => {
+        if (!to.trim()) {
+            setSendError('Please enter a recipient');
+            return;
+        }
+        if (!subject.trim()) {
+            setSendError('Please enter a subject');
+            return;
+        }
 
-    const handleModifyDraftAI = async (msgId: string, currentDraft: EmailDraft, modification: 'shorten' | 'expand' | 'professional' | 'casual') => {
-        // Show loading state
-        handleDraftUpdate(msgId, { status: 'drafting' });
+        setIsSending(true);
+        setSendError('');
 
         try {
-            // Call backend /api/ai/compose with modification context
-            const response = await fetch(`${API_URL}/api/ai/compose`, {
+            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
+
+            const response = await fetch(`${API_URL}/api/smtp/send`, {
                 method: 'POST',
-                headers: getAuthHeaders(),
+                headers: {
+                    ...getAuthHeaders(),
+                    'x-user-id': userId || ''
+                },
                 body: JSON.stringify({
-                    context: `Rewrite this email to be more ${modification}: ${currentDraft.body}`,
-                    to: currentDraft.to.join(', '),
-                    subject: currentDraft.subject,
-                    tone: modification === 'professional' ? 'professional' : 'casual',
-                    length: modification === 'shorten' ? 'short' : modification === 'expand' ? 'long' : 'medium'
+                    to: to,
+                    cc: cc || undefined,
+                    bcc: bcc || undefined,
+                    subject: subject,
+                    body: body,
+                    html: `<div style="font-family: sans-serif; white-space: pre-wrap;">${body}</div>`,
+                    tracking: enableTracking,
+                    userId: userId
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('AI modification failed');
-            }
-
             const data = await response.json();
 
-            if (data.body) {
-                handleDraftUpdate(msgId, { body: data.body, status: 'ready' });
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to send email');
             }
-        } catch (e) {
-            console.error('Modification error:', e);
-            handleDraftUpdate(msgId, { status: 'ready' });
+
+            onSend?.({ to, subject, body, tracking: enableTracking });
+            onClose();
+
+        } catch (error: any) {
+            console.error('Send error:', error);
+            setSendError(error.message || 'Failed to send email');
+        } finally {
+            setIsSending(false);
         }
     };
 
-    // --- Components ---
-
-    const ContactDrawer = () => (
-        <div className={`absolute bottom-24 left-4 right-4 bg-white/80 dark:bg-[#1A1A1C]/90 backdrop-blur-xl rounded-[2rem] border border-white/20 shadow-2xl overflow-hidden transition-all duration-300 origin-bottom z-50 ${isContactDrawerOpen ? 'max-h-[300px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 translate-y-10'}`}>
-            <div className="p-4 border-b border-white/10 flex justify-between items-center">
-                <span className="text-xs font-black uppercase tracking-widest opacity-50 ml-2">Suggested Contacts</span>
-                <button onClick={() => setIsContactDrawerOpen(false)}><X size={16} /></button>
-            </div>
-            <div className="p-2 overflow-y-auto max-h-[240px]">
-                {MOCK_CONTACTS.map((c, i) => (
-                    <button
-                        key={i}
-                        onClick={() => {
-                            setInput(prev => prev + ` ${c.name} `);
-                            setIsContactDrawerOpen(false);
-                            inputRef.current?.focus();
-                        }}
-                        className="w-full flex items-center gap-4 p-3 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl transition-colors text-left"
-                    >
-                        <div className="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm">
-                            {c.avatar}
-                        </div>
-                        <div>
-                            <div className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{c.name}</div>
-                            <div className="text-xs opacity-50">{c.email}</div>
-                        </div>
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-
-    const DraftCard = ({ msgId, draft }: { msgId: string, draft: EmailDraft }) => (
-        <div className="w-full mt-4 mb-2 animate-in zoom-in-95 duration-300">
-            <div className={`rounded-[1.5rem] overflow-hidden border backdrop-blur-md shadow-lg transition-all ${isDark ? 'bg-white/5 border-white/10' : 'bg-white/60 border-white'}`}>
-                {/* Draft Header */}
-                <div className={`px-5 py-4 border-b flex justify-between items-center ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
-                    <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${draft.status === 'drafting' ? 'bg-amber-400 animate-pulse' : 'bg-green-400'}`}></div>
-                        <span className="text-[0.6rem] font-black uppercase tracking-widest opacity-60">
-                            {draft.status === 'drafting' ? 'Processing...' : 'Draft Preview'}
-                        </span>
-                    </div>
-                    <div className="flex gap-2">
-                        <button onClick={() => handleModifyDraftAI(msgId, draft, 'shorten')} className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10" title="Shorten"><Minimize2 size={14} /></button>
-                        <button onClick={() => handleModifyDraftAI(msgId, draft, 'expand')} className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10" title="Expand"><Maximize2 size={14} /></button>
-                    </div>
-                </div>
-
-                {/* Editable Fields */}
-                <div className="p-5 space-y-4">
-                    <div className="space-y-1">
-                        <label className="text-[0.55rem] font-black uppercase tracking-widest opacity-40">To</label>
-                        <input
-                            value={draft.to.join(', ')}
-                            onChange={(e) => handleDraftUpdate(msgId, { to: e.target.value.split(',').map(s => s.trim()) })}
-                            className={`w-full bg-transparent text-sm font-medium focus:outline-none border-b border-transparent focus:border-indigo-500/50 transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[0.55rem] font-black uppercase tracking-widest opacity-40">Subject</label>
-                        <input
-                            value={draft.subject}
-                            onChange={(e) => handleDraftUpdate(msgId, { subject: e.target.value })}
-                            className={`w-full bg-transparent text-lg font-bold focus:outline-none border-b border-transparent focus:border-indigo-500/50 transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}
-                        />
-                    </div>
-                    <div className="space-y-1 pt-2">
-                        <div
-                            contentEditable
-                            onBlur={(e) => handleDraftUpdate(msgId, { body: e.currentTarget.innerHTML })}
-                            dangerouslySetInnerHTML={{ __html: draft.body }}
-                            className={`w-full bg-transparent text-sm leading-relaxed focus:outline-none min-h-[100px] ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
-                        />
-                    </div>
-                </div>
-
-                {/* Gesture/Action Bar */}
-                <div className={`p-2 flex gap-2 border-t ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
-                    <button
-                        onClick={() => handleSendAction(draft)}
-                        disabled={draft.status === 'drafting'}
-                        className="flex-1 py-3 rounded-xl bg-slate-900 text-white flex items-center justify-center gap-2 hover:bg-black transition-colors disabled:opacity-50"
-                    >
-                        <Send size={14} /> <span className="text-xs font-bold uppercase tracking-widest">Send Now</span>
-                    </button>
-                    <button
-                        onClick={() => { /* Discard logic */ }}
-                        className="w-12 flex items-center justify-center rounded-xl hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors"
-                    >
-                        <Trash2 size={16} />
-                    </button>
-                    <button
-                        onClick={() => handleModifyDraftAI(msgId, draft, 'professional')}
-                        disabled={draft.status === 'drafting'}
-                        className={`flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50 ${isDark ? 'border-white/10' : 'border-slate-200'}`}
-                    >
-                        {draft.status === 'drafting' ? (
-                            <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                            <Sparkles size={14} />
-                        )}
-                        <span className="text-xs font-bold uppercase tracking-widest">Polish</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+    // Filter contacts
+    const filteredContacts = MOCK_CONTACTS.filter(c =>
+        c.name.toLowerCase().includes(contactQuery.toLowerCase()) ||
+        c.email.toLowerCase().includes(contactQuery.toLowerCase())
     );
 
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-[200] flex flex-col justify-end pointer-events-none">
-            {/* Fullscreen Backdrop */}
+            {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/20 backdrop-blur-sm pointer-events-auto transition-opacity duration-500"
+                className="absolute inset-0 bg-black/30 backdrop-blur-sm pointer-events-auto transition-opacity duration-300"
                 onClick={onClose}
             />
 
-            {/* Main Interface Container */}
+            {/* Composer Panel */}
             <div className={`
-            pointer-events-auto w-full max-w-2xl mx-auto h-[90vh] 
-            rounded-t-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative
-            animate-in slide-in-from-bottom-20 duration-500
-            ${isDark ? 'bg-[#0A0A0B]/95 border-t border-x border-white/10' : 'bg-white/95 border-t border-x border-white'}
-            backdrop-blur-3xl
-        `}>
-                {/* Header */}
-                <div className="px-6 py-8 flex items-center gap-6 shrink-0 bg-transparent z-20">
-                    <div className="flex items-center gap-6 flex-1">
-                        <div className={`w-[2px] h-9 ${isDark ? 'bg-slate-600' : 'bg-slate-900'} rounded-full`}></div>
-                        <div className={`flex-1 flex justify-between items-center ${isDark ? 'text-white/80' : 'text-slate-900'}`}>
-                            <span className="text-[1rem] font-black uppercase tracking-[0.8em]">
-                                {mode === 'new' ? 'COMPOSE' : 'REPLY'}
-                            </span>
-                            <span className="opacity-20 font-mono text-[0.55rem] hidden sm:block">
-                                {mode === 'new' ? 'NEW_MESSAGE' : 'THREAD_REPLY'}
-                            </span>
-                        </div>
+                pointer-events-auto w-full max-w-2xl mx-auto 
+                rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden
+                animate-in slide-in-from-bottom-10 duration-300
+                ${isDark ? 'bg-[#121214] border-t border-x border-white/10' : 'bg-white border-t border-x border-slate-200'}
+            `}
+                style={{ maxHeight: '90vh' }}
+            >
+                {/* Header with View Toggle */}
+                <div className={`px-6 py-4 flex items-center justify-between border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+                    <div className="flex items-center gap-4">
+                        <div className={`w-1 h-6 rounded-full ${isDark ? 'bg-indigo-500' : 'bg-slate-900'}`}></div>
+                        <span className={`text-sm font-black uppercase tracking-[0.3em] ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            {mode === 'new' ? 'COMPOSE' : mode === 'reply' ? 'REPLY' : 'FORWARD'}
+                        </span>
                     </div>
 
-                    {/* Close Button */}
+                    {/* View Toggle */}
+                    <div className={`flex items-center rounded-xl p-1 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}>
+                        <button
+                            onClick={() => setComposeView('manual')}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${composeView === 'manual'
+                                    ? (isDark ? 'bg-white text-black' : 'bg-slate-900 text-white')
+                                    : (isDark ? 'text-slate-400' : 'text-slate-500')
+                                }`}
+                        >
+                            <Edit3 size={12} /> Manual
+                        </button>
+                        <button
+                            onClick={() => setComposeView('ai')}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${composeView === 'ai'
+                                    ? (isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white')
+                                    : (isDark ? 'text-slate-400' : 'text-slate-500')
+                                }`}
+                        >
+                            <Sparkles size={12} /> AI Assist
+                        </button>
+                    </div>
+
                     <button
                         onClick={onClose}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-slate-100 text-slate-900 hover:bg-slate-200'}`}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-600'}`}
                     >
-                        <ChevronDown size={20} strokeWidth={2.5} />
+                        <X size={18} />
                     </button>
                 </div>
 
-                {/* Chat Stream */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pb-4 space-y-6">
-                    {messages.map((msg) => (
-                        <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                            {/* Bubble */}
-                            {msg.text && (
-                                <div className={`
-                                max-w-[85%] px-6 py-4 rounded-2xl text-sm font-medium leading-relaxed
-                                ${msg.role === 'user'
-                                        ? (isDark ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-slate-900 text-white rounded-tr-sm')
-                                        : (isDark ? 'bg-[#1A1A1C] text-slate-200 rounded-tl-sm' : 'bg-slate-100/80 text-slate-800 rounded-tl-sm')}
-                            `}>
-                                    {msg.text}
+                {/* ==================== MANUAL VIEW ==================== */}
+                {composeView === 'manual' && (
+                    <>
+                        {/* Email Fields */}
+                        <div className={`px-6 py-4 space-y-3 border-b ${isDark ? 'border-white/5' : 'border-slate-50'}`}>
+                            {/* To Field */}
+                            <div className="flex items-center gap-3">
+                                <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>To</label>
+                                <div className="flex-1 relative">
+                                    <input
+                                        ref={toInputRef}
+                                        type="email"
+                                        value={to}
+                                        onChange={(e) => {
+                                            setTo(e.target.value);
+                                            setContactQuery(e.target.value);
+                                            setShowContacts(e.target.value.length > 0);
+                                        }}
+                                        onFocus={() => setShowContacts(to.length > 0)}
+                                        onBlur={() => setTimeout(() => setShowContacts(false), 200)}
+                                        placeholder="recipient@email.com"
+                                        className={`w-full bg-transparent text-sm font-medium focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
+                                    />
+
+                                    {/* Contact Suggestions */}
+                                    {showContacts && filteredContacts.length > 0 && (
+                                        <div className={`absolute top-full left-0 right-0 mt-2 rounded-xl border shadow-xl z-50 max-h-48 overflow-y-auto ${isDark ? 'bg-[#1A1A1C] border-white/10' : 'bg-white border-slate-200'}`}>
+                                            {filteredContacts.map((contact, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => {
+                                                        setTo(contact.email);
+                                                        setShowContacts(false);
+                                                    }}
+                                                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'}`}
+                                                >
+                                                    <div className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">
+                                                        {contact.avatar}
+                                                    </div>
+                                                    <div>
+                                                        <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{contact.name}</div>
+                                                        <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{contact.email}</div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-
-                            {/* Typing Indicator */}
-                            {msg.isTyping && (
-                                <div className="flex gap-1 px-4 py-2">
-                                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
-                                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-100"></div>
-                                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-200"></div>
-                                </div>
-                            )}
-
-                            {/* Draft Card */}
-                            {msg.draft && <DraftCard msgId={msg.id} draft={msg.draft} />}
-                        </div>
-                    ))}
-                    <div ref={messagesEndRef} />
-                </div>
-
-                {/* Contacts Drawer */}
-                <ContactDrawer />
-
-                {/* Input Area */}
-                <div className={`p-4 pb-8 ${isDark ? 'bg-[#1A1A1C]' : 'bg-slate-50'}`}>
-                    {/* Suggestion Chips */}
-                    {messages.length < 2 && (
-                        <div className="flex gap-2 overflow-x-auto no-scrollbar mb-4 px-2">
-                            {['Write a professional email', 'Draft a quick reply', 'Compose a follow-up'].map((chip, i) => (
                                 <button
-                                    key={i}
-                                    onClick={() => processAICommand(chip)}
-                                    className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300' : 'bg-white border-slate-200 hover:border-slate-300 text-slate-600 shadow-sm'}`}
+                                    onClick={() => setShowCcBcc(!showCcBcc)}
+                                    className={`text-xs font-medium px-2 py-1 rounded transition-colors ${isDark ? 'text-slate-500 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
                                 >
-                                    <Sparkles size={12} className="inline mr-2 mb-0.5" />
-                                    {chip}
+                                    Cc/Bcc
                                 </button>
+                            </div>
+
+                            {/* Cc/Bcc Fields */}
+                            {showCcBcc && (
+                                <>
+                                    <div className="flex items-center gap-3">
+                                        <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Cc</label>
+                                        <input
+                                            type="email"
+                                            value={cc}
+                                            onChange={(e) => setCc(e.target.value)}
+                                            placeholder="cc@email.com"
+                                            className={`flex-1 bg-transparent text-sm font-medium focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bcc</label>
+                                        <input
+                                            type="email"
+                                            value={bcc}
+                                            onChange={(e) => setBcc(e.target.value)}
+                                            placeholder="bcc@email.com"
+                                            className={`flex-1 bg-transparent text-sm font-medium focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Subject Field */}
+                            <div className="flex items-center gap-3">
+                                <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Subj</label>
+                                <input
+                                    type="text"
+                                    value={subject}
+                                    onChange={(e) => setSubject(e.target.value)}
+                                    placeholder="Enter subject..."
+                                    className={`flex-1 bg-transparent text-sm font-bold focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Body */}
+                        <div className="flex-1 overflow-y-auto p-6" style={{ minHeight: '180px', maxHeight: '35vh' }}>
+                            <textarea
+                                ref={bodyRef}
+                                value={body}
+                                onChange={(e) => setBody(e.target.value)}
+                                placeholder="Write your message here..."
+                                className={`w-full h-full min-h-[160px] bg-transparent text-sm leading-relaxed focus:outline-none resize-none ${isDark ? 'text-slate-300 placeholder:text-slate-600' : 'text-slate-700 placeholder:text-slate-400'}`}
+                            />
+                        </div>
+                    </>
+                )}
+
+                {/* ==================== AI VIEW ==================== */}
+                {composeView === 'ai' && (
+                    <div className="flex-1 flex flex-col overflow-hidden" style={{ maxHeight: '60vh' }}>
+                        {/* Chat Messages */}
+                        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+                            {messages.map((msg) => (
+                                <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                    {msg.text && (
+                                        <div className={`
+                                            max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium
+                                            ${msg.role === 'user'
+                                                ? (isDark ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-slate-900 text-white rounded-tr-sm')
+                                                : (isDark ? 'bg-[#1A1A1C] text-slate-200 rounded-tl-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm')}
+                                        `}>
+                                            {msg.text}
+                                        </div>
+                                    )}
+
+                                    {msg.isTyping && (
+                                        <div className="flex gap-1 px-4 py-2">
+                                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                        </div>
+                                    )}
+
+                                    {/* Draft Card */}
+                                    {msg.draft && (
+                                        <div className={`w-full mt-3 p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className={`text-[0.6rem] font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                    Draft Preview
+                                                </span>
+                                                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                            </div>
+
+                                            <div className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                To: {msg.draft.to.join(', ') || '(Not specified)'}
+                                            </div>
+                                            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                                {msg.draft.subject}
+                                            </div>
+                                            <div className={`text-sm leading-relaxed mb-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
+                                                dangerouslySetInnerHTML={{ __html: msg.draft.body.replace(/\n/g, '<br/>') }}
+                                            />
+
+                                            <button
+                                                onClick={() => useDraft(msg.draft!)}
+                                                className="w-full py-2.5 rounded-lg bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"
+                                            >
+                                                <Check size={14} /> Use This Draft
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             ))}
+                            <div ref={messagesEndRef} />
                         </div>
-                    )}
 
-                    <div className={`
-                    flex items-center gap-3 p-2 pl-4 rounded-[2rem] border shadow-2xl transition-all focus-within:ring-2 ring-indigo-500/20
-                    ${isDark ? 'bg-[#0A0A0B] border-white/10' : 'bg-white border-white'}
-                `}>
-                        <button
-                            onClick={() => setIsContactDrawerOpen(!isContactDrawerOpen)}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}
-                        >
-                            <AtSign size={20} strokeWidth={2} />
-                        </button>
+                        {/* AI Input */}
+                        <div className={`p-4 border-t ${isDark ? 'border-white/10 bg-[#0A0A0B]' : 'border-slate-100 bg-slate-50'}`}>
+                            {/* Suggestion Chips */}
+                            {messages.length < 2 && (
+                                <div className="flex gap-2 overflow-x-auto no-scrollbar mb-3">
+                                    {['Write a professional email', 'Draft a quick reply', 'Compose a follow-up'].map((chip, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => processAICommand(chip)}
+                                            className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300' : 'bg-white border-slate-200 hover:border-slate-300 text-slate-600'}`}
+                                        >
+                                            <Sparkles size={10} className="inline mr-1.5" />
+                                            {chip}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && input.trim()) processAICommand(input);
-                            }}
-                            placeholder="Tell AI what to write..."
-                            className={`flex-1 bg-transparent border-none outline-none text-sm font-medium h-12 ${isDark ? 'text-white placeholder:text-slate-500' : 'text-slate-900 placeholder:text-slate-400'}`}
-                        />
-
-                        <button className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}>
-                            <Link size={20} strokeWidth={2} />
-                        </button>
-
-                        <button
-                            onClick={() => input.trim() ? processAICommand(input) : setIsListening(!isListening)}
-                            className={`w-14 h-12 rounded-[1.5rem] flex items-center justify-center shrink-0 transition-all ${input.trim() ? 'bg-indigo-600 text-white' : (isListening ? 'bg-red-500 text-white animate-pulse' : (isDark ? 'bg-white text-black' : 'bg-slate-900 text-white'))}`}
-                        >
-                            {input.trim() ? <ArrowUp size={20} strokeWidth={3} /> : <Mic size={20} strokeWidth={2} />}
-                        </button>
-                    </div>
-
-                    <div className="flex justify-center mt-4 gap-6 opacity-30">
-                        <div className="flex items-center gap-1.5 text-[0.55rem] font-black uppercase tracking-widest">
-                            <Bot size={10} /> Powered by Gemini AI
+                            <div className={`flex items-center gap-2 p-2 rounded-xl border ${isDark ? 'bg-[#1A1A1C] border-white/10' : 'bg-white border-slate-200'}`}>
+                                <input
+                                    ref={aiInputRef}
+                                    type="text"
+                                    value={aiInput}
+                                    onChange={(e) => setAiInput(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && aiInput.trim() && processAICommand(aiInput)}
+                                    placeholder="Tell AI what to write..."
+                                    className={`flex-1 bg-transparent text-sm focus:outline-none px-2 ${isDark ? 'text-white placeholder:text-slate-500' : 'text-slate-900 placeholder:text-slate-400'}`}
+                                />
+                                <button
+                                    onClick={() => aiInput.trim() && processAICommand(aiInput)}
+                                    disabled={!aiInput.trim()}
+                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors disabled:opacity-40 ${aiInput.trim() ? 'bg-indigo-500 text-white' : (isDark ? 'bg-white/10 text-slate-400' : 'bg-slate-100 text-slate-400')}`}
+                                >
+                                    <ArrowUp size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
+
+                {/* Error Message */}
+                {sendError && (
+                    <div className="px-6 py-2 bg-red-500/10 text-red-500 text-sm font-medium">
+                        {sendError}
+                    </div>
+                )}
+
+                {/* Footer Actions (only show in manual view) */}
+                {composeView === 'manual' && (
+                    <div className={`px-6 py-4 flex items-center justify-between border-t ${isDark ? 'border-white/10 bg-[#0A0A0B]' : 'border-slate-100 bg-slate-50'}`}>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setComposeView('ai')}
+                                className={`p-2.5 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-200 text-slate-500'}`}
+                                title="AI Assist"
+                            >
+                                <Sparkles size={18} />
+                            </button>
+                            <button className={`p-2.5 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-200 text-slate-500'}`} title="Attach File">
+                                <Paperclip size={18} />
+                            </button>
+                            <button className={`p-2.5 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-200 text-slate-500'}`} title="Insert Image">
+                                <Image size={18} />
+                            </button>
+
+                            <div className={`h-6 w-px mx-2 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`}></div>
+
+                            {/* Tracking Toggle */}
+                            <button
+                                onClick={() => setEnableTracking(!enableTracking)}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${enableTracking
+                                        ? (isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700')
+                                        : (isDark ? 'bg-white/5 text-slate-500' : 'bg-slate-100 text-slate-500')
+                                    }`}
+                            >
+                                <div className={`w-2 h-2 rounded-full ${enableTracking ? 'bg-emerald-500' : 'bg-slate-400'}`}></div>
+                                Tracking {enableTracking ? 'On' : 'Off'}
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={onClose}
+                                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-200 text-slate-600'}`}
+                            >
+                                Discard
+                            </button>
+                            <button
+                                onClick={handleSend}
+                                disabled={isSending || !to.trim()}
+                                className="px-6 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSending ? (
+                                    <Loader2 size={14} className="animate-spin" />
+                                ) : (
+                                    <Send size={14} />
+                                )}
+                                {isSending ? 'Sending...' : 'Send'}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
