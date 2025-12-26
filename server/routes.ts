@@ -1068,6 +1068,10 @@ export async function registerRoutes(
       }
 
       const { accountsService } = await import("./accounts");
+
+      // Auto-deduplicate on every fetch to clean up any existing duplicates
+      await accountsService.deduplicateAccounts(userId);
+
       const accounts = await accountsService.getAccounts(userId);
 
       // Don't send passwords to client
@@ -1084,6 +1088,28 @@ export async function registerRoutes(
       console.error("Failed to fetch accounts:", error);
       // Return empty array on error instead of 500
       res.json([]);
+    }
+  });
+
+  // Cleanup duplicate accounts
+  app.post("/api/accounts/cleanup", async (req, res) => {
+    try {
+      const userId = req.body.userId || req.query.userId;
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+      }
+
+      const { accountsService } = await import("./accounts");
+      const result = await accountsService.deduplicateAccounts(userId);
+
+      res.json({
+        success: true,
+        message: `Removed ${result.removed} duplicate accounts`,
+        ...result
+      });
+    } catch (error: any) {
+      console.error("Failed to cleanup accounts:", error);
+      res.status(500).json({ error: error.message });
     }
   });
 

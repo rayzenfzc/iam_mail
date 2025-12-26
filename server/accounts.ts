@@ -221,6 +221,49 @@ export class AccountsService {
         });
     }
 
+    // Deduplicate accounts - remove duplicates, keeping only the most recently updated
+    async deduplicateAccounts(userId: string): Promise<{ removed: number; kept: string[] }> {
+        const accounts = await this.getAccounts(userId);
+
+        // Group by email
+        const emailGroups: Record<string, EmailAccount[]> = {};
+        accounts.forEach(acc => {
+            if (!emailGroups[acc.email]) {
+                emailGroups[acc.email] = [];
+            }
+            emailGroups[acc.email].push(acc);
+        });
+
+        const removed: string[] = [];
+        const kept: string[] = [];
+
+        // For each email with multiple accounts, keep only the most recent
+        for (const email of Object.keys(emailGroups)) {
+            const group = emailGroups[email];
+            if (group.length > 1) {
+                // Sort by updatedAt desc, keep the newest
+                group.sort((a, b) => {
+                    const aTime = a.updatedAt instanceof Date ? a.updatedAt.getTime() : new Date(a.updatedAt).getTime();
+                    const bTime = b.updatedAt instanceof Date ? b.updatedAt.getTime() : new Date(b.updatedAt).getTime();
+                    return bTime - aTime;
+                });
+
+                kept.push(group[0].id);
+
+                // Delete the rest
+                for (let i = 1; i < group.length; i++) {
+                    await this.collection.doc(group[i].id).delete();
+                    removed.push(group[i].id);
+                }
+            } else {
+                kept.push(group[0].id);
+            }
+        }
+
+        console.log(`Deduplication for ${userId}: removed ${removed.length} duplicates, kept ${kept.length} accounts`);
+        return { removed: removed.length, kept };
+    }
+
     private detectProvider(email: string): string {
         const domain = email.split('@')[1];
         if (domain.includes('gmail')) return 'Gmail';
