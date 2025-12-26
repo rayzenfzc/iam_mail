@@ -1516,7 +1516,7 @@ export async function registerRoutes(
         },
       });
 
-      const trackingToken = require("crypto").randomUUID();
+      const trackingToken = crypto.randomUUID();
       const baseUrl = process.env.BASE_URL || `https://${req.get("host")}`;
       const trackingPixel = `<img src="${baseUrl}/api/track?id=${trackingToken}" width="1" height="1" style="display:none" alt="" />`;
       const htmlBody = html || `<p>${(body || '').replace(/\n/g, "</p><p>")}</p>`;
