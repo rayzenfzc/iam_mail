@@ -24,6 +24,9 @@ interface HubProps {
     // Callbacks for actions
     onComposeEmail?: (data: { to?: string; subject?: string; body?: string }) => void;
     onReplyEmail?: (data: { body?: string }) => void;
+    onForwardEmail?: (data: { to?: string; body?: string }) => void;
+    onSummarizeEmail?: () => void;
+    onArchiveEmail?: () => void;
     onOpenSettings?: () => void;
     onThemeToggle?: () => void;
     onSearch?: (query: string) => void;
@@ -37,6 +40,9 @@ const Hub: React.FC<HubProps> = ({
     context,
     onComposeEmail,
     onReplyEmail,
+    onForwardEmail,
+    onSummarizeEmail,
+    onArchiveEmail,
     onOpenSettings,
     onThemeToggle,
     onSearch,
@@ -119,6 +125,21 @@ const Hub: React.FC<HubProps> = ({
                     }
                     if (intent.action === 'reply') {
                         onReplyEmail?.({ body: intent.entities.body });
+                        return true;
+                    }
+                    if (intent.action === 'forward') {
+                        onForwardEmail?.({
+                            to: intent.entities.recipients?.[0]?.email,
+                            body: intent.entities.body,
+                        });
+                        return true;
+                    }
+                    if (intent.action === 'summarize') {
+                        onSummarizeEmail?.();
+                        return true;
+                    }
+                    if (intent.action === 'archive' || intent.action === 'delete') {
+                        onArchiveEmail?.();
                         return true;
                     }
                     break;

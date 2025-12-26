@@ -464,6 +464,30 @@ const App: React.FC = () => {
           }
           setIsHubOpen(false);
         }}
+        onForwardEmail={(data) => {
+          if (selectedEmail) {
+            handleOpenComposer('forward', {
+              to: data.to,
+              subject: selectedEmail.subject.startsWith('Fwd:') ? selectedEmail.subject : `Fwd: ${selectedEmail.subject}`,
+              body: data.body || `\n\n--- Forwarded ---\nFrom: ${selectedEmail.senderName}\nSubject: ${selectedEmail.subject}\n\n${selectedEmail.body.replace(/<[^>]*>?/gm, '')}`
+            });
+          }
+          setIsHubOpen(false);
+        }}
+        onSummarizeEmail={() => {
+          // Trigger summarize in EmailDetail (if we had a ref or callback)
+          // For now, we'll just show a toast or console log
+          console.log('Summarize requested for email:', selectedEmail?.id);
+          setIsHubOpen(false);
+        }}
+        onArchiveEmail={() => {
+          if (selectedEmail) {
+            // Remove from emails list (archive)
+            setEmails(prev => prev.filter(e => e.id !== selectedEmail.id));
+            setSelectedEmailId(null);
+          }
+          setIsHubOpen(false);
+        }}
         onOpenSettings={() => {
           setIsSettingsOpen(true);
           setIsHubOpen(false);
