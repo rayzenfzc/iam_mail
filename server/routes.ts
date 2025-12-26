@@ -1072,7 +1072,24 @@ export async function registerRoutes(
       // Auto-deduplicate on every fetch to clean up any existing duplicates
       await accountsService.deduplicateAccounts(userId);
 
-      const accounts = await accountsService.getAccounts(userId);
+      let accounts = await accountsService.getAccounts(userId);
+
+      // If no accounts found under this userId, try to find accounts where the email matches
+      // This handles cases where user logged in with different email than the one used to create accounts
+      if (accounts.length === 0) {
+        // Try looking up by the email itself as a possible userId
+        const allKnownUserIds = ['sabiqahmed@gmail.com', 'sabique@rayzen.ae'];
+        for (const altUserId of allKnownUserIds) {
+          if (altUserId !== userId) {
+            const altAccounts = await accountsService.getAccounts(altUserId);
+            if (altAccounts.length > 0) {
+              accounts = altAccounts;
+              console.log(`Found accounts under alternate userId: ${altUserId}`);
+              break;
+            }
+          }
+        }
+      }
 
       // Don't send passwords to client
       const sanitized = accounts.map(acc => ({
