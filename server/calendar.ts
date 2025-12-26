@@ -1,4 +1,4 @@
-import { db } from './accounts';
+import { db } from './firebase';
 import crypto from 'crypto';
 
 export interface CalendarEvent {

@@ -1,4 +1,4 @@
-import { db } from './accounts';
+import { db } from './firebase';
 import * as crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
