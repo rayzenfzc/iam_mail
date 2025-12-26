@@ -84,7 +84,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, themeMod
 
     const fetchAccounts = async () => {
         try {
-            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
+            // Check all possible localStorage keys for userId
+            const userId = localStorage.getItem('userId') ||
+                localStorage.getItem('userEmail') ||
+                localStorage.getItem('user_email') ||
+                localStorage.getItem('saved_email');
+
+            console.log('Fetching accounts for userId:', userId);
             const res = await fetch(`/api/accounts?userId=${encodeURIComponent(userId || '')}`);
             if (res.ok) {
                 const data = await res.json();
@@ -211,7 +217,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, themeMod
         setIsSaving(true);
 
         try {
-            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail') || editingAccount.email;
+            const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail') || localStorage.getItem('user_email') || localStorage.getItem('saved_email') || editingAccount.email;
 
             const res = await fetch('/api/email/save-config', {
                 method: 'POST',
@@ -252,7 +258,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, themeMod
     const handleDeleteAccount = async () => {
         if (deleteConfirmId) {
             try {
-                const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail');
+                const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail') || localStorage.getItem('user_email') || localStorage.getItem('saved_email');
                 await fetch(`/api/accounts/${deleteConfirmId}?userId=${encodeURIComponent(userId || '')}`, {
                     method: 'DELETE'
                 });
