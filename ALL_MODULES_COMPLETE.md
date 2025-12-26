@@ -464,7 +464,7 @@ The **I AM MAIL** application now has:
 ---
 
 *"Fast, Fluid, Futuristic" - Achieved!* 🎨
-gmail app password REDACTED_APP_PASSWORD
+gmail app password <REDACTED>
 zoho client id : REDACTED_ZOHO_CLIENT_ID
 zoho client secret : REDACTED_ZOHO_SECRET
 Client NameI AM MAIL
