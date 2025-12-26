@@ -259,7 +259,9 @@ const Composer: React.FC<ComposerProps> = ({
     return (
         <div className="fixed bottom-0 left-0 right-0 z-[200] flex justify-center pointer-events-none">
             {/* Composer Panel - docked at bottom, no blocking backdrop */}
-            <div className={`
+            <div
+                data-testid="composer-panel"
+                className={`
                 pointer-events-auto w-full max-w-2xl mx-4 mb-0
                 rounded-t-[1.5rem] shadow-2xl flex flex-col overflow-hidden
                 animate-in slide-in-from-bottom-10 duration-300

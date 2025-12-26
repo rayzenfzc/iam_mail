@@ -179,10 +179,11 @@ test.describe('P1: Composer UI', () => {
             await composeBtn.click();
         }
 
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(1500);
 
-        // Composer should be visible - look for composer header or To field
-        const composerVisible = await page.locator('text=COMPOSE, text=FORWARD, text=REPLY, input[placeholder*="recipient"]').first().count();
+        // Composer should be visible - check for the composer panel with data-testid
+        const composerPanel = page.locator('[data-testid="composer-panel"]');
+        const composerVisible = await composerPanel.count();
         expect(composerVisible).toBeGreaterThan(0);
     });
 
