@@ -257,21 +257,15 @@ const Composer: React.FC<ComposerProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex flex-col justify-end pointer-events-none">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/30 backdrop-blur-sm pointer-events-auto transition-opacity duration-300"
-                onClick={onClose}
-            />
-
-            {/* Composer Panel */}
+        <div className="fixed bottom-0 left-0 right-0 z-[200] flex justify-center pointer-events-none">
+            {/* Composer Panel - docked at bottom, no blocking backdrop */}
             <div className={`
-                pointer-events-auto w-full max-w-2xl mx-auto 
-                rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden
+                pointer-events-auto w-full max-w-2xl mx-4 mb-0
+                rounded-t-[1.5rem] shadow-2xl flex flex-col overflow-hidden
                 animate-in slide-in-from-bottom-10 duration-300
                 ${isDark ? 'bg-[#121214] border-t border-x border-white/10' : 'bg-white border-t border-x border-slate-200'}
             `}
-                style={{ maxHeight: '90vh' }}
+                style={{ maxHeight: '70vh' }}
             >
                 {/* Header with View Toggle */}
                 <div className={`px-6 py-4 flex items-center justify-between border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
@@ -287,8 +281,8 @@ const Composer: React.FC<ComposerProps> = ({
                         <button
                             onClick={() => setComposeView('manual')}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${composeView === 'manual'
-                                    ? (isDark ? 'bg-white text-black' : 'bg-slate-900 text-white')
-                                    : (isDark ? 'text-slate-400' : 'text-slate-500')
+                                ? (isDark ? 'bg-white text-black' : 'bg-slate-900 text-white')
+                                : (isDark ? 'text-slate-400' : 'text-slate-500')
                                 }`}
                         >
                             <Edit3 size={12} /> Manual
@@ -296,8 +290,8 @@ const Composer: React.FC<ComposerProps> = ({
                         <button
                             onClick={() => setComposeView('ai')}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${composeView === 'ai'
-                                    ? (isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white')
-                                    : (isDark ? 'text-slate-400' : 'text-slate-500')
+                                ? (isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white')
+                                : (isDark ? 'text-slate-400' : 'text-slate-500')
                                 }`}
                         >
                             <Sparkles size={12} /> AI Assist
@@ -550,8 +544,8 @@ const Composer: React.FC<ComposerProps> = ({
                             <button
                                 onClick={() => setEnableTracking(!enableTracking)}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${enableTracking
-                                        ? (isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700')
-                                        : (isDark ? 'bg-white/5 text-slate-500' : 'bg-slate-100 text-slate-500')
+                                    ? (isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700')
+                                    : (isDark ? 'bg-white/5 text-slate-500' : 'bg-slate-100 text-slate-500')
                                     }`}
                             >
                                 <div className={`w-2 h-2 rounded-full ${enableTracking ? 'bg-emerald-500' : 'bg-slate-400'}`}></div>
