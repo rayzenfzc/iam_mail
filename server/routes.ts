@@ -56,6 +56,108 @@ export async function registerRoutes(
   });
 
   // ============================================
+  // @HUB AI ASSISTANT ENDPOINTS
+  // ============================================
+
+  // Parse user message into structured intent
+  app.post("/api/hub/parse", async (req, res) => {
+    try {
+      const { message, context } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      const { parseHubIntent } = await import("./hub-intent");
+      const intent = await parseHubIntent(message, context || {});
+
+      res.json(intent);
+    } catch (error) {
+      console.error("Hub parse error:", error);
+      res.status(500).json({
+        type: "help",
+        action: "error",
+        entities: {},
+        confidence: 0,
+        error: "Failed to parse intent"
+      });
+    }
+  });
+
+  // Execute confirmed action
+  app.post("/api/hub/execute", async (req, res) => {
+    try {
+      const { intent, confirmed } = req.body;
+
+      if (!confirmed) {
+        return res.status(400).json({ error: "Action must be confirmed" });
+      }
+
+      const { executeHubIntent } = await import("./hub-intent");
+      const result = await executeHubIntent(intent);
+
+      res.json(result);
+    } catch (error) {
+      console.error("Hub execute error:", error);
+      res.status(500).json({ success: false, message: "Execution failed" });
+    }
+  });
+
+  // Get contextual suggestions based on current screen
+  app.get("/api/hub/suggestions", async (req, res) => {
+    try {
+      const { screen } = req.query;
+
+      const suggestions: Record<string, string[]> = {
+        inbox: [
+          "Compose new email",
+          "Search emails",
+          "Show unread",
+          "Summarize inbox"
+        ],
+        "email-detail": [
+          "Reply",
+          "Summarize",
+          "Schedule meeting",
+          "Add sender to contacts",
+          "Forward"
+        ],
+        compose: [
+          "Shorten",
+          "Make professional",
+          "Schedule send",
+          "Add attachment"
+        ],
+        calendar: [
+          "New meeting",
+          "Today's schedule",
+          "Find free time",
+          "Monthly summary"
+        ],
+        contacts: [
+          "Add contact",
+          "Recent contacts",
+          "Important contacts"
+        ],
+        settings: [
+          "Toggle dark mode",
+          "Add account",
+          "Manage notifications",
+          "Export data"
+        ]
+      };
+
+      res.json({
+        screen: screen || "inbox",
+        suggestions: suggestions[screen as string] || suggestions.inbox
+      });
+    } catch (error) {
+      console.error("Hub suggestions error:", error);
+      res.status(500).json({ suggestions: [] });
+    }
+  });
+
+  // ============================================
   // AUTHENTICATION ENDPOINTS
   // ============================================
 

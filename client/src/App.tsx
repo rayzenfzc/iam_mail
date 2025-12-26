@@ -13,6 +13,8 @@ import SentView from './components/SentView';
 import AuthWrapper from './components/auth';
 import { AIProvider } from './context/AIContext';
 import { ToastProvider } from './components/ui/ToastProvider';
+import { Hub, HubContext, HubScreen } from './components/Hub';
+import { Bot } from 'lucide-react';
 
 const App: React.FC = () => {
   // =============================
@@ -38,6 +40,7 @@ const App: React.FC = () => {
   const [composerData, setComposerData] = useState<{ to?: string, subject?: string, body?: string, attachments?: any[] }>({});
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHubOpen, setIsHubOpen] = useState(false);
   const isDark = themeMode === 'dark';
 
   // =============================
@@ -430,6 +433,65 @@ const App: React.FC = () => {
         themeMode={themeMode}
         onThemeModeChange={setThemeMode}
       />
+
+      {/* @Hub AI Assistant */}
+      <Hub
+        isOpen={isHubOpen}
+        onClose={() => setIsHubOpen(false)}
+        isDark={isDark}
+        context={{
+          currentScreen: (selectedEmailId ? 'email-detail' : currentView) as HubScreen,
+          selectedEmailId: selectedEmailId || undefined,
+          selectedEmail: selectedEmail ? {
+            id: selectedEmail.id,
+            subject: selectedEmail.subject,
+            sender: selectedEmail.senderName,
+            senderEmail: selectedEmail.senderEmail,
+            body: selectedEmail.body
+          } : undefined,
+        }}
+        onComposeEmail={(data) => {
+          handleOpenComposer('new', data);
+          setIsHubOpen(false);
+        }}
+        onReplyEmail={(data) => {
+          if (selectedEmail) {
+            handleOpenComposer('reply', {
+              to: selectedEmail.senderEmail,
+              subject: selectedEmail.subject.startsWith('Re:') ? selectedEmail.subject : `Re: ${selectedEmail.subject}`,
+              body: data.body
+            });
+          }
+          setIsHubOpen(false);
+        }}
+        onOpenSettings={() => {
+          setIsSettingsOpen(true);
+          setIsHubOpen(false);
+        }}
+        onThemeToggle={() => setThemeMode(prev => prev === 'light' ? 'dark' : 'light')}
+      />
+
+      {/* Hub FAB Button */}
+      {!isHubOpen && (
+        <button
+          onClick={() => setIsHubOpen(true)}
+          className={`
+            fixed bottom-6 right-6 z-[100] w-14 h-14 rounded-full shadow-2xl
+            flex items-center justify-center transition-all duration-300
+            hover:scale-110 active:scale-95 group
+            ${isDark
+              ? 'bg-indigo-600 text-white shadow-indigo-500/30 hover:bg-indigo-500'
+              : 'bg-slate-900 text-white shadow-slate-900/30 hover:bg-black'
+            }
+          `}
+          title="Open @hub AI Assistant"
+        >
+          <Bot size={24} className="group-hover:rotate-12 transition-transform" />
+
+          {/* Pulse Animation */}
+          <span className="absolute inset-0 rounded-full animate-ping bg-indigo-500/30 opacity-75"></span>
+        </button>
+      )}
     </div>
   );
 };
