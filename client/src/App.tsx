@@ -106,6 +106,7 @@ const App: React.FC = () => {
       if (!token) return;
 
       try {
+        // First try to check for configured accounts
         const response = await fetch(`${API_URL}/api/accounts`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -115,10 +116,30 @@ const App: React.FC = () => {
           if (accounts && accounts.length > 0) {
             setIsConnected(true);
             localStorage.setItem('iam_email_connected', 'true');
+            return;
           }
+        }
+
+        // Fallback: Try to fetch emails directly to check if env vars are configured
+        const emailCheck = await fetch(`${API_URL}/api/imap/emails?limit=1`);
+        if (emailCheck.ok) {
+          setIsConnected(true);
+          localStorage.setItem('iam_email_connected', 'true');
+          return;
+        }
+
+        // If nothing works, still allow local testing
+        if (window.location.hostname === 'localhost') {
+          setIsConnected(true);
+          localStorage.setItem('iam_email_connected', 'true');
         }
       } catch (error) {
         console.error('Failed to check email accounts:', error);
+        // On error, still try to connect for local dev
+        if (window.location.hostname === 'localhost') {
+          setIsConnected(true);
+          localStorage.setItem('iam_email_connected', 'true');
+        }
       }
     };
 
