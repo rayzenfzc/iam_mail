@@ -3,7 +3,7 @@
  * Manages contacts in Firestore with i.Pulse relationship scoring
  */
 
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from './firebase';
 
 export interface Contact {
     id: string;
@@ -25,8 +25,7 @@ export interface Contact {
 }
 
 export class ContactsService {
-    private db = getFirestore();
-    private collection = this.db.collection('contacts');
+    private collection = db.collection('contacts');
 
     /**
      * Get all contacts for a user
