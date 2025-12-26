@@ -158,15 +158,18 @@ test.describe('P1: Composer UI', () => {
     });
 
     test('should open composer on Compose button click', async ({ page }) => {
-        // Look for visible compose/new button with multiple selectors
-        const composeBtn = page.locator('button:visible:has-text("Compose"), button:visible:has-text("NEW"), button:visible:has-text("New")').first();
+        // Use data-testid for reliable button detection
+        const composeBtn = page.locator('[data-testid="compose-button"]');
+
+        // Wait for sidebar to be visible
+        await page.waitForTimeout(2000);
 
         const count = await composeBtn.count();
         if (count === 0) {
-            // Try finding by looking at the sidebar buttons
-            const sidebarBtn = page.locator('.sidebar button, nav button').filter({ hasText: /compose|new/i }).first();
-            if (await sidebarBtn.count() > 0) {
-                await sidebarBtn.click();
+            // Fallback: try finding by looking at the sidebar buttons
+            const fallbackBtn = page.locator('button:has(svg)').filter({ hasText: /compose|new/i }).first();
+            if (await fallbackBtn.count() > 0) {
+                await fallbackBtn.click();
             } else {
                 console.log('Compose button not found - skipping test');
                 test.skip();

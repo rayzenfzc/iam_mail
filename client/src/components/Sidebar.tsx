@@ -290,6 +290,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* Compose Button */}
           <div className={`mt-4 mb-4 px-4 ${!isOpen && 'lg:items-center'}`}>
             <button
+              data-testid="compose-button"
               onClick={() => {
                 onCompose();
                 if (window.innerWidth < 1024) onToggle();
@@ -299,7 +300,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       `}
             >
               <Plus size={20} strokeWidth={2.5} />
-              <span className={`text-[0.7rem] font-black uppercase tracking-[0.2em] ${!isOpen && 'hidden'}`}>Compose</span>
+              <span className={`text-[0.7rem] font-black uppercase tracking-[0.2em] transition-opacity duration-300 ${!isOpen ? 'lg:hidden' : ''}`}>Compose</span>
             </button>
           </div>
 
