@@ -54,6 +54,31 @@ export class AccountsService {
         smtpPort: number;
         provider?: string;
     }): Promise<EmailAccount> {
+        // Check if account with same email already exists for this user
+        const existingSnapshot = await this.collection
+            .where('userId', '==', userId)
+            .where('email', '==', accountData.email)
+            .limit(1)
+            .get();
+
+        if (!existingSnapshot.empty) {
+            // Update existing account instead of creating duplicate
+            const existingDoc = existingSnapshot.docs[0];
+            const encryptedPassword = encrypt(accountData.password);
+
+            await this.collection.doc(existingDoc.id).update({
+                imapHost: accountData.imapHost,
+                imapPort: accountData.imapPort,
+                smtpHost: accountData.smtpHost,
+                smtpPort: accountData.smtpPort,
+                password: encryptedPassword,
+                updatedAt: new Date()
+            });
+
+            const updatedDoc = await this.collection.doc(existingDoc.id).get();
+            return { id: existingDoc.id, ...updatedDoc.data() as Omit<EmailAccount, 'id'> };
+        }
+
         const encryptedPassword = encrypt(accountData.password);
 
         const account: Omit<EmailAccount, 'id'> = {
