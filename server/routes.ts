@@ -1038,6 +1038,94 @@ export async function registerRoutes(
     }
   });
 
+  // Get sent emails with tracking data
+  app.get("/api/sent-emails", async (req, res) => {
+    try {
+      const sentEmails = await storage.getEmailsByFolder("sent");
+
+      // Transform to include tracking info
+      const emailsWithTracking = sentEmails.map((email: any) => {
+        const isOpened = email.readCount && email.readCount > 0;
+        const daysSinceSent = email.createdAt
+          ? Math.floor((Date.now() - new Date(email.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+          : 0;
+
+        // Ghost detection: sent > 3 days ago but never opened
+        const ghosted = !isOpened && daysSinceSent > 3;
+
+        // Calculate impact score based on engagement
+        let impactScore = 40; // Base score
+        if (isOpened) impactScore += 30;
+        if (email.readCount > 1) impactScore += Math.min(email.readCount * 5, 20);
+        if (email.userAgent) impactScore += 10; // Has device info
+
+        return {
+          id: email.id,
+          senderName: 'Me',
+          senderEmail: email.senderEmail || email.sender || 'me@rayzen.ae',
+          recipientEmail: email.recipientEmail || email.recipient || '',
+          subject: email.subject,
+          preview: email.preview || email.body?.slice(0, 100) || '',
+          body: email.body,
+          time: email.createdAt ? formatTimeAgo(new Date(email.createdAt)) : 'Recently',
+          read: true,
+          folder: 'sent',
+          category: 'other',
+          urgencyScore: 50,
+          tracking: {
+            isEnabled: !!email.trackingToken,
+            status: isOpened ? 'opened' : 'delivered',
+            openedAt: email.readAt ? formatTimeAgo(new Date(email.readAt)) : undefined,
+            location: parseLocationFromIP(email.ip),
+            device: parseDeviceFromUA(email.userAgent),
+            impactScore: Math.min(impactScore, 100),
+            ghosted,
+            openCount: email.readCount || 0,
+          }
+        };
+      });
+
+      res.json(emailsWithTracking);
+    } catch (error: any) {
+      console.error("Failed to fetch sent emails:", error);
+      res.status(500).json({ error: "Failed to fetch sent emails" });
+    }
+  });
+
+  // Helper functions for tracking display
+  function formatTimeAgo(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  }
+
+  function parseLocationFromIP(ip: string | undefined): string | undefined {
+    if (!ip) return undefined;
+    // In production, you'd use an IP geolocation service
+    // For now, return a placeholder
+    if (ip.includes('127.0.0.1') || ip.includes('::1')) return 'Local';
+    return 'Unknown Location';
+  }
+
+  function parseDeviceFromUA(ua: string | undefined): string | undefined {
+    if (!ua) return undefined;
+    if (ua.includes('iPhone')) return 'iPhone';
+    if (ua.includes('iPad')) return 'iPad';
+    if (ua.includes('Android')) return 'Android';
+    if (ua.includes('Mac')) return 'Mac';
+    if (ua.includes('Windows')) return 'Windows';
+    if (ua.includes('Linux')) return 'Linux';
+    return 'Unknown Device';
+  }
+
   app.get("/api/emails/:id", async (req, res) => {
     try {
       const email = await storage.getEmail(req.params.id);
