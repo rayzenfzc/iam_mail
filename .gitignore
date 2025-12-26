@@ -33,3 +33,6 @@ Thumbs.db
 
 # Agent
 .agent/
+# Playwright test artifacts
+playwright-report/
+test-results/
