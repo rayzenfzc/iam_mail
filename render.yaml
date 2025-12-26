@@ -1,0 +1,27 @@
+# Render deployment configuration for i.AM Mail
+
+services:
+  - type: web
+    name: iam-mail
+    env: node
+    region: singapore  # Closest to UAE
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # The following should be set in Render dashboard (not in file for security)
+      # - key: API_KEY
+      # - key: FIREBASE_PROJECT_ID
+      # - key: FIREBASE_CLIENT_EMAIL
+      # - key: FIREBASE_PRIVATE_KEY
+      # - key: JWT_SECRET
+      # - key: ENCRYPTION_KEY
+      # - key: ZOHO_CLIENT_ID
+      # - key: ZOHO_CLIENT_SECRET
+      # - key: ZOHO_REFRESH_TOKEN
+      # - key: ZOHO_ZOID

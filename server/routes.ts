@@ -45,6 +45,17 @@ export async function registerRoutes(
 ): Promise<Server> {
 
   // ============================================
+  // HEALTH CHECK (Required for Render.com)
+  // ============================================
+  app.get("/api/health", (req, res) => {
+    res.json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      version: "1.0.0"
+    });
+  });
+
+  // ============================================
   // AUTHENTICATION ENDPOINTS
   // ============================================
 
