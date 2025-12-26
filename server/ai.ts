@@ -73,7 +73,7 @@ IMPORTANT: Return ONLY valid JSON. No explanations.`;
 
         try {
             const response = await this.ai.models.generateContent({
-                model: "gemini-1.5-flash",
+                model: "gemini-2.0-flash-lite",
                 contents: [{
                     role: 'user',
                     parts: [{ text: `${systemPrompt}\n\nUser command: "${command}"` }]
@@ -139,7 +139,7 @@ Return JSON with "subject" and "body" keys. The body should be plain text with \
 
         try {
             const response = await this.ai.models.generateContent({
-                model: "gemini-1.5-flash",
+                model: "gemini-2.0-flash-lite",
                 contents: [{ role: 'user', parts: [{ text: prompt }] }],
                 config: {
                     temperature: 0.7,
@@ -191,7 +191,7 @@ Return ONLY the summary text, no JSON.`;
 
         try {
             const response = await this.ai.models.generateContent({
-                model: "gemini-1.5-flash",
+                model: "gemini-2.0-flash-lite",
                 contents: [{ role: 'user', parts: [{ text: prompt }] }],
                 config: {
                     temperature: 0.3,
