@@ -1,0 +1,8 @@
+{
+  "name": "i AM Token Importer",
+  "id": "iam-token-importer",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "ui": {}
+}

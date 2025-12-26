@@ -1,0 +1,288 @@
+/* ============================================
+   i AM Mail - Design Token System
+   Collection: i AM token
+   Modes: Default (light), Superhuman (dark)
+   ============================================ */
+
+:root {
+    /* ============================================
+     Background Tokens
+     ============================================ */
+    --bg-base: #FFFFFF;
+    --bg-surface: #F8FAFC;
+    --bg-elevated: #FFFFFF;
+    --bg-active: #E2E8F0;
+    --bg-hover: #F1F5F9;
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+
+    /* ============================================
+     Text Tokens
+     ============================================ */
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-tertiary: #94A3B8;
+    --text-inverse: #FFFFFF;
+    --text-disabled: #CBD5E1;
+
+    /* ============================================
+     Border Tokens
+     ============================================ */
+    --border-default: #E2E8F0;
+    --border-strong: #E2E8F0;
+    --border-focus: #3B82F6;
+    --border-error: #EF4444;
+
+    /* ============================================
+     Accent Tokens
+     ============================================ */
+    --accent-primary: #3B82F6;
+    --accent-hover: #2563EB;
+    --accent-active: #1D4ED8;
+    --accent-subtle: #DBEAFE;
+
+    /* ============================================
+     Status Tokens
+     ============================================ */
+    --status-success: #10B981;
+    --status-success-bg: #D1FAE5;
+    --status-warning: #F59E0B;
+    --status-warning-bg: #FEF3C7;
+    --status-error: #EF4444;
+    --status-error-bg: #FEE2E2;
+    --status-info: #3B82F6;
+    --status-info-bg: #DBEAFE;
+
+    /* ============================================
+     Shadows
+     ============================================ */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+
+    /* ============================================
+     Spacing Scale (4px base unit)
+     ============================================ */
+    --space-0: 0px;
+    --space-1: 4px;
+    /* xs - icon gaps */
+    --space-2: 8px;
+    /* sm - inline spacing */
+    --space-3: 12px;
+    /* md-sm - compact padding */
+    --space-4: 16px;
+    /* md - standard padding */
+    --space-5: 20px;
+    /* md-lg - section gaps */
+    --space-6: 24px;
+    /* lg - card padding */
+    --space-8: 32px;
+    /* xl - section margins */
+    --space-10: 40px;
+    /* 2xl - page margins */
+    --space-12: 48px;
+    /* 3xl - large gaps */
+    --space-16: 64px;
+    /* 4xl - hero spacing */
+
+    /* Legacy aliases (backwards compatibility) */
+    --space-xs: var(--space-1);
+    --space-sm: var(--space-2);
+    --space-md: var(--space-4);
+    --space-lg: var(--space-6);
+    --space-xl: var(--space-8);
+    --space-2xl: var(--space-12);
+
+    /* ============================================
+     Component Heights (fixed for consistency)
+     ============================================ */
+    --height-input: 40px;
+    --height-button: 40px;
+    --height-button-sm: 32px;
+    --height-button-lg: 48px;
+    --height-avatar-sm: 32px;
+    --height-avatar: 40px;
+    --height-avatar-lg: 48px;
+    --height-email-row: 92px;
+    /* Must fit: sender + subject + preview */
+    --height-header: 64px;
+    --height-toolbar: 48px;
+    --height-calendar-slot: 60px;
+    --height-command-bar: 56px;
+
+    /* ============================================
+     Component Widths
+     ============================================ */
+    --width-sidebar: 80px;
+    --width-sidebar-expanded: 280px;
+    --width-email-list: 400px;
+    --width-compose: 640px;
+    --width-settings: 560px;
+    --width-calendar-stream: 280px;
+    --width-command-bar: 600px;
+    --width-time-column: 64px;
+
+    /* ============================================
+     Typography - Font Sizes
+     ============================================ */
+    --text-xs: 10px;
+    --text-sm: 12px;
+    --text-base: 14px;
+    --text-md: 16px;
+    --text-lg: 18px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 32px;
+
+    /* ============================================
+     Typography - Font Weights
+     ============================================ */
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    /* ============================================
+     Typography - Line Heights
+     ============================================ */
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.75;
+
+    /* ============================================
+     Border Radius
+     ============================================ */
+    --radius-none: 0;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* ============================================
+     Transitions
+     ============================================ */
+    --transition-fast: 150ms ease;
+    --transition-normal: 200ms ease;
+    --transition-slow: 300ms ease;
+}
+
+/* ============================================
+   Superhuman Theme (Dark Mode)
+   Supports: data-theme="superhuman", data-theme="dark", and .dark class
+   ============================================ */
+[data-theme="superhuman"],
+[data-theme="dark"],
+html.dark,
+.dark {
+    /* Background */
+    --bg-base: #000000;
+    --bg-surface: #0A0A0A;
+    --bg-elevated: #141414;
+    --bg-active: #262626;
+    --bg-hover: #1A1A1A;
+    --bg-overlay: rgba(0, 0, 0, 0.8);
+
+    /* Text */
+    --text-primary: #FFFFFF;
+    --text-secondary: #A1A1AA;
+    --text-tertiary: #52525B;
+    --text-inverse: #000000;
+    --text-disabled: #3F3F46;
+
+    /* Border */
+    --border-default: #27272A;
+    --border-strong: #27272A;
+    --border-focus: #3B82F6;
+    --border-error: #EF4444;
+
+    /* Accent */
+    --accent-primary: #3B82F6;
+    --accent-hover: #2563EB;
+    --accent-active: #1D4ED8;
+    --accent-subtle: #1E3A8A;
+
+    /* Status (adjusted for dark) */
+    --status-success: #34D399;
+    --status-success-bg: #064E3B;
+    --status-warning: #FBBF24;
+    --status-warning-bg: #78350F;
+    --status-error: #F87171;
+    --status-error-bg: #7F1D1D;
+    --status-info: #60A5FA;
+    --status-info-bg: #1E3A8A;
+
+    /* Shadows (darker) */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6);
+}
+
+/* ============================================
+   Z-Index Hierarchy
+   ============================================ */
+:root {
+    --z-base: 0;
+    --z-dropdown: 50;
+    --z-sticky: 100;
+    --z-fixed: 200;
+    --z-modal-backdrop: 300;
+    --z-modal: 400;
+    --z-popover: 500;
+    --z-tooltip: 600;
+    --z-toast: 700;
+}
+
+/* ============================================
+   Mobile Responsive Overrides
+   ============================================ */
+@media (max-width: 768px) {
+    :root {
+        /* Larger touch targets for mobile */
+        --height-email-row: 96px;
+        /* Taller for touch + readability */
+        --height-button: 48px;
+        --height-button-sm: 40px;
+        --height-input: 48px;
+        --height-touch-target: 44px;
+
+        /* Full width components */
+        --width-email-list: 100%;
+        --width-compose: 100%;
+        --width-settings: 100%;
+
+        /* Slightly larger base text for readability */
+        --text-base: 16px;
+        --text-sm: 14px;
+
+        /* Increased spacing for touch */
+        --space-4: 20px;
+    }
+}
+
+/* ============================================
+   Theme Transition (smooth switching)
+   ============================================ */
+html {
+    color-scheme: light dark;
+}
+
+html,
+html *,
+html *::before,
+html *::after {
+    transition:
+        background-color var(--transition-normal),
+        border-color var(--transition-normal),
+        color var(--transition-fast);
+}
+
+/* Disable transitions on page load */
+html.no-transitions,
+html.no-transitions *,
+html.no-transitions *::before,
+html.no-transitions *::after {
+    transition: none !important;
+}

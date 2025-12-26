@@ -7,6 +7,9 @@ import { simpleParser } from "mailparser";
 import nodemailer from "nodemailer";
 import webpush from "web-push";
 import { GoogleGenAI } from "@google/genai";
+import { detectProvider, getProvider, EMAIL_PROVIDERS } from "./email-providers";
+import { zohoAdmin, isZohoConfigured } from "./zoho-admin";
+import crypto from "crypto";
 
 // In-memory subscription storage (replace with database in production)
 const subscriptions: webpush.PushSubscription[] = [];
@@ -41,17 +44,504 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
-  app.get("/api/notifications/vapid-public-key", (req, res) => {
-    // Return the current public key so the client can subscribe with it
-    // Note: We need to access the key we set. 
-    // If we generated one, we need to store it. 
-    // Ideally, read from env or the one we just generated.
-    // For this implementation, we assume we can get it from process.env or the generated variable.
-    // Let's rely on the logs for now to set the env var, but for the API to work dynamically:
+  // ============================================
+  // AUTHENTICATION ENDPOINTS
+  // ============================================
 
-    // We'll use a hack to expose the key if generated locally
-    const currentKey = process.env.VAPID_PUBLIC_KEY || (webpush as any)._vapid_keys?.publicKey; // _vapid_keys is internal?
-    // Safer:
+  // Signup
+  app.post("/api/auth/signup", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password required" });
+      }
+
+      const { authService } = await import("./auth");
+      const { user, token } = await authService.signup(email, password);
+
+      res.json({
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          preferences: user.preferences
+        }
+      });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Login
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password required" });
+      }
+
+      const { authService } = await import("./auth");
+      const { user, token } = await authService.login(email, password);
+
+      res.json({
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          preferences: user.preferences
+        }
+      });
+    } catch (error: any) {
+      res.status(401).json({ error: error.message });
+    }
+  });
+
+  // Genesis Protocol - Connect Email Account
+  app.post("/api/auth/connect", async (req, res) => {
+    try {
+      const { email, password, imapHost, imapPort, smtpHost, smtpPort } = req.body;
+      const token = req.headers.authorization?.replace('Bearer ', '');
+
+      if (!token) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { authService, verifyToken } = await import("./auth");
+      const payload = verifyToken(token);
+
+      if (!payload) {
+        return res.status(401).json({ error: "Invalid token" });
+      }
+
+      const result = await authService.connectEmailAccount(
+        payload.userId,
+        email,
+        password,
+        imapHost || `imap.${email.split('@')[1]}`,
+        imapPort || 993,
+        smtpHost || `smtp.${email.split('@')[1]}`,
+        smtpPort || 587
+      );
+
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get current user
+  app.get("/api/auth/me", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { authService, verifyToken } = await import("./auth");
+      const payload = verifyToken(token);
+
+      if (!payload) {
+        return res.status(401).json({ error: "Invalid token" });
+      }
+
+      const user = await authService.getUserById(payload.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({
+        id: user.id,
+        email: user.email,
+        preferences: user.preferences,
+        createdAt: user.createdAt
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Update user preferences
+  app.patch("/api/user/preferences", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { authService, verifyToken } = await import("./auth");
+      const payload = verifyToken(token);
+
+      if (!payload) {
+        return res.status(401).json({ error: "Invalid token" });
+      }
+
+      await authService.updatePreferences(payload.userId, req.body);
+      res.json({ success: true, message: "Preferences updated" });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // CALENDAR & OPPORTUNITIES ENDPOINTS
+  // ============================================
+
+  // Get calendar events
+  app.get("/api/calendar/events", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const { startDate, endDate, userId } = req.query;
+
+      const userIdToUse = userId as string || (token ? (await import("./auth")).verifyToken(token)?.userId : null);
+      if (!userIdToUse) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { calendarService } = await import("./calendar");
+      const events = await calendarService.getEvents(
+        userIdToUse,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(events);
+    } catch (error: any) {
+      console.error('Get events error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create calendar event
+  app.post("/api/calendar/events", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+
+      const userId = req.body.userId || payload?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { calendarService } = await import("./calendar");
+      const event = await calendarService.createEvent(userId, req.body);
+
+      res.status(201).json(event);
+    } catch (error: any) {
+      console.error('Create event error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Update calendar event
+  app.patch("/api/calendar/events/:id", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+
+      const userId = req.body.userId || payload?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { calendarService } = await import("./calendar");
+      const event = await calendarService.updateEvent(userId, req.params.id, req.body);
+
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      res.json(event);
+    } catch (error: any) {
+      console.error('Update event error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete calendar event
+  app.delete("/api/calendar/events/:id", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+      const userId = (req.query.userId as string) || payload?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { calendarService } = await import("./calendar");
+      await calendarService.deleteEvent(userId, req.params.id);
+
+      res.json({ success: true, message: "Event deleted" });
+    } catch (error: any) {
+      console.error('Delete event error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get opportunities
+  app.get("/api/opportunities", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const { status, priority, userId } = req.query;
+
+      const userIdToUse = userId as string || (token ? (await import("./auth")).verifyToken(token)?.userId : null);
+      if (!userIdToUse) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { calendarService } = await import("./calendar");
+      const opportunities = await calendarService.getOpportunities(userIdToUse, {
+        status: status as string,
+        priority: priority as string
+      });
+
+      res.json(opportunities);
+    } catch (error: any) {
+      console.error('Get opportunities error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create opportunity
+  app.post("/api/opportunities", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+
+      const userId = req.body.userId || payload?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { calendarService } = await import("./calendar");
+      const opportunity = await calendarService.createOpportunity(userId, req.body);
+
+      res.status(201).json(opportunity);
+    } catch (error: any) {
+      console.error('Create opportunity error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Convert opportunity to event (Drag-and-Drop)
+  app.post("/api/calendar/convert", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+
+      const userId = req.body.userId || payload?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { opportunityId, startDate, endDate, allDay, location } = req.body;
+
+      if (!opportunityId || !startDate || !endDate) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const { calendarService } = await import("./calendar");
+      const event = await calendarService.convertOpportunityToEvent(userId, opportunityId, {
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        allDay,
+        location
+      });
+
+      res.json({ success: true, event });
+    } catch (error: any) {
+      console.error('Convert opportunity error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // CONTACTS ENDPOINTS
+  // ============================================
+
+  // Get all contacts for user
+  app.get("/api/contacts", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+      const userId = (req.query.userId as string) || payload?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { contactsService } = await import("./contacts");
+      const contacts = await contactsService.getContacts(userId);
+
+      res.json(contacts);
+    } catch (error: any) {
+      console.error('Get contacts error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Search contacts
+  app.get("/api/contacts/search", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+      const userId = (req.query.userId as string) || payload?.userId;
+      const query = req.query.q as string;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (!query) {
+        return res.status(400).json({ error: "Search query required" });
+      }
+
+      const { contactsService } = await import("./contacts");
+      const contacts = await contactsService.searchContacts(userId, query);
+
+      res.json(contacts);
+    } catch (error: any) {
+      console.error('Search contacts error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create contact
+  app.post("/api/contacts", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+      const userId = req.body.userId || payload?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { contactsService } = await import("./contacts");
+      const contact = await contactsService.createContact(userId, req.body);
+
+      res.status(201).json(contact);
+    } catch (error: any) {
+      console.error('Create contact error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Update contact
+  app.patch("/api/contacts/:id", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+      const userId = req.body.userId || payload?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { contactsService } = await import("./contacts");
+      const contact = await contactsService.updateContact(userId, req.params.id, req.body);
+
+      res.json(contact);
+    } catch (error: any) {
+      console.error('Update contact error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete contact
+  app.delete("/api/contacts/:id", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const payload = token ? (await import("./auth")).verifyToken(token) : null;
+      const userId = (req.query.userId as string) || payload?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { contactsService } = await import("./contacts");
+      await contactsService.deleteContact(userId, req.params.id);
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Delete contact error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // AI INTEGRATION ENDPOINTS
+  // ============================================
+
+  // Interpret natural language command
+  app.post("/api/ai/interpret", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const { command, context } = req.body;
+
+      if (!command) {
+        return res.status(400).json({ error: "Command required" });
+      }
+
+      const { aiService } = await import("./ai");
+      const action = await aiService.interpretCommand(command, context);
+
+      res.json(action);
+    } catch (error: any) {
+      console.error('AI interpret error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Generate email draft
+  app.post("/api/ai/compose", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const { to, subject, context, tone, length } = req.body;
+
+      const { aiService } = await import("./ai");
+      const draft = await aiService.composeEmail({
+        to,
+        subject,
+        context,
+        tone,
+        length
+      });
+
+      res.json(draft);
+    } catch (error: any) {
+      console.error('AI compose error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Summarize email
+  app.post("/api/ai/summarize", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      const { email } = req.body;
+
+      if (!email || !email.subject || !email.body) {
+        return res.status(400).json({ error: "Email data required" });
+      }
+
+      const { aiService } = await import("./ai");
+      const summary = await aiService.summarizeEmail(email);
+
+      res.json({ summary });
+    } catch (error: any) {
+      console.error('AI summarize error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // NOTIFICATIONS & PUSH
+  // ============================================
+
+  app.get("/api/notifications/vapid-public-key", (req, res) => {
     res.json({ publicKey: process.env.VAPID_PUBLIC_KEY || "check_server_logs_for_generated_key" });
   });
 
@@ -136,11 +626,25 @@ export async function registerRoutes(
 
   // Email configuration endpoints
   app.post("/api/email/test-connection", async (req, res) => {
-    const { email, password, imapHost, imapPort, smtpHost, smtpPort } = req.body;
+    let { email, password, imapHost, imapPort, smtpHost, smtpPort, provider } = req.body;
 
-    if (!email || !password || !imapHost || !smtpHost) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
     }
+
+    // Auto-detect provider if not specified or if hosts not provided
+    if (!imapHost || !smtpHost) {
+      const detected = detectProvider(email);
+      console.log(`Auto-detected provider for ${email}: ${detected.config.name}`);
+
+      imapHost = imapHost || detected.config.imap.host;
+      imapPort = imapPort || detected.config.imap.port;
+      smtpHost = smtpHost || detected.config.smtp.host;
+      smtpPort = smtpPort || detected.config.smtp.port;
+      provider = provider || detected.key;
+    }
+
+    console.log(`Testing connection: ${email} via ${imapHost}:${imapPort} / ${smtpHost}:${smtpPort}`);
 
     // In production (Railway), iCloud blocks connections from cloud providers
     // So we skip the actual connection test and just validate the input format
@@ -160,11 +664,12 @@ export async function registerRoutes(
       // Return success without actually testing (since iCloud blocks cloud IPs)
       return res.json({
         success: true,
-        message: "Credentials validated (connection will be tested when fetching emails)"
+        message: "Credentials validated (connection will be tested when fetching emails)",
+        provider: provider
       });
     }
 
-    // Local development - actually test the connection
+    // Local development - actually test the connection with timeout
     const imapClient = new ImapFlow({
       host: imapHost,
       port: parseInt(imapPort) || 993,
@@ -177,42 +682,104 @@ export async function registerRoutes(
     });
 
     try {
-      await imapClient.connect();
-      await imapClient.logout();
+      // Wrap in promise to catch ALL errors including timeout
+      await new Promise(async (resolve, reject) => {
+        // Handle ALL error events
+        const errorHandler = (err: any) => {
+          reject(err);
+        };
 
-      // Test SMTP connection
-      const smtpTransporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: parseInt(smtpPort) || 587,
-        secure: parseInt(smtpPort) === 465,
-        auth: {
-          user: email,
-          pass: password,
-        },
+        imapClient.on('error', errorHandler);
+
+        try {
+          // 10 second timeout
+          const timeoutId = setTimeout(() => {
+            reject(new Error('Connection timeout (10s)'));
+          }, 10000);
+
+          await imapClient.connect();
+          clearTimeout(timeoutId);
+          await imapClient.logout();
+
+          // Test SMTP connection
+          const smtpTransporter = nodemailer.createTransport({
+            host: smtpHost,
+            port: parseInt(smtpPort) || 587,
+            secure: parseInt(smtpPort) === 465,
+            auth: {
+              user: email,
+              pass: password,
+            },
+            connectionTimeout: 10000,
+          });
+
+          await smtpTransporter.verify();
+
+          imapClient.removeListener('error', errorHandler);
+          resolve(true);
+        } catch (err) {
+          imapClient.removeListener('error', errorHandler);
+          reject(err);
+        }
       });
 
-      await smtpTransporter.verify();
-
-      res.json({ success: true, message: "Connection successful" });
+      res.json({ success: true, message: "Connection successful", provider: provider });
     } catch (error: any) {
-      console.error("Connection test failed:", error);
+      // Ensure client is closed
+      try {
+        await imapClient.logout();
+      } catch (e) {
+        // Ignore logout errors
+      }
+      console.error("Connection test failed:", error.message);
+      console.error("Attempted connection to:", { imapHost, imapPort, smtpHost, smtpPort, email });
       res.status(500).json({
         error: "Connection failed",
-        message: error.message || "Unable to connect to email server"
+        message: error.message || "Unable to connect to email server",
+        details: `IMAP: ${imapHost}:${imapPort}, SMTP: ${smtpHost}:${smtpPort}`
       });
     }
   });
 
   app.post("/api/email/save-config", async (req, res) => {
-    const { email, password, imapHost, imapPort, smtpHost, smtpPort } = req.body;
+    const { email, password, imapHost, imapPort, smtpHost, smtpPort, userId } = req.body;
 
     if (!email || !password || !imapHost || !smtpHost) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     try {
-      // In a real app, you'd save this to a database
-      // For now, we'll update the process.env (note: this won't persist across restarts)
+      // Check if Firebase is configured
+      const hasFirebase = process.env.FIREBASE_PROJECT_ID &&
+        process.env.FIREBASE_CLIENT_EMAIL &&
+        process.env.FIREBASE_PRIVATE_KEY;
+
+      if (hasFirebase) {
+        // Full Firebase implementation
+        const { accountsService } = await import("./accounts");
+
+        // Use email as userId if not provided (for now)
+        const userIdToUse = userId || email;
+
+        // Create account in Firestore
+        await accountsService.createAccount(userIdToUse, {
+          email,
+          password,
+          imapHost,
+          imapPort: parseInt(imapPort) || 993,
+          smtpHost,
+          smtpPort: parseInt(smtpPort) || 587
+        });
+
+        // Set as active account
+        const accounts = await accountsService.getAccounts(userIdToUse);
+        const newAccount = accounts.find(acc => acc.email === email);
+        if (newAccount) {
+          await accountsService.setActiveAccount(userIdToUse, newAccount.id);
+        }
+      }
+
+      // Always update process.env (works without Firebase)
       process.env.IMAP_HOST = imapHost;
       process.env.IMAP_PORT = String(imapPort);
       process.env.IMAP_USER = email;
@@ -222,10 +789,240 @@ export async function registerRoutes(
       process.env.SMTP_USER = email;
       process.env.SMTP_PASS = password;
 
-      res.json({ success: true, message: "Configuration saved" });
+      console.log(`✅ Saved email config for: ${email} ${hasFirebase ? '(Firestore + process.env)' : '(process.env only)'}`);
+
+      res.json({
+        success: true,
+        message: hasFirebase ? "Account saved to database" : "Account saved (Firebase not configured - using temporary storage)",
+        usesFirebase: hasFirebase
+      });
     } catch (error: any) {
       console.error("Failed to save configuration:", error);
-      res.status(500).json({ error: "Failed to save configuration" });
+      res.status(500).json({ error: "Failed to save configuration", message: error.message });
+    }
+  });
+
+  // ============================================
+  // ZOHO MAILBOX PROVISIONING ENDPOINTS
+  // ============================================
+
+  // Create new mailbox via Zoho Admin API
+  app.post("/api/email/create-mailbox", async (req, res) => {
+    const { desiredEmail, customerName, userId } = req.body;
+
+    if (!desiredEmail || !customerName) {
+      return res.status(400).json({ error: "Email and name are required" });
+    }
+
+    // Check if Zoho Admin API is configured
+    if (!isZohoConfigured()) {
+      return res.status(503).json({
+        error: "Zoho Admin API not configured",
+        message: "Please run setup commands to get refresh token and ZOID"
+      });
+    }
+
+    try {
+      // Generate secure initial password (16 chars)
+      const initialPassword = crypto.randomBytes(12).toString('base64').slice(0, 16);
+
+      // Create user in Zoho via Admin API
+      const zohoResponse = await zohoAdmin.createUser({
+        email: desiredEmail,
+        password: initialPassword,
+        firstName: customerName.split(' ')[0],
+        lastName: customerName.split(' ').slice(1).join(' ') || '',
+        displayName: customerName,
+      });
+
+      console.log('Zoho mailbox created:', zohoResponse);
+
+      // Save to Firebase (encrypted)
+      let savedToDb = false;
+      try {
+        const { accountsService } = await import("./accounts");
+        const userIdToUse = userId || req.headers['x-user-id'] as string || desiredEmail;
+
+        await accountsService.addAccount(userIdToUse, {
+          email: desiredEmail,
+          password: initialPassword,
+          provider: 'iam', // i.AM Mail Hosted (white-label)
+          displayName: customerName,
+          zohoAccountId: zohoResponse.data?.accountId || zohoResponse.accountId,
+          createdViaIAM: true,
+          isActive: true,
+        });
+        savedToDb = true;
+      } catch (dbError) {
+        console.error("Warning: Could not save to Firestore:", dbError);
+      }
+
+      return res.json({
+        success: true,
+        email: desiredEmail,
+        tempPassword: initialPassword, // Show once, then customer should change
+        message: "Email created successfully! Use Genesis Protocol to connect.",
+        savedToDatabase: savedToDb,
+      });
+
+    } catch (error: any) {
+      console.error("Mailbox creation failed:", error.response?.data || error.message);
+      return res.status(500).json({
+        error: "Failed to create mailbox",
+        details: error.response?.data?.message || error.message,
+      });
+    }
+  });
+
+  // Change password via Zoho Admin API
+  app.post("/api/email/change-password", async (req, res) => {
+    const { accountId, currentPassword, newPassword, userId } = req.body;
+
+    if (!accountId || !newPassword) {
+      return res.status(400).json({ error: "Account ID and new password are required" });
+    }
+
+    try {
+      const { accountsService } = await import("./accounts");
+      const userIdToUse = userId || req.headers['x-user-id'] as string;
+
+      if (!userIdToUse) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      // Get account from Firebase
+      const accounts = await accountsService.getAccounts(userIdToUse);
+      const account = accounts.find((a: any) => a.id === accountId);
+
+      if (!account) {
+        return res.status(404).json({ error: "Account not found" });
+      }
+
+      // Verify current password if provided
+      if (currentPassword) {
+        const storedPassword = await accountsService.getDecryptedPassword(accountId);
+        if (storedPassword !== currentPassword) {
+          return res.status(401).json({ error: "Current password is incorrect" });
+        }
+      }
+
+      // Update in Zoho if it's a Zoho-hosted account
+      if (account.zohoAccountId && isZohoConfigured()) {
+        try {
+          await zohoAdmin.updatePassword(account.zohoAccountId, newPassword);
+          console.log("Password updated in Zoho");
+        } catch (zohoError: any) {
+          console.error("Failed to update Zoho password:", zohoError.response?.data || zohoError.message);
+          // Continue - still update in Firebase
+        }
+      }
+
+      // Update in Firebase
+      await accountsService.updatePassword(userIdToUse, accountId, newPassword);
+
+      return res.json({
+        success: true,
+        message: "Password updated successfully",
+      });
+
+    } catch (error: any) {
+      console.error("Password change failed:", error);
+      return res.status(500).json({ error: "Failed to update password" });
+    }
+  });
+
+  // Check Zoho Admin API status
+  app.get("/api/zoho/status", async (req, res) => {
+    res.json({
+      configured: isZohoConfigured(),
+      message: isZohoConfigured()
+        ? "Zoho Admin API is ready for mailbox provisioning"
+        : "Zoho Admin API needs configuration (run setup commands)",
+    });
+  });
+
+  // Get all accounts for a user
+  app.get("/api/accounts", async (req, res) => {
+    try {
+      // Try multiple sources for userId
+      const userId = (req.query.userId as string) ||
+        (req.headers['x-user-id'] as string) ||
+        (req.query.email as string);
+
+      if (!userId) {
+        // Return empty array instead of error - no accounts configured yet
+        return res.json([]);
+      }
+
+      const { accountsService } = await import("./accounts");
+      const accounts = await accountsService.getAccounts(userId);
+
+      // Don't send passwords to client
+      const sanitized = accounts.map(acc => ({
+        id: acc.id,
+        email: acc.email,
+        provider: acc.provider,
+        isActive: acc.isActive,
+        createdAt: acc.createdAt
+      }));
+
+      res.json(sanitized);
+    } catch (error: any) {
+      console.error("Failed to fetch accounts:", error);
+      // Return empty array on error instead of 500
+      res.json([]);
+    }
+  });
+
+  // Switch active account
+  app.post("/api/accounts/switch", async (req, res) => {
+    try {
+      const { userId, accountId } = req.body;
+      if (!userId || !accountId) {
+        return res.status(400).json({ error: "userId and accountId are required" });
+      }
+
+      const { accountsService } = await import("./accounts");
+      await accountsService.setActiveAccount(userId, accountId);
+
+      // Update process.env with new active account
+      const activeAccount = await accountsService.getActiveAccount(userId);
+      if (activeAccount) {
+        const password = await accountsService.getDecryptedPassword(activeAccount.id);
+        process.env.IMAP_HOST = activeAccount.imapHost;
+        process.env.IMAP_PORT = String(activeAccount.imapPort);
+        process.env.IMAP_USER = activeAccount.email;
+        process.env.IMAP_PASS = password;
+        process.env.SMTP_HOST = activeAccount.smtpHost;
+        process.env.SMTP_PORT = String(activeAccount.smtpPort);
+        process.env.SMTP_USER = activeAccount.email;
+        process.env.SMTP_PASS = password;
+      }
+
+      res.json({ success: true, message: "Account switched successfully" });
+    } catch (error: any) {
+      console.error("Failed to switch account:", error);
+      res.status(500).json({ error: "Failed to switch account" });
+    }
+  });
+
+  // Delete account
+  app.delete("/api/accounts/:accountId", async (req, res) => {
+    try {
+      const { accountId } = req.params;
+      const userId = (req.query.userId as string) || (req.headers['x-user-id'] as string);
+
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+      }
+
+      const { accountsService } = await import("./accounts");
+      await accountsService.deleteAccount(userId, accountId);
+
+      res.json({ success: true, message: "Account deleted successfully" });
+    } catch (error: any) {
+      console.error("Failed to delete account:", error);
+      res.status(500).json({ error: "Failed to delete account" });
     }
   });
 
@@ -305,22 +1102,57 @@ export async function registerRoutes(
   });
 
   app.get("/api/imap/emails", async (req, res) => {
-    const { IMAP_HOST, IMAP_USER, IMAP_PASS, IMAP_PORT } = process.env;
+    // Try to get user's configured email account first
+    let imapHost: string = '', imapPort: number = 993, imapUser: string = '', imapPass: string = '';
 
-    if (!IMAP_HOST || !IMAP_USER || !IMAP_PASS) {
-      return res.status(500).json({
-        error: "IMAP credentials not configured",
-        message: "Please set IMAP_HOST, IMAP_USER, and IMAP_PASS in Secrets"
-      });
+    try {
+      const accountsService = (await import('./accounts')).accountsService;
+      const userId = req.query.userId as string || req.headers['x-user-id'] as string;
+
+      if (userId) {
+        const accounts = await accountsService.getAccounts(userId);
+        const activeAccount = accounts.find((a: any) => a.isActive) || accounts[0];
+
+        if (activeAccount) {
+          // Use provider detection for IMAP settings
+          const { config } = detectProvider(activeAccount.email);
+
+          imapHost = activeAccount.imapHost || config.imap.host;
+          imapPort = activeAccount.imapPort || config.imap.port;
+          imapUser = activeAccount.email;
+          imapPass = await accountsService.getDecryptedPassword(activeAccount.id);
+
+          console.log(`Fetching emails for ${imapUser} via ${imapHost}:${imapPort} (${config.name})`);
+        }
+      }
+    } catch (e) {
+      console.log('No user account found, falling back to env vars');
+    }
+
+    // Fallback to environment variables
+    if (!imapHost!) {
+      const { IMAP_HOST, IMAP_USER, IMAP_PASS, IMAP_PORT } = process.env;
+
+      if (!IMAP_HOST || !IMAP_USER || !IMAP_PASS) {
+        return res.status(400).json({
+          error: "No email account configured",
+          message: "Please connect an email account in Settings first"
+        });
+      }
+
+      imapHost = IMAP_HOST;
+      imapPort = parseInt(IMAP_PORT || "993");
+      imapUser = IMAP_USER;
+      imapPass = IMAP_PASS;
     }
 
     const client = new ImapFlow({
-      host: IMAP_HOST,
-      port: parseInt(IMAP_PORT || "993"),
+      host: imapHost,
+      port: imapPort,
       secure: true,
       auth: {
-        user: IMAP_USER,
-        pass: IMAP_PASS,
+        user: imapUser,
+        pass: imapPass,
       },
       logger: false,
     });
@@ -388,40 +1220,86 @@ export async function registerRoutes(
   });
 
   app.post("/api/smtp/send", async (req, res) => {
-    const { SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_PORT } = process.env;
-
-    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
-      return res.status(500).json({
-        error: "SMTP credentials not configured",
-        message: "Please set SMTP_HOST, SMTP_USER, and SMTP_PASS in Secrets"
-      });
-    }
-
-    const { to, subject, body, html } = req.body;
+    const { to, cc, bcc, subject, body, html } = req.body;
 
     if (!to || !subject) {
       return res.status(400).json({ error: "Missing required fields: to, subject" });
     }
 
-    const trackingToken = require("crypto").randomUUID();
-    const baseUrl = process.env.BASE_URL || `https://${req.get("host")}`;
-    const trackingPixel = `<img src="${baseUrl}/api/track?id=${trackingToken}" width="1" height="1" style="display:none" alt="" />`;
-    const htmlWithTracking = (html || `<p>${body.replace(/\n/g, "</p><p>")}</p>`) + trackingPixel;
-
-    const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: parseInt(SMTP_PORT || "587"),
-      secure: parseInt(SMTP_PORT || "587") === 465,
-      auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS,
-      },
-    });
-
+    // Try to get user's configured email account
     try {
+      const accountsService = (await import('./accounts')).accountsService;
+
+      // Get active account for user (use first active account)
+      const userId = req.body.userId || req.headers['x-user-id'] || 'default';
+      let activeAccount;
+
+      try {
+        const accounts = await accountsService.getAccounts(userId.toString());
+        activeAccount = accounts.find((a: any) => a.isActive) || accounts[0];
+      } catch (e) {
+        // Try localStorage user email
+        const userEmail = req.headers['x-user-email'] as string;
+        if (userEmail) {
+          const accounts = await accountsService.getAccounts(userEmail);
+          activeAccount = accounts.find((a: any) => a.isActive) || accounts[0];
+        }
+      }
+
+      if (!activeAccount) {
+        // Fallback to environment variables if no account configured
+        const { SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_PORT } = process.env;
+
+        if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+          return res.status(400).json({
+            error: "No email account configured",
+            message: "Please connect an email account in Settings first"
+          });
+        }
+
+        // Use env vars as fallback
+        activeAccount = {
+          email: SMTP_USER,
+          smtpHost: SMTP_HOST,
+          smtpPort: parseInt(SMTP_PORT || "587"),
+          password: SMTP_PASS
+        };
+      }
+
+      // Get decrypted password
+      let smtpPassword = activeAccount.password;
+      if (activeAccount.id) {
+        // It's from Firestore, need to get decrypted version
+        smtpPassword = await accountsService.getDecryptedPassword(activeAccount.id);
+      }
+
+      // Determine SMTP settings
+      const smtpHost = activeAccount.smtpHost || activeAccount.imapHost?.replace('imap.', 'smtp.');
+      const smtpPort = activeAccount.smtpPort || 587;
+
+      console.log(`Sending email via ${smtpHost}:${smtpPort} from ${activeAccount.email}`);
+
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+          user: activeAccount.email,
+          pass: smtpPassword,
+        },
+      });
+
+      const trackingToken = require("crypto").randomUUID();
+      const baseUrl = process.env.BASE_URL || `https://${req.get("host")}`;
+      const trackingPixel = `<img src="${baseUrl}/api/track?id=${trackingToken}" width="1" height="1" style="display:none" alt="" />`;
+      const htmlBody = html || `<p>${(body || '').replace(/\n/g, "</p><p>")}</p>`;
+      const htmlWithTracking = htmlBody + trackingPixel;
+
       const info = await transporter.sendMail({
-        from: SMTP_USER,
+        from: activeAccount.email,
         to,
+        cc: cc || undefined,
+        bcc: bcc || undefined,
         subject,
         text: body,
         html: htmlWithTracking,
@@ -429,7 +1307,7 @@ export async function registerRoutes(
 
       await storage.createEmail({
         sender: "You",
-        senderEmail: SMTP_USER,
+        senderEmail: activeAccount.email,
         recipient: to.split("@")[0] || to,
         recipientEmail: to,
         subject,

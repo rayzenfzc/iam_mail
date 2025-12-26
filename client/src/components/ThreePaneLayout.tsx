@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Email, MOCK_EMAILS } from '@/types';
+import { Email } from '@/types';
 import { GoogleGenAI, Modality } from "@google/genai";
 import {
     Search, Mail, Shield, Send, FileText, Video, MoreHorizontal,
@@ -86,7 +86,7 @@ const EmailItem = ({ email, selectedEmail, setSelectedEmail }: { email: Email, s
 };
 
 const ThreePaneLayout: React.FC<ThreePaneLayoutProps> = ({ isDarkMode, toggleTheme }) => {
-    const [emails, setEmails] = useState<Email[]>(MOCK_EMAILS);
+    const [emails, setEmails] = useState<Email[]>([]);
     const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
     const [tab, setTab] = useState<'focus' | 'other'>('focus');
     const [isComposerOpen, setIsComposerOpen] = useState(false);

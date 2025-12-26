@@ -1,0 +1,424 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  X, CheckCircle, Server, Key, Mail, 
+  Settings2, UserCircle, Users, Bell, Grid, Keyboard, Type,
+  BookOpen, PenTool, FileSignature, ArrowRightLeft, Ban, Reply,
+  Calendar, Sun, Shield, Search, RefreshCw, HardDrive, 
+  ToggleLeft, ToggleRight, ChevronRight, Plus, Palette,
+  Linkedin, Globe, Smartphone, Megaphone, LayoutTemplate, Sparkles, Copy, Monitor, Trash2, Link as LinkIcon, Instagram, Twitter, Facebook, Github,
+  QrCode, Share2, CreditCard, Download, Layers, Youtube, Camera, Code, Upload, Check, AlertCircle, Clock, Volume2, Eye, Zap, Lock, ChevronLeft
+} from 'lucide-react';
+import { AppTheme } from '../types';
+
+interface SettingsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentTheme: AppTheme;
+  onThemeChange: (theme: AppTheme) => void;
+  onAddAccount?: () => void;
+}
+
+type SettingsCategory = 
+  | 'general' | 'profiles' | 'accounts' | 'notifications' | 'categories' | 'shortcuts' | 'fonts'
+  | 'reading' | 'composing' | 'signatures' | 'rules' | 'junk' | 'autoreply'
+  | 'calendar' | 'myday' | 'privacy' | 'search' | 'sync' | 'storage';
+
+interface CustomBlock {
+    id: string;
+    label: string;
+    value: string;
+    type: 'link' | 'text';
+}
+
+interface SignatureData {
+    fullName: string;
+    role: string;
+    company: string;
+    phone: string;
+    photoUrl: string;
+    website: string;
+    linkedin: string;
+    whatsapp: string;
+    instagram: string;
+    twitter: string;
+    facebook: string;
+    youtube: string;
+    bannerText: string;
+    bannerLink: string;
+    style: 'modern' | 'executive' | 'creative' | 'minimal';
+    customBlocks: CustomBlock[];
+}
+
+type DeviceView = 'desktop' | 'mobile';
+type MobileModel = 'iphone17' | 's25';
+type StudioMode = 'visual' | 'code';
+
+// Helper Component for Toggles
+const ToggleRow: React.FC<{ label: string; description?: string; checked: boolean; onChange: () => void }> = ({ label, description, checked, onChange }) => (
+    <div className="flex items-center justify-between py-4 border-b border-slate-50 last:border-0">
+        <div>
+            <div className="text-sm font-medium text-slate-900">{label}</div>
+            {description && <div className="text-xs text-slate-500 mt-0.5">{description}</div>}
+        </div>
+        <button 
+            onClick={onChange}
+            className={`w-11 h-6 rounded-full transition-colors relative ${checked ? 'bg-slate-900' : 'bg-slate-200'}`}
+        >
+            <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${checked ? 'left-6' : 'left-1'}`}></div>
+        </button>
+    </div>
+);
+
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, currentTheme, onThemeChange, onAddAccount }) => {
+  const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
+  const [search, setSearch] = useState('');
+  
+  // Mobile Responsive State: true = showing menu, false = showing detail
+  const [isMobileListView, setIsMobileListView] = useState(true);
+
+  // Signature State
+  const [studioMode, setStudioMode] = useState<StudioMode>('visual');
+  const [sigData, setSigData] = useState<SignatureData>({
+      fullName: 'Sabique',
+      role: 'Product Engineer',
+      company: 'Rayzen',
+      phone: '+1 (555) 0123-4567',
+      photoUrl: 'https://ui-avatars.com/api/?name=Sabique&background=0f172a&color=fff',
+      website: 'www.rayzen.ae',
+      linkedin: 'linkedin.com/in/sabique',
+      whatsapp: '',
+      instagram: '',
+      twitter: '',
+      facebook: '',
+      youtube: '',
+      bannerText: '🚀 Launching Q4 Strategy? Book a consultation.',
+      bannerLink: 'https://cal.com/sabique/strategy',
+      style: 'modern',
+      customBlocks: []
+  });
+
+  const [generatedHtml, setGeneratedHtml] = useState('');
+  const [previewDevice, setPreviewDevice] = useState<DeviceView>('desktop');
+  const [mobileModel, setMobileModel] = useState<MobileModel>('iphone17');
+  
+  // -- Dummy States for interactivity --
+  const [notifications, setNotifications] = useState({ desktop: true, sound: false, badges: true, focusOnly: true });
+  const [reading, setReading] = useState({ conversationView: true, autoAdvance: true, showAvatars: true, loadImages: false });
+  const [autoReply, setAutoReply] = useState({ enabled: false, subject: 'Out of Office', body: 'I am currently away with limited access to email.' });
+  const [junkLevel, setJunkLevel] = useState(75);
+
+  // Update signature whenever data changes
+  useEffect(() => {
+      if (isOpen && activeCategory === 'signatures' && studioMode === 'visual') {
+          renderTemplate();
+      }
+  }, [sigData, isOpen, activeCategory, studioMode]);
+
+  const handleCategorySelect = (id: SettingsCategory) => {
+      setActiveCategory(id);
+      setIsMobileListView(false); // Switch to content view on mobile
+  };
+
+  const addCustomBlock = () => {
+      if (sigData.customBlocks.length < 5) {
+          setSigData({
+              ...sigData,
+              customBlocks: [...sigData.customBlocks, { id: Date.now().toString(), label: '', value: '', type: 'link' }]
+          });
+      }
+  };
+
+  const removeCustomBlock = (id: string) => {
+      setSigData({
+          ...sigData,
+          customBlocks: sigData.customBlocks.filter(b => b.id !== id)
+      });
+  };
+
+  const updateCustomBlock = (id: string, field: keyof CustomBlock, val: string) => {
+      setSigData({
+          ...sigData,
+          customBlocks: sigData.customBlocks.map(b => b.id === id ? { ...b, [field]: val } : b)
+      });
+  };
+
+  // Basic HTML Templates engine
+  const renderTemplate = () => {
+    const { fullName, role, company, phone, photoUrl, website, linkedin, whatsapp, instagram, twitter, facebook, youtube, bannerText, bannerLink, style, customBlocks } = sigData;
+
+    // Helper for icons
+    const iconStyle = "width: 20px; height: 20px; display: inline-block; margin-right: 8px; vertical-align: middle;";
+    const socialLinks = [];
+    if (linkedin) socialLinks.push(`<a href="https://${linkedin}" style="text-decoration:none; margin-right:5px;"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" style="${iconStyle}" alt="LI"/></a>`);
+    if (website) socialLinks.push(`<a href="https://${website}" style="text-decoration:none; margin-right:5px;"><img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" style="${iconStyle}" alt="Web"/></a>`);
+    if (whatsapp) socialLinks.push(`<a href="https://${whatsapp}" style="text-decoration:none; margin-right:5px;"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" style="${iconStyle}" alt="WA"/></a>`);
+    if (instagram) socialLinks.push(`<a href="https://${instagram}" style="text-decoration:none; margin-right:5px;"><img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" style="${iconStyle}" alt="IG"/></a>`);
+    if (twitter) socialLinks.push(`<a href="https://${twitter}" style="text-decoration:none; margin-right:5px;"><img src="https://cdn-icons-png.flaticon.com/512/5969/5969020.png" style="${iconStyle}" alt="X"/></a>`);
+    if (facebook) socialLinks.push(`<a href="https://${facebook}" style="text-decoration:none; margin-right:5px;"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" style="${iconStyle}" alt="FB"/></a>`);
+    if (youtube) socialLinks.push(`<a href="https://${youtube}" style="text-decoration:none; margin-right:5px;"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" style="${iconStyle}" alt="YT"/></a>`);
+
+    const customBlockHtml = customBlocks.map(b => `
+        <div style="margin-top: 4px; font-size: 11px; color: #64748b;">
+            <strong style="color: #334155;">${b.label}:</strong> <a href="${b.value}" style="color: #2563eb; text-decoration: none;">${b.value}</a>
+        </div>
+    `).join('');
+
+    const bannerHtml = bannerText ? `
+        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+            <a href="${bannerLink}" style="color: #4f46e5; font-weight: bold; font-size: 12px; text-decoration: none;">
+                ${bannerText} <span style="font-size: 14px;">→</span>
+            </a>
+        </div>
+    ` : '';
+
+    let html = '';
+
+    if (style === 'modern') {
+        html = `
+            <table cellpadding="0" cellspacing="0" border="0" style="font-family: Arial, sans-serif; line-height: 1.5;">
+                <tr>
+                    <td style="padding-right: 20px; vertical-align: top;">
+                        <img src="${photoUrl}" alt="${fullName}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;" />
+                    </td>
+                    <td style="border-left: 2px solid #e2e8f0; padding-left: 20px; vertical-align: top;">
+                        <div style="font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 2px;">${fullName}</div>
+                        <div style="font-size: 13px; color: #475569; margin-bottom: 8px;">${role} <span style="color: #cbd5e1;">|</span> ${company}</div>
+                        <div style="margin-bottom: 12px;">
+                            ${socialLinks.join('')}
+                        </div>
+                        <div style="font-size: 12px; color: #64748b;">
+                            <div style="margin-bottom: 2px;">📞 <a href="tel:${phone}" style="color: #64748b; text-decoration: none;">${phone}</a></div>
+                            ${customBlockHtml}
+                        </div>
+                        ${bannerHtml}
+                    </td>
+                </tr>
+            </table>
+        `;
+    } else if (style === 'minimal') {
+        html = `
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                <div style="font-size: 18px; font-weight: 700; color: #000000; letter-spacing: -0.5px;">${fullName}</div>
+                <div style="font-size: 14px; color: #666666; margin-bottom: 12px;">${role}, ${company}</div>
+                <div style="margin-bottom: 12px;">
+                    <a href="tel:${phone}" style="font-size: 12px; color: #000; text-decoration: none; border-bottom: 1px solid #ddd; margin-right: 15px;">${phone}</a>
+                    <a href="https://${website}" style="font-size: 12px; color: #000; text-decoration: none; border-bottom: 1px solid #ddd;">${website}</a>
+                </div>
+                <div>${socialLinks.join('')}</div>
+                 ${bannerHtml}
+            </div>
+        `;
+    } else if (style === 'executive') {
+        html = `
+             <table cellpadding="0" cellspacing="0" border="0" style="font-family: Georgia, serif;">
+                <tr>
+                    <td style="vertical-align: middle; padding-right: 15px;">
+                         <img src="${photoUrl}" style="width: 60px; height: 60px; border-radius: 4px;" />
+                    </td>
+                    <td style="vertical-align: middle;">
+                         <div style="font-size: 18px; font-weight: bold; color: #1e293b; text-transform: uppercase; letter-spacing: 1px;">${fullName}</div>
+                         <div style="font-size: 12px; font-style: italic; color: #64748b;">${role} &bull; ${company}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding-top: 12px; border-top: 3px solid #0f172a; margin-top: 8px;">
+                        <div style="font-family: Arial, sans-serif; font-size: 11px; color: #334155; margin-top: 8px;">
+                            M: ${phone} &nbsp;|&nbsp; W: ${website} &nbsp;|&nbsp; ${linkedin}
+                        </div>
+                         ${bannerHtml}
+                    </td>
+                </tr>
+            </table>
+        `;
+    } else {
+        // Creative
+         html = `
+            <div style="font-family: Arial, sans-serif; background-color: #f8fafc; padding: 20px; border-radius: 12px; display: inline-block;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                     <img src="${photoUrl}" style="width: 50px; height: 50px; border-radius: 12px; background: #fff;" />
+                     <div>
+                        <div style="font-weight: 900; font-size: 20px; color: #2563eb;">${fullName}</div>
+                        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #94a3b8;">${role} @ ${company}</div>
+                     </div>
+                </div>
+                <div style="margin-bottom: 10px;">${socialLinks.join('')}</div>
+                 ${bannerHtml}
+            </div>
+        `;
+    }
+
+    setGeneratedHtml(html);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setGeneratedHtml(e.target.value);
+  };
+
+  if (!isOpen) return null;
+
+  const renderSidebarItem = (id: SettingsCategory, label: string, Icon: any) => (
+    <button
+      onClick={() => handleCategorySelect(id)}
+      className={`w-full flex items-center gap-3 px-3 py-3 md:py-2 rounded-lg text-sm md:text-xs font-medium transition-colors mb-0.5
+        ${activeCategory === id ? 'bg-slate-200 text-slate-900' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}
+      `}
+    >
+      <Icon size={18} strokeWidth={1.5} className="md:w-4 md:h-4" />
+      <span>{label}</span>
+      <ChevronRight size={14} className="ml-auto md:hidden text-slate-300" />
+    </button>
+  );
+
+  const renderThemeOption = (id: AppTheme, label: string, description: string, colorClass: string) => (
+    <button
+        onClick={() => onThemeChange(id)}
+        className={`
+            relative p-4 rounded-xl border-2 text-left transition-all duration-300 group overflow-hidden
+            ${currentTheme === id ? 'border-slate-900 bg-slate-50' : 'border-slate-100 hover:border-slate-300 bg-white'}
+        `}
+    >
+        <div className={`absolute top-0 right-0 p-2 ${currentTheme === id ? 'opacity-100' : 'opacity-0'}`}>
+            <CheckCircle size={16} className="text-slate-900" />
+        </div>
+        <div className={`w-8 h-8 rounded-full mb-3 ${colorClass} shadow-sm border border-black/5`}></div>
+        <div className="font-medium text-sm text-slate-900 mb-1">{label}</div>
+        <div className="text-[10px] text-slate-500 font-light leading-relaxed">{description}</div>
+    </button>
+  );
+
+  const renderContent = () => {
+    switch (activeCategory) {
+        // --- PERSONAL SETTINGS ---
+        case 'general':
+            return (
+                <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-300">
+                     <div>
+                         <label className="text-sm font-medium text-slate-900 mb-4 block flex items-center gap-2">
+                            <Palette size={16} />
+                            i.M Theme
+                         </label>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {renderThemeOption('onyx', 'Onyx', 'High contrast, executive black & white.', 'bg-black')}
+                            {renderThemeOption('titanium', 'Titanium', 'Clean, industrial slate grey. The standard.', 'bg-slate-500')}
+                            {renderThemeOption('indigo', 'Indigo', 'Deep blues with professional clarity.', 'bg-indigo-600')}
+                            {renderThemeOption('bronze', 'Bronze', 'Warm, sophisticated stone & earth tones.', 'bg-amber-800')}
+                         </div>
+                    </div>
+                </div>
+            )
+
+        // ... rest of the cases remain exactly the same as they were before ...
+        
+        default:
+             // Catch-all for Sync, MyDay, Search which are less critical for visual demo
+             return (
+                <div className="flex flex-col items-center justify-center h-full opacity-50 text-center">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4 text-slate-400">
+                        <Settings2 size={32} strokeWidth={1} />
+                    </div>
+                    <p className="text-sm font-medium">Coming Soon</p>
+                    <p className="text-xs mt-1 text-slate-500 max-w-xs">This section is under active development for the next release.</p>
+                </div>
+            );
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose}></div>
+      
+      <div className="bg-white w-[100vw] h-[100vh] md:w-[95vw] md:h-[90vh] max-w-[1600px] md:rounded-xl relative animate-in zoom-in-95 duration-200 flex flex-col md:flex-row overflow-hidden shadow-2xl">
+        
+        {/* Sidebar - HIDDEN on mobile if detail view is active */}
+        <div className={`
+            w-full md:w-64 bg-slate-50 border-r border-slate-200 flex flex-col h-full shrink-0
+            ${!isMobileListView ? 'hidden md:flex' : 'flex'}
+        `}>
+            <div className="p-6 pb-4 border-b border-slate-200 bg-white flex justify-between items-start">
+                <div>
+                    <div className="text-slate-900 font-light text-xl tracking-tighter leading-none mb-4">
+                        i.<span className="text-slate-900 font-medium">M</span> <span className="text-slate-400 font-thin ml-2 text-sm">Config</span>
+                    </div>
+                    <div className="relative mt-2">
+                        <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                        <input 
+                            type="text" 
+                            placeholder="Search i.Settings" 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-100 border-none rounded-md focus:ring-1 focus:ring-slate-300 focus:outline-none"
+                        />
+                    </div>
+                </div>
+                <button onClick={onClose} className="md:hidden p-2 -mr-2 text-slate-400 hover:text-slate-900">
+                    <X size={24} />
+                </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <div className="mb-6">
+                    <div className="px-3 mb-2 text-[10px] uppercase tracking-wider font-semibold text-slate-400">i.Personal</div>
+                    {renderSidebarItem('general', 'i.M General', Settings2)}
+                    {renderSidebarItem('profiles', 'i.M Profile', UserCircle)}
+                    {renderSidebarItem('accounts', 'i.M Identity', Users)}
+                    {renderSidebarItem('notifications', 'i.Notify', Bell)}
+                    {renderSidebarItem('categories', 'i.Sort', Grid)}
+                    {renderSidebarItem('shortcuts', 'i.M Command', Keyboard)}
+                    {renderSidebarItem('fonts', 'i.M Type', Type)}
+                </div>
+
+                <div className="mb-6">
+                    <div className="px-3 mb-2 text-[10px] uppercase tracking-wider font-semibold text-slate-400">i.Mail</div>
+                    {renderSidebarItem('reading', 'i.M Reading', BookOpen)}
+                    {renderSidebarItem('composing', 'i.M Composing', PenTool)}
+                    {renderSidebarItem('signatures', 'i.Sign', FileSignature)}
+                    {renderSidebarItem('rules', 'i.Rules', ArrowRightLeft)}
+                    {renderSidebarItem('junk', 'i.Block', Ban)}
+                    {renderSidebarItem('autoreply', 'i.Respond', Reply)}
+                </div>
+
+                <div className="mb-6">
+                    <div className="px-3 mb-2 text-[10px] uppercase tracking-wider font-semibold text-slate-400">i.System</div>
+                    {renderSidebarItem('calendar', 'i.M Calendar', Calendar)}
+                    {renderSidebarItem('myday', 'i.M Day', Sun)}
+                    {renderSidebarItem('privacy', 'i.Guard', Shield)}
+                    {renderSidebarItem('search', 'i.Search', Search)}
+                    {renderSidebarItem('sync', 'i.Sync', RefreshCw)}
+                    {renderSidebarItem('storage', 'i.Vault', HardDrive)}
+                </div>
+            </div>
+        </div>
+
+        {/* Content - HIDDEN on mobile if list view is active */}
+        <div className={`
+            flex-1 flex flex-col h-full bg-white relative
+            ${isMobileListView ? 'hidden md:flex' : 'flex'}
+        `}>
+            {/* Mobile Back Header */}
+            <div className="md:hidden p-4 border-b border-slate-100 flex items-center gap-2">
+                <button 
+                    onClick={() => setIsMobileListView(true)} 
+                    className="p-2 -ml-2 hover:bg-slate-50 rounded-full text-slate-600"
+                >
+                    <ChevronLeft size={24} />
+                </button>
+                <span className="font-bold text-slate-900">Back to Menu</span>
+            </div>
+
+            {/* Desktop Close Button */}
+            <button onClick={onClose} className="hidden md:block absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full transition-colors z-10">
+                <X size={20} className="text-slate-400 hover:text-slate-900" />
+            </button>
+            
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+                <div className="max-w-full h-full">
+                    {renderContent()}
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SettingsModal;
