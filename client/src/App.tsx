@@ -105,9 +105,19 @@ const App: React.FC = () => {
       const token = localStorage.getItem('auth_token');
       if (!token) return;
 
+      // Get userId from multiple localStorage keys
+      const userId = localStorage.getItem('user_email') ||
+        localStorage.getItem('userEmail') ||
+        localStorage.getItem('saved_email') ||
+        localStorage.getItem('userId');
+
       try {
-        // First try to check for configured accounts
-        const response = await fetch(`${API_URL}/api/accounts`, {
+        // First try to check for configured accounts with userId
+        const accountsUrl = userId
+          ? `${API_URL}/api/accounts?userId=${encodeURIComponent(userId)}`
+          : `${API_URL}/api/accounts`;
+
+        const response = await fetch(accountsUrl, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -123,9 +133,12 @@ const App: React.FC = () => {
         // Fallback: Try to fetch emails directly to check if env vars are configured
         const emailCheck = await fetch(`${API_URL}/api/imap/emails?limit=1`);
         if (emailCheck.ok) {
-          setIsConnected(true);
-          localStorage.setItem('iam_email_connected', 'true');
-          return;
+          const emails = await emailCheck.json();
+          if (emails && emails.length > 0) {
+            setIsConnected(true);
+            localStorage.setItem('iam_email_connected', 'true');
+            return;
+          }
         }
 
         // If nothing works, still allow local testing
