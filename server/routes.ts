@@ -1345,6 +1345,146 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // ZOHO ADMIN API ENDPOINTS
+  // ============================================
+
+  // Check Zoho configuration status
+  app.get("/api/zoho/status", async (req, res) => {
+    try {
+      const configured = isZohoConfigured();
+
+      if (!configured) {
+        return res.json({
+          configured: false,
+          message: "Zoho Admin API not configured. See setup guide for instructions."
+        });
+      }
+
+      res.json({
+        configured: true,
+        organizationId: process.env.ZOHO_ZOID,
+        features: [
+          "mailbox_provisioning",
+          "password_management",
+          "user_management"
+        ]
+      });
+    } catch (error: any) {
+      console.error('Zoho status check error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Provision new Zoho mailbox
+  app.post("/api/zoho/provision", async (req, res) => {
+    try {
+      if (!isZohoConfigured()) {
+        return res.status(503).json({
+          error: "Zoho Admin API not configured",
+          message: "Please configure ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN, and ZOHO_ZOID in .env"
+        });
+      }
+
+      const { email, password, firstName, lastName, displayName } = req.body;
+
+      if (!email || !password || !firstName) {
+        return res.status(400).json({
+          error: "Missing required fields: email, password, firstName"
+        });
+      }
+
+      // Validate email domain matches i.AM Mail domains
+      const domain = email.split('@')[1];
+      const allowedDomains = ['iammail.cloud', 'iamrayzen.com', 'rayzen.ae'];
+
+      if (!allowedDomains.includes(domain)) {
+        return res.status(400).json({
+          error: `Email domain must be one of: ${allowedDomains.join(', ')}`
+        });
+      }
+
+      console.log(`Provisioning Zoho mailbox for: ${email}`);
+
+      const result = await zohoAdmin.createUser({
+        email,
+        password,
+        firstName,
+        lastName: lastName || '',
+        displayName: displayName || firstName
+      });
+
+      res.json({
+        success: true,
+        message: `Mailbox created successfully for ${email}`,
+        accountId: result.data?.accountId,
+        email: email
+      });
+    } catch (error: any) {
+      console.error('Zoho provision error:', error);
+
+      // Handle specific Zoho API errors
+      if (error.response?.data) {
+        return res.status(error.response.status || 500).json({
+          error: error.response.data.message || "Failed to provision mailbox",
+          details: error.response.data
+        });
+      }
+
+      res.status(500).json({
+        error: error.message || "Failed to provision mailbox"
+      });
+    }
+  });
+
+  // List Zoho organization users
+  app.get("/api/zoho/users", async (req, res) => {
+    try {
+      if (!isZohoConfigured()) {
+        return res.status(503).json({
+          error: "Zoho Admin API not configured"
+        });
+      }
+
+      const users = await zohoAdmin.listUsers();
+      res.json(users);
+    } catch (error: any) {
+      console.error('Zoho list users error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Update Zoho user password
+  app.patch("/api/zoho/users/:accountId/password", async (req, res) => {
+    try {
+      if (!isZohoConfigured()) {
+        return res.status(503).json({
+          error: "Zoho Admin API not configured"
+        });
+      }
+
+      const { accountId } = req.params;
+      const { newPassword } = req.body;
+
+      if (!newPassword) {
+        return res.status(400).json({ error: "newPassword is required" });
+      }
+
+      await zohoAdmin.updatePassword(accountId, newPassword);
+      res.json({
+        success: true,
+        message: "Password updated successfully"
+      });
+    } catch (error: any) {
+      console.error('Zoho update password error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // IMAP / SMTP EMAIL ENDPOINTS
+  // ============================================
+
   app.get("/api/imap/emails", async (req, res) => {
     // Try to get user's configured email account first
     let imapHost: string = '', imapPort: number = 993, imapUser: string = '', imapPass: string = '';

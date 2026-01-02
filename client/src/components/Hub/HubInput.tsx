@@ -82,6 +82,7 @@ const HubInput: React.FC<HubInputProps> = ({
         ${isDark ? 'bg-white/5 border-white/10 focus-within:border-indigo-500/50' : 'bg-slate-50 border-slate-200 focus-within:border-indigo-500'}
       `}>
                 <textarea
+                    data-testid="hub-input"
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}

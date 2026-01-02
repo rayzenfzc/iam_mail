@@ -1,0 +1,245 @@
+/* 
+ * Precision Titanium Design System
+ * Light Mode Refinements for I AM Mail
+ */
+
+/* ===== TITANIUM COLOR PALETTE ===== */
+:root {
+    /* Crimson Red - Critical/Compose Areas */
+    --titanium-red: #DC143C;
+    --titanium-red-hover: #B01030;
+    --titanium-red-light: rgba(220, 20, 60, 0.05);
+
+    /* Chrome Silver - General Borders */
+    --titanium-silver: #94a3b8;
+    --titanium-silver-light: #cbd5e1;
+    --titanium-silver-dark: #64748b;
+
+    /* Steel - Backgrounds */
+    --titanium-steel: #f8fafc;
+    --titanium-steel-dark: #f1f5f9;
+
+    /* Precision Border Width */
+    --border-precision: 0.25px;
+
+    /* Max Border Radius */
+    --radius-max: 1rem;
+}
+
+/* ===== GLOBAL OVERRIDES ===== */
+
+/* Force thin fonts everywhere in light mode */
+.bg-gradient-to-tr {
+    font-weight: 300 !important;
+}
+
+/* Remove all bold fonts in light mode */
+.bg-gradient-to-tr .font-bold {
+    font-weight: 300 !important;
+}
+
+.bg-gradient-to-tr .font-semibold {
+    font-weight: 300 !important;
+}
+
+.bg-gradient-to-tr .font-medium {
+    font-weight: 300 !important;
+}
+
+/* Ensure all fonts are light or thin */
+.bg-gradient-to-tr * {
+    font-weight: 300;
+}
+
+/* Keep only specific elements with font-bold in dark mode */
+[class*="bg-[#0A0A0B]"] .font-bold {
+    font-weight: 700;
+}
+
+/* ===== BORDER RADIUS LIMITS ===== */
+
+/* Max 1rem for all rounded corners in light mode */
+.bg-gradient-to-tr .rounded-xl,
+.bg-gradient-to-tr .rounded-2xl,
+.bg-gradient-to-tr .rounded-3xl {
+    border-radius: 1rem !important;
+}
+
+/* ===== BUTTON STYLES ===== */
+
+/* No solid color buttons - only borders */
+.bg-gradient-to-tr button {
+    background: transparent !important;
+    border-width: 0.25px !important;
+    font-weight: 300 !important;
+}
+
+/* Compose/Critical buttons - Crimson Red border */
+.bg-gradient-to-tr button[class*="primary"],
+.bg-gradient-to-tr button[class*="compose"] {
+    border-color: var(--titanium-red) !important;
+    color: var(--titanium-red) !important;
+}
+
+.bg-gradient-to-tr button[class*="primary"]:hover,
+.bg-gradient-to-tr button[class*="compose"]:hover {
+    background: var(--titanium-red-light) !important;
+}
+
+/* General buttons - Chrome Silver border */
+.bg-gradient-to-tr button:not([class*="primary"]):not([class*="compose"]) {
+    border-color: var(--titanium-silver) !important;
+    color: var(--titanium-silver-dark) !important;
+}
+
+.bg-gradient-to-tr button:not([class*="primary"]):not([class*="compose"]):hover {
+    border-color: var(--titanium-red) !important;
+    color: var(--titanium-red) !important;
+}
+
+/* ===== CARD STYLES ===== */
+
+/* All cards - consistent styling */
+.bg-gradient-to-tr [class*="GlassModule"],
+.bg-gradient-to-tr .glass-card {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+    backdrop-filter: blur(40px) !important;
+}
+
+/* Compose/Chat cards - Crimson Red border */
+.bg-gradient-to-tr [class*="compose"] [class*="GlassModule"],
+.bg-gradient-to-tr [class*="chat"] [class*="GlassModule"],
+.bg-gradient-to-tr .compose-card,
+.bg-gradient-to-tr .chat-card {
+    border-color: var(--titanium-red) !important;
+}
+
+/* ===== NOTIFICATION COLORS ===== */
+
+/* Replace green/yellow with titanium colors */
+.bg-gradient-to-tr .bg-emerald-500,
+.bg-gradient-to-tr .bg-emerald-600,
+.bg-gradient-to-tr .bg-green-500,
+.bg-gradient-to-tr .bg-green-600 {
+    background: var(--titanium-silver) !important;
+    color: white !important;
+}
+
+.bg-gradient-to-tr .bg-yellow-400,
+.bg-gradient-to-tr .bg-yellow-500,
+.bg-gradient-to-tr .bg-amber-400,
+.bg-gradient-to-tr .bg-amber-500 {
+    background: var(--titanium-silver-light) !important;
+    color: var(--titanium-silver-dark) !important;
+}
+
+/* ===== TEXT STYLES ===== */
+
+/* All headings - thin */
+.bg-gradient-to-tr h1,
+.bg-gradient-to-tr h2,
+.bg-gradient-to-tr h3,
+.bg-gradient-to-tr h4,
+.bg-gradient-to-tr h5,
+.bg-gradient-to-tr h6 {
+    font-weight: 300 !important;
+}
+
+/* Labels and small text */
+.bg-gradient-to-tr label,
+.bg-gradient-to-tr .text-xs,
+.bg-gradient-to-tr .text-sm {
+    font-weight: 300 !important;
+    color: var(--titanium-silver-dark) !important;
+}
+
+/* ===== SPECIFIC COMPONENT OVERRIDES ===== */
+
+/* Sidebar borders */
+.bg-gradient-to-tr aside {
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+}
+
+/* Email list items */
+.bg-gradient-to-tr [class*="inbox"]>div,
+.bg-gradient-to-tr .email-item {
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+}
+
+/* Contact cards */
+.bg-gradient-to-tr [class*="contact"] {
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+    font-weight: 300 !important;
+}
+
+/* Calendar day cards */
+.bg-gradient-to-tr [class*="calendar"] [class*="event"],
+.bg-gradient-to-tr .calendar-event {
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+    font-weight: 300 !important;
+}
+
+/* Settings cards */
+.bg-gradient-to-tr [class*="settings"]>div,
+.bg-gradient-to-tr .settings-card {
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+}
+
+/* Input fields */
+.bg-gradient-to-tr input,
+.bg-gradient-to-tr textarea {
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+    font-weight: 300 !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.bg-gradient-to-tr input:focus,
+.bg-gradient-to-tr textarea:focus {
+    border-color: var(--titanium-red) !important;
+    outline: none !important;
+}
+
+/* Dock container */
+.bg-gradient-to-tr [class*="dock"],
+.bg-gradient-to-tr .dock-container {
+    border: 0.25px solid var(--titanium-silver) !important;
+    border-radius: 1rem !important;
+}
+
+/* Chat/Compose specific - Red borders */
+.bg-gradient-to-tr [class*="compose"],
+.bg-gradient-to-tr [class*="chat"] {
+    border-color: var(--titanium-red) !important;
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+.titanium-border {
+    border: 0.25px solid var(--titanium-silver) !important;
+}
+
+.titanium-border-red {
+    border: 0.25px solid var(--titanium-red) !important;
+}
+
+.titanium-text {
+    color: var(--titanium-silver-dark) !important;
+    font-weight: 300 !important;
+}
+
+.titanium-text-red {
+    color: var(--titanium-red) !important;
+    font-weight: 300 !important;
+}
+
+.titanium-radius {
+    border-radius: 1rem !important;
+}

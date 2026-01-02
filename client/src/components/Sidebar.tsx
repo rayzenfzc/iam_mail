@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Calendar, Users, FileText, Send, Plus, Settings, Archive, Trash2, AlertOctagon, Clock, StickyNote, Sun, Moon, Database, LogOut, UserPlus } from 'lucide-react';
+import { Mail, Calendar, Users, FileText, Send, Plus, Settings, Archive, Trash2, AlertOctagon, Clock, StickyNote, Sun, Moon, Database, LogOut, UserPlus, Home } from 'lucide-react';
 import { ViewType } from '../types';
 
 interface EmailAccount {
@@ -96,6 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const MENU_ITEMS = [
+    { label: 'Home', icon: Home, id: 'dashboard' },
     { label: 'Inbox', icon: Mail, id: 'inbox' },
     { label: 'Sent', icon: Send, id: 'sent' },
     { label: 'Drafts', icon: FileText, id: 'drafts' },
@@ -244,6 +245,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Settings Button */}
             <button
+              data-testid="settings-button"
               onClick={onOpenSettings}
               className={`
                            flex items-center gap-5 p-3.5 rounded-[0.75rem] transition-all group relative w-full mt-4

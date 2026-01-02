@@ -12,7 +12,7 @@ import { useCaretPosition, getTextAreaCaretCoordinates } from '@/hooks/useCaretP
 import { subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { useSwipeable } from 'react-swipeable';
 import { classifyEmail } from '@/lib/emailClassification';
-import { SettingsModal } from '@/components/SettingsModal';
+import NexusSettings from '@/components/NexusSettings';
 
 const DEFAULT_SNIPPETS = [
     { trigger: 'meeting', label: 'Schedule Meeting', template: "Hi [Name],\n\nLet's schedule a time to meet. Here is my calendar link: [Calendar Link]\n\nBest,\n[Your Name]" },
@@ -712,7 +712,7 @@ const ThreePaneLayout: React.FC<ThreePaneLayoutProps> = ({ isDarkMode, toggleThe
             )}
 
             {/* Settings Modal */}
-            <SettingsModal
+            <NexusSettings
                 isOpen={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}
                 isDarkMode={isDarkMode}

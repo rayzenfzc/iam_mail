@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300&display=swap');
+
+        :root {
+            --titanium: #1a1a1b;
+            --charcoal: #0d0d0d;
+            --crimson: #9e1b32;
+            --rose-gold: #b76e79;
+            --platinum: #e5e4e2;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background: var(--charcoal);
+            font-family: 'Inter', sans-serif;
+            color: var(--platinum);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 80px 320px 1fr;
+            height: 100vh;
+            background: linear-gradient(135deg, #121212 0%, #080808 100%);
+            padding: 10px;
+            gap: 8px;
+            box-sizing: border-box;
+        }
+
+        .pane {
+            background: var(--titanium);
+            border: 1px solid rgba(183, 110, 121, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-rail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            border-right: 1px solid var(--crimson);
+            box-shadow: inset -2px 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-weight: 100;
+            letter-spacing: 0.3em;
+            color: var(--rose-gold);
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .list-pane {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(158, 27, 50, 0.3);
+        }
+
+        .header {
+            padding: 30px;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            font-size: 10px;
+            color: var(--rose-gold);
+            border-bottom: 1px solid rgba(229, 228, 226, 0.1);
+        }
+
+        .mail-item {
+            padding: 20px;
+            border-bottom: 1px solid rgba(158, 27, 50, 0.15);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .mail-item:hover {
+            background: rgba(158, 27, 50, 0.05);
+            border-left: 2px solid var(--crimson);
+        }
+
+        .subject {
+            font-weight: 300;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .preview {
+            font-size: 11px;
+            color: #666;
+            letter-spacing: 0.05em;
+        }
+
+        .view-pane {
+            background: radial-gradient(circle at top right, #1a1a1b, #0d0d0d);
+            border: 1px solid rgba(158, 27, 50, 0.2);
+            box-shadow: 0 0 40px rgba(158, 27, 50, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-area {
+            padding: 60px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .content-area h1 {
+            font-weight: 100;
+            font-size: 32px;
+            letter-spacing: 0.2em;
+            border-left: 1px solid var(--crimson);
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+
+        .crimson-accent {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--crimson), transparent);
+            position: absolute;
+            top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='app-container'>
+        <div class='pane nav-rail'>
+            <div class='logo'>I.AM</div>
+            <div style='width: 2px; height: 100px; background: var(--crimson); opacity: 0.4;'></div>
+        </div>
+
+        <div class='pane list-pane'>
+            <div class='crimson-accent'></div>
+            <div class='header'>Inbox / Priority</div>
+            <div class='mail-item'>
+                <div class='subject'>AERODYNAMICS REVIEW</div>
+                <div class='preview'>The carbon composites arrived for the...</div>
+            </div>
+            <div class='mail-item'>
+                <div class='subject'>TITANIUM TOOLING</div>
+                <div class='preview'>Precision specs for the chassis update...</div>
+            </div>
+        </div>
+
+        <div class='pane view-pane'>
+            <div class='crimson-accent'></div>
+            <div class='content-area'>
+                <h1>DESIGN LOG: 094</h1>
+                <p style='color: var(--rose-gold); font-size: 12px; letter-spacing: 0.2em;'>
+                    FROM: CHIEF ENGINEER<br>
+                    DATE: 12.04.2024
+                </p>
+                <p style='font-weight: 100;'>
+                    The integration of the crimson lining within the cockpit interface reflects a high-torque mechanical
+                    logic. Every interaction is mapped to the tactile feedback of milled titanium.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

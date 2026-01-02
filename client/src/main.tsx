@@ -1,9 +1,16 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import AppNewDesign from "./AppNewDesign";
+import PlatinumOS from "./PlatinumOS";
 import "./index.css";
 
-// Service worker disabled for development to avoid cache errors
-// Uncomment when PWA assets are ready
+// Toggle between designs:
+// 'app' - Original deployed design
+// 'new' - AppNewDesign (light edition)
+// 'platinum' - i-AM Platinum OS (MOBILE-FIRST)
+const USE_DESIGN = 'platinum';
+
+// Service worker disabled for development
 /*
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -18,4 +25,8 @@ if ('serviceWorker' in navigator) {
 }
 */
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+    USE_DESIGN === 'platinum' ? <PlatinumOS /> :
+        USE_DESIGN === 'new' ? <AppNewDesign /> :
+            <App />
+);

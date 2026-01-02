@@ -5,6 +5,7 @@ import {
     ChevronUp, ChevronDown, AlignLeft, Bot, AtSign, Link, Loader2,
     Plus, Image, FileText, MessageSquare, Edit3
 } from 'lucide-react';
+import TectonicCard from './ui/TectonicCard';
 
 // --- Types ---
 export type ComposerMode = 'new' | 'reply' | 'forward';
@@ -94,6 +95,10 @@ const Composer: React.FC<ComposerProps> = ({
     const bodyRef = useRef<HTMLTextAreaElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const aiInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Attachments State
+    const [attachments, setAttachments] = useState<File[]>([]);
 
     // --- Init ---
     useEffect(() => {
@@ -257,263 +262,197 @@ const Composer: React.FC<ComposerProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-[200] flex justify-center pointer-events-none">
-            {/* Composer Panel - docked at bottom, no blocking backdrop */}
-            <div
-                data-testid="composer-panel"
-                className={`
-                pointer-events-auto w-full max-w-2xl mx-4 mb-0
-                rounded-t-[1.5rem] shadow-2xl flex flex-col overflow-hidden
-                animate-in slide-in-from-bottom-10 duration-300
-                ${isDark ? 'bg-[#121214] border-t border-x border-white/10' : 'bg-white border-t border-x border-slate-200'}
-            `}
-                style={{ maxHeight: '70vh' }}
-            >
-                {/* Header with View Toggle */}
-                <div className={`px-6 py-4 flex items-center justify-between border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
-                    <div className="flex items-center gap-4">
-                        <div className={`w-1 h-6 rounded-full ${isDark ? 'bg-indigo-500' : 'bg-slate-900'}`}></div>
-                        <span className={`text-sm font-black uppercase tracking-[0.3em] ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            {mode === 'new' ? 'COMPOSE' : mode === 'reply' ? 'REPLY' : 'FORWARD'}
-                        </span>
-                    </div>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 lg:p-12 pointer-events-none">
+            {/* Backdrop blur when open */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto" onClick={onClose} />
 
-                    {/* View Toggle */}
-                    <div className={`flex items-center rounded-xl p-1 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}>
-                        <button
-                            onClick={() => setComposeView('manual')}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${composeView === 'manual'
-                                ? (isDark ? 'bg-white text-black' : 'bg-slate-900 text-white')
-                                : (isDark ? 'text-slate-400' : 'text-slate-500')
-                                }`}
-                        >
-                            <Edit3 size={12} /> Manual
-                        </button>
-                        <button
-                            onClick={() => setComposeView('ai')}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${composeView === 'ai'
-                                ? (isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white')
-                                : (isDark ? 'text-slate-400' : 'text-slate-500')
-                                }`}
-                        >
-                            <Sparkles size={12} /> AI Assist
-                        </button>
+            <TectonicCard
+                data-testid="composer-panel"
+                className="pointer-events-auto w-full max-w-4xl h-full max-h-[90vh] flex flex-col overflow-hidden"
+            >
+                {/* Header: Obsidian Style */}
+                <div className="px-10 py-8 flex items-center justify-between border-b border-[var(--glass-border)] relative z-10">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tighter uppercase">New Transmission</h1>
+                        <div className="text-[0.6rem] font-mono text-[var(--accent-glow)] uppercase tracking-[0.3em] mt-1">Draft // 0xAF44</div>
                     </div>
 
                     <button
+                        data-testid="composer-close"
                         onClick={onClose}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-600'}`}
+                        className="w-10 h-10 border border-[var(--glass-border)] flex items-center justify-center hover:border-red-500/50 hover:text-red-500 transition-all"
                     >
                         <X size={18} />
                     </button>
                 </div>
 
-                {/* ==================== MANUAL VIEW ==================== */}
-                {composeView === 'manual' && (
-                    <>
-                        {/* Email Fields */}
-                        <div className={`px-6 py-4 space-y-3 border-b ${isDark ? 'border-white/5' : 'border-slate-50'}`}>
-                            {/* To Field */}
-                            <div className="flex items-center gap-3">
-                                <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>To</label>
-                                <div className="flex-1 relative">
-                                    <input
-                                        ref={toInputRef}
-                                        type="email"
-                                        value={to}
-                                        onChange={(e) => {
-                                            setTo(e.target.value);
-                                            setContactQuery(e.target.value);
-                                            setShowContacts(e.target.value.length > 0);
-                                        }}
-                                        onFocus={() => setShowContacts(to.length > 0)}
-                                        onBlur={() => setTimeout(() => setShowContacts(false), 200)}
-                                        placeholder="recipient@email.com"
-                                        className={`w-full bg-transparent text-sm font-medium focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
-                                    />
-
-                                    {/* Contact Suggestions */}
-                                    {showContacts && filteredContacts.length > 0 && (
-                                        <div className={`absolute top-full left-0 right-0 mt-2 rounded-xl border shadow-xl z-50 max-h-48 overflow-y-auto ${isDark ? 'bg-[#1A1A1C] border-white/10' : 'bg-white border-slate-200'}`}>
-                                            {filteredContacts.map((contact, i) => (
-                                                <button
-                                                    key={i}
-                                                    onClick={() => {
-                                                        setTo(contact.email);
-                                                        setShowContacts(false);
-                                                    }}
-                                                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'}`}
-                                                >
-                                                    <div className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">
-                                                        {contact.avatar}
-                                                    </div>
-                                                    <div>
-                                                        <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{contact.name}</div>
-                                                        <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{contact.email}</div>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <button
-                                    onClick={() => setShowCcBcc(!showCcBcc)}
-                                    className={`text-xs font-medium px-2 py-1 rounded transition-colors ${isDark ? 'text-slate-500 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
-                                >
-                                    Cc/Bcc
-                                </button>
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col overflow-hidden relative z-10">
+                    {composeView === 'manual' ? (
+                        <div className="flex-1 flex flex-col p-10 space-y-8 overflow-y-auto no-scrollbar">
+                            {/* RECIPIENT NODE */}
+                            <div className="input-group">
+                                <label className="input-label">Recipients</label>
+                                <input
+                                    ref={toInputRef}
+                                    type="text"
+                                    value={to}
+                                    onChange={(e) => setTo(e.target.value)}
+                                    placeholder="search_directory.sh"
+                                    className="input-field"
+                                />
                             </div>
 
-                            {/* Cc/Bcc Fields */}
-                            {showCcBcc && (
-                                <>
-                                    <div className="flex items-center gap-3">
-                                        <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Cc</label>
-                                        <input
-                                            type="email"
-                                            value={cc}
-                                            onChange={(e) => setCc(e.target.value)}
-                                            placeholder="cc@email.com"
-                                            className={`flex-1 bg-transparent text-sm font-medium focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bcc</label>
-                                        <input
-                                            type="email"
-                                            value={bcc}
-                                            onChange={(e) => setBcc(e.target.value)}
-                                            placeholder="bcc@email.com"
-                                            className={`flex-1 bg-transparent text-sm font-medium focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
-                                        />
-                                    </div>
-                                </>
-                            )}
-
-                            {/* Subject Field */}
-                            <div className="flex items-center gap-3">
-                                <label className={`w-12 text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Subj</label>
+                            {/* SUBJECT HEADER */}
+                            <div className="input-group">
+                                <label className="input-label">Subject Line</label>
                                 <input
                                     type="text"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
-                                    placeholder="Enter subject..."
-                                    className={`flex-1 bg-transparent text-sm font-bold focus:outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-400'}`}
+                                    placeholder="Enter transmission header..."
+                                    className="input-field font-bold"
                                 />
                             </div>
-                        </div>
 
-                        {/* Body */}
-                        <div className="flex-1 overflow-y-auto p-6" style={{ minHeight: '180px', maxHeight: '35vh' }}>
-                            <textarea
-                                ref={bodyRef}
-                                value={body}
-                                onChange={(e) => setBody(e.target.value)}
-                                placeholder="Write your message here..."
-                                className={`w-full h-full min-h-[160px] bg-transparent text-sm leading-relaxed focus:outline-none resize-none ${isDark ? 'text-slate-300 placeholder:text-slate-600' : 'text-slate-700 placeholder:text-slate-400'}`}
-                            />
-                        </div>
-                    </>
-                )}
-
-                {/* ==================== AI VIEW ==================== */}
-                {composeView === 'ai' && (
-                    <div className="flex-1 flex flex-col overflow-hidden" style={{ maxHeight: '60vh' }}>
-                        {/* Chat Messages */}
-                        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-                            {messages.map((msg) => (
-                                <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                    {msg.text && (
-                                        <div className={`
-                                            max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium
-                                            ${msg.role === 'user'
-                                                ? (isDark ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-slate-900 text-white rounded-tr-sm')
-                                                : (isDark ? 'bg-[#1A1A1C] text-slate-200 rounded-tl-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm')}
-                                        `}>
-                                            {msg.text}
-                                        </div>
-                                    )}
-
-                                    {msg.isTyping && (
-                                        <div className="flex gap-1 px-4 py-2">
-                                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
-                                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                        </div>
-                                    )}
-
-                                    {/* Draft Card */}
-                                    {msg.draft && (
-                                        <div className={`w-full mt-3 p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className={`text-[0.6rem] font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                                                    Draft Preview
-                                                </span>
-                                                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                            </div>
-
-                                            <div className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                                                To: {msg.draft.to.join(', ') || '(Not specified)'}
-                                            </div>
-                                            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                                                {msg.draft.subject}
-                                            </div>
-                                            <div className={`text-sm leading-relaxed mb-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
-                                                dangerouslySetInnerHTML={{ __html: msg.draft.body.replace(/\n/g, '<br/>') }}
-                                            />
-
-                                            <button
-                                                onClick={() => useDraft(msg.draft!)}
-                                                className="w-full py-2.5 rounded-lg bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"
-                                            >
-                                                <Check size={14} /> Use This Draft
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                            <div ref={messagesEndRef} />
-                        </div>
-
-                        {/* AI Input */}
-                        <div className={`p-4 border-t ${isDark ? 'border-white/10 bg-[#0A0A0B]' : 'border-slate-100 bg-slate-50'}`}>
-                            {/* Suggestion Chips */}
-                            {messages.length < 2 && (
-                                <div className="flex gap-2 overflow-x-auto no-scrollbar mb-3">
-                                    {['Write a professional email', 'Draft a quick reply', 'Compose a follow-up'].map((chip, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => processAICommand(chip)}
-                                            className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300' : 'bg-white border-slate-200 hover:border-slate-300 text-slate-600'}`}
-                                        >
-                                            <Sparkles size={10} className="inline mr-1.5" />
-                                            {chip}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-
-                            <div className={`flex items-center gap-2 p-2 rounded-xl border ${isDark ? 'bg-[#1A1A1C] border-white/10' : 'bg-white border-slate-200'}`}>
-                                <input
-                                    ref={aiInputRef}
-                                    type="text"
-                                    value={aiInput}
-                                    onChange={(e) => setAiInput(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && aiInput.trim() && processAICommand(aiInput)}
-                                    placeholder="Tell AI what to write..."
-                                    className={`flex-1 bg-transparent text-sm focus:outline-none px-2 ${isDark ? 'text-white placeholder:text-slate-500' : 'text-slate-900 placeholder:text-slate-400'}`}
+                            {/* DATA PAYLOAD */}
+                            <div className="input-group flex-1 flex flex-col">
+                                <label className="input-label">Message Payload</label>
+                                <textarea
+                                    ref={bodyRef}
+                                    value={body}
+                                    onChange={(e) => setBody(e.target.value)}
+                                    placeholder="Initiate conduit connection..."
+                                    className="editor-area"
                                 />
+                            </div>
+
+                            {/* FOOTER ACTIONS */}
+                            <div className="flex items-center justify-between pt-6">
+                                <div className="flex items-center gap-6">
+                                    <div className="flex gap-4">
+                                        <Paperclip size={20} className="text-[var(--text-dim)] cursor-pointer hover:text-[var(--accent-glow)] transition-colors" />
+                                        <Image size={20} className="text-[var(--text-dim)] cursor-pointer hover:text-[var(--accent-glow)] transition-colors" />
+                                        <Sparkles
+                                            size={20}
+                                            className="text-[var(--text-dim)] hover:text-[var(--accent-glow)] cursor-pointer transition-colors"
+                                            onClick={() => setComposeView('ai')}
+                                        />
+                                    </div>
+                                    <div className="h-4 w-[1px] bg-[var(--glass-border)]"></div>
+                                    <div className="flex items-center gap-2 text-[0.6rem] font-mono text-[var(--text-dim)]">
+                                        <div className={`w-2 h-2 rounded-full ${enableTracking ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-red-500/30'}`}></div>
+                                        TRACKING: {enableTracking ? 'ACTIVE' : 'DISABLED'}
+                                    </div>
+                                </div>
+
                                 <button
-                                    onClick={() => aiInput.trim() && processAICommand(aiInput)}
-                                    disabled={!aiInput.trim()}
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors disabled:opacity-40 ${aiInput.trim() ? 'bg-indigo-500 text-white' : (isDark ? 'bg-white/10 text-slate-400' : 'bg-slate-100 text-slate-400')}`}
+                                    onClick={handleSend}
+                                    disabled={isSending || !to.trim()}
+                                    className="btn-send"
                                 >
-                                    <ArrowUp size={18} />
+                                    {isSending ? 'TRANSMITTING...' : 'EXECUTE SEND'}
                                 </button>
                             </div>
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        /* AI VIEW - Keep existing logic but match aesthetic */
+                        <div className="flex-1 flex flex-col overflow-hidden relative z-10" style={{ maxHeight: '60vh' }}>
+                            {/* Chat Messages */}
+                            <div className="flex-1 overflow-y-auto px-8 py-4 space-y-4 custom-scrollbar">
+                                {messages.map((msg) => (
+                                    <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                        {msg.text && (
+                                            <div className={`
+                                                max-w-[85%] px-5 py-3 rounded-md text-sm font-medium border
+                                                ${msg.role === 'user'
+                                                    ? (isDark ? 'bg-[var(--vitreous-glow)]/10 border-[var(--vitreous-glow)]/30 text-white font-mono' : 'bg-slate-900 text-white')
+                                                    : (isDark ? 'bg-[var(--vitreous-glass)] border-[var(--vitreous-border)] text-slate-200' : 'bg-slate-100 text-slate-800')}
+                                            `}>
+                                                {msg.text}
+                                            </div>
+                                        )}
+
+                                        {msg.isTyping && (
+                                            <div className="flex gap-1 px-4 py-2 opacity-50">
+                                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
+                                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                            </div>
+                                        )}
+
+                                        {msg.draft && (
+                                            <div className={`w-full mt-4 card-vitreous p-6 border backdrop-blur-md ${isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+                                                <div className="sintered-texture">
+                                                    <svg width="100%" height="100%">
+                                                        <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+                                                    </svg>
+                                                </div>
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <span className="section-label mb-0" style={{ fontSize: '0.6rem' }}>Draft Payload</span>
+                                                    <div className="w-2 h-2 rounded-full bg-[var(--vitreous-glow)] status-pulse-anim"></div>
+                                                </div>
+
+                                                <div className="space-y-4 relative z-10">
+                                                    <div>
+                                                        <div className="compose-label">Recipient</div>
+                                                        <div className="text-sm font-mono text-[var(--vitreous-secondary)]">{msg.draft.to.join(', ') || '(NOT SPECIFIED)'}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="compose-label">Subject</div>
+                                                        <div className="text-sm font-bold">{msg.draft.subject}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="compose-label">Encrypted Content</div>
+                                                        <div className="text-xs leading-relaxed opacity-70 font-mono"
+                                                            dangerouslySetInnerHTML={{ __html: msg.draft.body.replace(/\n/g, '<br/>') }}
+                                                        />
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => useDraft(msg.draft!)}
+                                                        className="transmit-btn w-full mt-2"
+                                                        style={{ padding: '0.6rem' }}
+                                                    >
+                                                        SYNC_LOAD_DRAFT
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            {/* AI Input */}
+                            <div className={`p-6 border-t ${isDark ? 'border-white/10 bg-[#050505]' : 'border-slate-100 bg-slate-50'}`}>
+                                <div className="flex items-center gap-3 p-3 rounded-md border backdrop-blur-md relative overflow-hidden bg-[var(--vitreous-glass)] border-[var(--vitreous-border)]">
+                                    <div className="sintered-texture">
+                                        <svg width="100%" height="100%">
+                                            <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        ref={aiInputRef}
+                                        type="text"
+                                        value={aiInput}
+                                        onChange={(e) => setAiInput(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && aiInput.trim() && processAICommand(aiInput)}
+                                        placeholder="Enter conduit commands..."
+                                        className="flex-1 bg-transparent text-sm focus:outline-none px-2 font-mono relative z-10"
+                                    />
+                                    <button
+                                        onClick={() => aiInput.trim() && processAICommand(aiInput)}
+                                        disabled={!aiInput.trim()}
+                                        className={`relative z-10 transition-all ${aiInput.trim() ? 'text-[var(--vitreous-glow)]' : 'text-[var(--vitreous-dim)] opacity-40'}`}
+                                    >
+                                        <ArrowUp size={24} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 {/* Error Message */}
                 {sendError && (
@@ -533,7 +472,25 @@ const Composer: React.FC<ComposerProps> = ({
                             >
                                 <Sparkles size={18} />
                             </button>
-                            <button className={`p-2.5 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-200 text-slate-500'}`} title="Attach File">
+
+                            {/* Hidden file input */}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files) {
+                                        setAttachments(prev => [...prev, ...Array.from(e.target.files!)]);
+                                    }
+                                }}
+                            />
+                            <button
+                                data-testid="attach-button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`p-2.5 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-200 text-slate-500'}`}
+                                title="Attach File"
+                            >
                                 <Paperclip size={18} />
                             </button>
                             <button className={`p-2.5 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-200 text-slate-500'}`} title="Insert Image">
@@ -577,7 +534,7 @@ const Composer: React.FC<ComposerProps> = ({
                         </div>
                     </div>
                 )}
-            </div>
+            </TectonicCard>
         </div>
     );
 };

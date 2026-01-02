@@ -107,6 +107,7 @@ const AICommandBar: React.FC<AICommandBarProps> = ({ onAction, isDark }) => {
         </div>
 
         <input
+          data-testid="hub-input"
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}

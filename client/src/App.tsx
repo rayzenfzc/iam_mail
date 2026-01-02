@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import EmailList from './components/EmailList';
 import EmailDetail from './components/EmailDetail';
 import Composer, { ComposerMode } from './components/Composer';
-import SettingsModal from './components/SettingsModal';
+import NexusSettings from './components/NexusSettings';
 import AuthPage from './components/AuthPage';
 import OnboardingFlow from './components/OnboardingFlow';
 import CalendarView from './components/CalendarView';
@@ -14,7 +14,11 @@ import AuthWrapper from './components/auth';
 import { AIProvider } from './context/AIContext';
 import { ToastProvider } from './components/ui/ToastProvider';
 import { Hub, HubContext, HubScreen } from './components/Hub';
-import { Bot } from 'lucide-react';
+import { Bot, Home } from 'lucide-react';
+import PlatinumOS from './PlatinumOS';
+
+
+
 
 const App: React.FC = () => {
   // =============================
@@ -29,9 +33,9 @@ const App: React.FC = () => {
   // V5 Design State
   // =============================
   const [viewState, setViewState] = useState<ViewState | 'AUTH' | 'ONBOARDING'>('AUTH');
-  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
+  const [themeMode, setThemeMode] = useState<ThemeMode>('dark'); // Default to dark for Vitreous aesthetic
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<ViewType>('inbox');
+  const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Composer State
@@ -349,8 +353,11 @@ const App: React.FC = () => {
   // =============================
   const renderMainContent = () => {
     switch (currentView) {
+      case 'dashboard':
+      case 'home':
+        return <PlatinumOS />;
       case 'calendar':
-        return <CalendarView isDark={isDark} onOpenMenu={() => setIsSidebarOpen(true)} />;
+        return <CalendarView isDark={isDark} />;
       case 'contacts':
         return <ContactsView isDark={isDark} onCompose={() => handleOpenComposer('new')} onOpenMenu={() => setIsSidebarOpen(true)} />;
       case 'sent':
@@ -415,21 +422,23 @@ const App: React.FC = () => {
       }}
     >
       <div className="flex flex-1 gap-0 overflow-hidden h-full">
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-          currentView={currentView}
-          onViewChange={setCurrentView}
-          onCompose={() => handleOpenComposer('new')}
-          onOpenSettings={() => setIsSettingsOpen(true)}
-          isDark={isDark}
-          toggleTheme={() => setThemeMode(prev => prev === 'light' ? 'dark' : 'light')}
-          onGenesis={() => setViewState('ONBOARDING')}
-          onLogout={handleLogout}
-          onAddAccount={() => setViewState('ONBOARDING')}
-          isConnected={isConnected}
-        />
-        <div className="flex-1 flex flex-col p-0 lg:p-6 lg:pl-0 overflow-hidden relative">
+        {currentView !== 'dashboard' && currentView !== 'home' && (
+          <Sidebar
+            isOpen={isSidebarOpen}
+            onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+            currentView={currentView}
+            onViewChange={setCurrentView}
+            onCompose={() => handleOpenComposer('new')}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+            isDark={isDark}
+            toggleTheme={() => setThemeMode(prev => prev === 'light' ? 'dark' : 'light')}
+            onGenesis={() => setViewState('ONBOARDING')}
+            onLogout={handleLogout}
+            onAddAccount={() => setViewState('ONBOARDING')}
+            isConnected={isConnected}
+          />
+        )}
+        <div className={`flex-1 flex flex-col p-0 overflow-hidden relative ${currentView !== 'dashboard' && currentView !== 'home' ? 'lg:p-6 lg:pl-0' : ''}`}>
           <div className="flex-1 h-full w-full">
             {renderMainContent()}
           </div>
@@ -461,7 +470,7 @@ const App: React.FC = () => {
         }}
       />
 
-      <SettingsModal
+      <NexusSettings
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         themeMode={themeMode}

@@ -1,0 +1,8 @@
+{
+  "name": "Prismatic Mail OS",
+  "description": "A high-end, glassmorphic email management system with a crystalline interface and intelligent search capabilities.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

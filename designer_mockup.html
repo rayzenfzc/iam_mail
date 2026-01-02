@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
+
+        :root {
+            --obsidian: #050505;
+            --titanium-slab: #141416;
+            --crimson-glow: #8e0000;
+            --gold-leaf: #d4af37;
+            --platinum: #fdfdfd;
+        }
+
+        body {
+            background: var(--obsidian);
+            color: var(--platinum);
+            font-family: 'Tenor Sans', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        .scaffold {
+            display: grid;
+            grid-template-columns: 300px 450px 1fr;
+            width: 100%;
+            height: 100%;
+        }
+
+        .panel {
+            border: 0.5px solid rgba(255, 255, 255, 0.03);
+            background: var(--titanium-slab);
+            position: relative;
+        }
+
+        .sidebar {
+            background: #000;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px 40px;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            letter-spacing: 15px;
+            color: var(--platinum);
+        }
+
+        .menu-link {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            display: block;
+            transition: 0.5s;
+        }
+
+        .menu-link:hover {
+            color: var(--gold-leaf);
+            transform: translateX(10px);
+        }
+
+        .inbox-list {
+            background: #0a0a0a;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .obsidian-card {
+            background: rgba(20, 20, 22, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .obsidian-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 1px;
+            background: var(--crimson-glow);
+            box-shadow: 0 0 10px var(--crimson-glow);
+        }
+
+        .obsidian-card .sender {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--gold-leaf);
+            margin-bottom: 10px;
+        }
+
+        .obsidian-card .preview {
+            font-size: 0.9rem;
+            font-weight: 100;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .reading-room {
+            background: linear-gradient(135deg, #0d0d0d 0%, #050505 100%);
+            padding: 100px;
+        }
+
+        .mail-header {
+            border-left: 1px solid var(--gold-leaf);
+            padding-left: 40px;
+            margin-bottom: 60px;
+        }
+
+        .mail-header h1 {
+            font-size: 3rem;
+            font-weight: 100;
+            margin: 0;
+            letter-spacing: -2px;
+        }
+
+        .mail-content {
+            max-width: 700px;
+            font-size: 1.1rem;
+            line-height: 2;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='scaffold'>
+        <div class='panel sidebar'>
+            <div class='brand'>I.AM</div>
+            <nav>
+                <a class='menu-link' href='#'>Atmosphere</a>
+                <a class='menu-link' href='#'>Slabs</a>
+                <a class='menu-link' href='#'>Deep Archive</a>
+            </nav>
+            <div class='menu-link' style='color: var(--crimson-glow)'>Security: Level 5</div>
+        </div>
+
+        <div class='panel inbox-list'>
+            <div class='obsidian-card'>
+                <div class='sender'>CRYSTALLINE FOUNDRY</div>
+                <div class='preview'>The new obsidian slabs have arrived. Perfection in every cut.</div>
+            </div>
+            <div class='obsidian-card' style='border-color: rgba(142, 0, 0, 0.3)'>
+                <div class='sender'>CRIMSON OVERSIGHT</div>
+                <div class='preview'>Thermal leak detected in the lower titanium tier. Immediate attention required.
+                </div>
+            </div>
+        </div>
+
+        <div class='panel reading-room'>
+            <div class='mail-header'>
+                <h1>Material Integrity</h1>
+            </div>
+            <div class='mail-content'>
+                The relationship between the dark titanium substructure and the rose gold highlights creates a tension
+                typical of high-end horological mastery. We have achieved a 16px blur depth across all tectonic
+                interfaces. No clutter persists.
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

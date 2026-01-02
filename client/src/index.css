@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Inter+Tight:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Inter+Tight:wght@100..900&family=Tenor+Sans&family=Gilda+Display&family=Montserrat:wght@200;400;700&display=swap');
 
 /* UI v2 - Semantic Design Tokens */
 @import './styles/tokens.css';
@@ -93,54 +93,59 @@
   --elevate-1: rgba(0, 0, 0, .04);
   --elevate-2: rgba(0, 0, 0, .08);
 
-  /* Light Theme - Slate Based */
-  --background: 210 40% 98%;
-  --foreground: 222 47% 11%;
-  --border: 214 32% 91%;
+  /* Light Theme - Industrial Industrial Greyscale */
+  --background: 0 0% 95%;
+  /* #f1f1f1 */
+  --foreground: 15 2% 23%;
+  /* #3d3b3a */
+  --border: 0 0% 88%;
 
   /* Card */
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --card-border: 214 32% 91%;
+  --card-foreground: 15 2% 23%;
+  --card-border: 0 0% 88%;
 
   /* Sidebar */
-  --sidebar: 210 40% 96%;
-  --sidebar-foreground: 215 16% 47%;
-  --sidebar-border: 214 32% 91%;
-  --sidebar-primary: 262 83% 58%;
+  --sidebar: 0 0% 93%;
+  --sidebar-foreground: 15 2% 40%;
+  --sidebar-border: 0 0% 88%;
+  --sidebar-primary: 0 0% 0%;
+  /* Black */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 262 83% 58% / 0.1;
-  --sidebar-accent-foreground: 222 47% 11%;
-  --sidebar-ring: 262 83% 58%;
+  --sidebar-accent: 0 0% 0% / 0.05;
+  --sidebar-accent-foreground: 15 2% 23%;
+  --sidebar-ring: 0 0% 0%;
 
   /* Popover */
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --popover-border: 214 32% 91%;
+  --popover-foreground: 15 2% 23%;
+  --popover-border: 0 0% 88%;
 
-  /* Violet Accent */
-  --primary: 262 83% 58%;
+  /* Monochrome Accent */
+  --primary: 0 0% 0%;
+  /* Black base */
   --primary-foreground: 0 0% 100%;
 
-  /* Secondary - Slate */
-  --secondary: 215 16% 47%;
+  /* Secondary - Grey */
+  --secondary: 0 0% 45%;
+  /* #737373 */
   --secondary-foreground: 0 0% 100%;
 
   /* Muted */
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
+  --muted: 0 0% 93%;
+  --muted-foreground: 0 0% 45%;
 
   /* Accent */
-  --accent: 262 83% 58% / 0.1;
-  --accent-foreground: 222 47% 11%;
+  --accent: 0 0% 0% / 0.05;
+  --accent-foreground: 15 2% 23%;
 
   /* Destructive */
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
   /* Input */
-  --input: 214 32% 91%;
-  --ring: 262 83% 58%;
+  --input: 0 0% 88%;
+  --ring: 0 0% 0%;
 
   /* Charts */
   --chart-1: 262 83% 58%;
@@ -184,97 +189,2335 @@
   --sidebar-accent-border: hsl(262 83% 58% / 0.2);
 }
 
-/* Dark Theme */
+/* Dark Theme - MOLTEN LOGIC EDITION */
 .dark {
-  --button-outline: rgba(255, 255, 255, .08);
-  --badge-outline: rgba(255, 255, 255, .05);
-  --opaque-button-border-intensity: 8;
+  --button-outline: rgba(255, 255, 255, .12);
+  --badge-outline: rgba(255, 255, 255, .08);
+  --opaque-button-border-intensity: 12;
   --elevate-1: rgba(255, 255, 255, .04);
   --elevate-2: rgba(255, 255, 255, .08);
 
-  /* Core Dark Theme - Slate 950 based */
-  --background: 222 47% 2%;
-  --foreground: 210 40% 98%;
-  --border: 217 33% 17% / 0.5;
+  /* ========== ETCHED CHROME PHOSPHOR DESIGN SYSTEM ========== */
+  --liquid: #e0e0e0;
+  --void: #060606;
+  --reflect: linear-gradient(135deg, #ffffff 0%, #888888 50%, #222222 100%);
+  --glass: rgba(15, 15, 15, 0.7);
+  --glass-stroke: rgba(255, 255, 255, 0.15);
+  --text-main: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.5);
 
-  /* Card */
-  --card: 222 47% 5%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217 33% 17% / 0.5;
+  /* Core - DARK VOID */
+  --background: 0 0% 2.4%;
+  /* #060606 */
+  --foreground: 0 0% 100%;
+  /* #ffffff */
+  --border: 0 0% 100% / 0.12;
+  /* Glass stroke */
 
-  /* Sidebar */
-  --sidebar: 222 47% 4%;
-  --sidebar-foreground: 215 20% 65%;
-  --sidebar-border: 217 33% 17% / 0.3;
-  --sidebar-primary: 262 83% 58%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 262 83% 58% / 0.15;
-  --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-ring: 262 83% 58%;
+  /* Card - Glass effect */
+  --card: 0 0% 100% / 0.04;
+  /* Glass bg */
+  --card-foreground: 0 0% 100%;
+  --card-border: 0 0% 100% / 0.12;
+  /* Glass stroke */
 
-  /* Popover */
-  --popover: 222 47% 7%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 217 33% 17% / 0.5;
+  /* Sidebar - Match main background */
+  --sidebar: 0 0% 2.4%;
+  /* #060606 - same as main background */
+  --sidebar-foreground: 0 0% 100% / 0.5;
+  /* Muted text */
+  --sidebar-border: 0 0% 100% / 0.12;
+  --sidebar-primary: 0 0% 100%;
+  /* White accent */
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 0 0% 100% / 0.04;
+  /* Glass */
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 0 0% 100%;
 
-  /* Violet Accent */
-  --primary: 262 83% 58%;
-  --primary-foreground: 0 0% 100%;
+  /* Popover - Glass */
+  --popover: 0 0% 100% / 0.04;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 0 0% 100% / 0.12;
+
+  /* Primary - WHITE accent (no color) */
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
 
   /* Secondary */
-  --secondary: 215 20% 65%;
+  --secondary: 0 0% 100% / 0.08;
   --secondary-foreground: 0 0% 100%;
 
   /* Muted */
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 0 0% 100% / 0.04;
+  --muted-foreground: 0 0% 100% / 0.5;
 
-  /* Accent */
-  --accent: 262 83% 58% / 0.15;
-  --accent-foreground: 210 40% 98%;
+  /* Accent - White */
+  --accent: 0 0% 100% / 0.04;
+  --accent-foreground: 0 0% 100%;
 
   /* Destructive */
+  --destructive: 0 0% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Input - Glass */
+  --input: 0 0% 100% / 0.04;
+  --ring: 0 0% 100%;
+
+  /* Shadows - Very subtle */
+  --shadow-2xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 30px 60px rgba(0, 0, 0, 0.7);
+
+  /* Glow Effects - Subtle white */
+  --glow-accent: 0 0 30px rgba(255, 255, 255, 0.1);
+  --glow-accent-intense: 0 0 50px rgba(255, 255, 255, 0.2);
+
+  /* Radius - Slight rounding */
+  --radius: 8px;
+}
+
+/* Vitrine Theme - Sapphire/Palladium/Lume */
+/* Vitrine Theme - Sapphire/Palladium/Lume */
+html.vitrine {
+  /* Core Colors from Design Spec - DARK GREEN OVERHAUL */
+  --sapphire-glass: rgba(0, 0, 0, 0.2);
+
+  --palladium-edge: #475569;
+  /* Darker Slate Metal */
+  --mechanical-ink: #020617;
+  /* Slate 950 */
+
+  --lume-green: #059669;
+  /* Emerald 600 - Darker Rich Green */
+  --lume-dim: #064E3B;
+  /* Emerald 900 */
+
+  --obsidian-matte: #000000;
+
+  /* Global Overrides */
+  --background: 155 40% 2%;
+  /* Very Dark Green-Black tint */
+  --foreground: 155 20% 90%;
+  /* Pale Green-White */
+
+  --card: 155 40% 3%;
+  --card-foreground: 155 20% 90%;
+  --card-border: 155 30% 15% / 0.3;
+
+  --popover: 155 40% 3%;
+  --popover-foreground: 155 20% 90%;
+  --popover-border: 155 30% 15% / 0.3;
+
+  /* Primary Accent: "Deep Venom Gradient" */
+  --primary: 158 64% 52%;
+  /* Emerald 500 for text visibility */
+  --primary-foreground: 0 0% 100%;
+  /* White text */
+
+  --secondary: 215 15% 20%;
+  /* Dark Metal */
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 155 30% 10%;
+  --muted-foreground: 155 10% 60%;
+
+  --accent: 158 64% 52% / 0.15;
+  --accent-foreground: 158 64% 52%;
+
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  /* Input */
-  --input: 217 33% 17% / 0.5;
-  --ring: 262 83% 58%;
+  --border: 155 30% 20% / 0.3;
+  --input: 155 30% 20% / 0.2;
+  --ring: 158 64% 52%;
 
-  /* Shadows - Dark mode */
-  --shadow-2xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.4), 0 6px 10px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.4);
-  --shadow-2xl: 0 30px 60px rgba(0, 0, 0, 0.6);
+  --radius: 0px;
 
-  /* Glow Effects - More visible in dark */
-  --glow-accent: 0 0 30px rgba(139, 92, 246, 0.3);
-  --glow-accent-intense: 0 0 50px rgba(139, 92, 246, 0.4), 0 0 100px rgba(139, 92, 246, 0.2);
+  /* Fonts */
+  --font-sans: 'Montserrat', sans-serif;
+  --font-serif: 'Gilda Display', serif;
 
-  /* Border Colors */
-  --primary-border: hsl(262 83% 58% / 0.3);
-  --secondary-border: hsl(215 20% 65% / 0.3);
-  --muted-border: hsl(217 33% 17% / 0.5);
-  --accent-border: hsl(262 83% 58% / 0.3);
-  --destructive-border: hsl(0 84% 60% / 0.3);
-  --sidebar-primary-border: hsl(262 83% 58% / 0.3);
-  --sidebar-accent-border: hsl(262 83% 58% / 0.2);
+  /* Sidebar */
+  --sidebar: 155 40% 2%;
+  /* Matches deep background */
+  --sidebar-foreground: 155 10% 80%;
+  --sidebar-primary: 158 64% 52%;
+  /* Emerald */
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 158 64% 52% / 0.1;
+  --sidebar-accent-foreground: 158 64% 52%;
+  --sidebar-border: 155 30% 20% / 0.1;
+  --sidebar-ring: 158 64% 52%;
+
+  /* Shadow & Glow */
+  --glow-accent: 0 0 30px rgba(16, 185, 129, 0.2);
+  /* Emerald Glow */
+  --glow-accent-intense: 0 0 60px rgba(16, 185, 129, 0.4);
+
+  /* Vitreous UI Tokens */
+  --vitreous-bg: #050505;
+  --vitreous-glass: rgba(255, 255, 255, 0.03);
+  --vitreous-border: rgba(255, 255, 255, 0.1);
+  --vitreous-glow: #b085ff;
+  --vitreous-secondary: #4facfe;
+  --vitreous-text: #e0e0e0;
+  --vitreous-dim: #707070;
+  --vitreous-blur: 20px;
+
+  /* Obsidian Conduit Tokens */
+  --bg-deep: #030303;
+  --glass-base: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --accent-glow: #b085ff;
+  --accent-secondary: #4facfe;
+  --text-main: #f0f0f0;
+  --text-dim: #606060;
+  --sintered-blur: 25px;
+  --tectonic-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  --obsidian-edge: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   PRISMATIC THEME - ALL WHITE Office Neutral
+   Clean pure white/gray everywhere
+   ============================================ */
+html.prismatic {
+  /* ALL WHITE Background */
+  --background: 0 0% 96%;
+  /* #f5f5f5 */
+  --foreground: 0 0% 15%;
+  /* Dark text */
+
+  /* Cards: Pure White */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 15%;
+  --card-border: 0 0% 0% / 0.06;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 15%;
+
+  /* Primary: Dark Gray */
+  --primary: 0 0% 20%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary */
+  --secondary: 0 0% 92%;
+  --secondary-foreground: 0 0% 20%;
+
+  /* Muted */
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 45%;
+
+  /* Accent */
+  --accent: 0 0% 0% / 0.04;
+  --accent-foreground: 0 0% 20%;
+
+  /* Destructive */
+  --destructive: 0 60% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Input & Borders */
+  --input: 0 0% 0% / 0.04;
+  --ring: 0 0% 30%;
+  --border: 0 0% 0% / 0.08;
+
+  --radius: 4px;
+
+  /* Fonts */
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Sidebar - ALSO WHITE (same as background) */
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 0 0% 25%;
+  --sidebar-primary: 0 0% 15%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 0% / 0.04;
+  --sidebar-accent-foreground: 0 0% 15%;
+  --sidebar-border: 0 0% 0% / 0.08;
+  --sidebar-ring: 0 0% 30%;
+
+  /* Shadows - Very subtle */
+  --shadow-2xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 30px 60px rgba(0, 0, 0, 0.12);
+}
+
+/* Prismatic Light Mode */
+html.prismatic.light {
+  --background: 0 0% 100%;
+  /* Pure White */
+  --foreground: 0 0% 5%;
+  /* Pure Black */
+
+  --card: 0 0% 98%;
+  --card-foreground: 0 0% 5%;
+  --card-border: 0 0% 0% / 0.08;
+
+  --sidebar: 0 0% 2.4%;
+  /* #060606 - dark background */
+  --sidebar-foreground: 0 0% 100% / 0.5;
+  /* Muted white text */
+  --sidebar-primary: 0 0% 100%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 0 0% 100% / 0.04;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 100% / 0.15;
+
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 45%;
+
+  --border: 0 0% 0% / 0.08;
+  --input: 0 0% 0% / 0.04;
+}
+
+/* Vitreous Noise Filter - DISABLED */
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  /* Disabled grain effect */
+}
+
+.sintered-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Vitreous Card Animation Base */
+.card-vitreous {
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+
+.card-vitreous:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transform: translateX(10px) perspective(1000px) rotateY(1deg);
+}
+
+.card-vitreous::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.6s ease;
+}
+
+/* Obsidian Tectonic Cards */
+.tectonic-card {
+  background: var(--glass-base);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--sintered-blur));
+  box-shadow: var(--obsidian-edge);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calendar-widget {
+  padding: 1.5rem;
+}
+
+.cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.cal-month {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.cal-day-label {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.cal-date {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.cal-date:hover {
+  border-color: var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cal-date.active {
+  background: var(--accent-glow);
+  color: var(--bg-deep);
+  font-weight: 700;
+}
+
+.cal-date.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 3px;
+  height: 3px;
+  background: var(--accent-secondary);
+  border-radius: 50%;
+}
+
+.meeting-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.meeting-card {
+  padding: 1.25rem;
+  display: flex;
+  gap: 1.25rem;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 0;
+}
+
+.meeting-time-obsidian {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  border-right: 1px solid var(--glass-border);
+  padding-right: 1.25rem;
+}
+
+.time-start {
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+}
+
+.time-dur {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+}
+
+.meeting-info {
+  flex-grow: 1;
+}
+
+.meeting-subject {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  color: var(--accent-secondary);
+}
+
+.meeting-attendees {
+  display: flex;
+  gap: -5px;
+}
+
+.mini-avatar {
+  width: 22px;
+  height: 22px;
+  background: #333;
+  border: 1px solid var(--bg-deep);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+}
+
+.card-vitreous:hover::before {
+  left: 100%;
+}
+
+/* Obsidian Conduit Specifics */
+.compose-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.compose-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.input-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.input-field {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  color: var(--text-main) !important;
+  font-family: 'Inter', sans-serif;
+  padding: 0.5rem 0 !important;
+  outline: none !important;
+  transition: border-color 0.3s !important;
+  border-radius: 0 !important;
+}
+
+.input-field:focus {
+  border-color: var(--accent-glow) !important;
+}
+
+/* ============================================
+   OBSIDIAN MONOLITH DESIGN SYSTEM
+   Exact match to Settings Nexus HTML
+   ============================================ */
+
+/* CSS Variables for Monolith */
+:root {
+  --obsidian-dark: #050505;
+  --obsidian-light: #1c1c1e;
+  --etch-color: rgba(255, 255, 255, 0.4);
+  --glow-color: rgba(255, 255, 255, 0.08);
+  --spectral-1: rgba(255, 0, 128, 0.15);
+  --spectral-2: rgba(0, 200, 255, 0.15);
+  --transition-smooth: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Monolith Card */
+.monolith {
+  position: relative;
+  aspect-ratio: 0.85 / 1;
+  background: linear-gradient(165deg, #111113 0%, #050505 100%);
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.03);
+  transition: var(--transition-smooth);
+  transform-style: preserve-3d;
+}
+
+/* The Etched Effect & Spectral Prism Overlay */
+.monolith::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.01) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.monolith:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.9),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.monolith:hover .icon-container {
+  transform: translateZ(30px) scale(1.1);
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+}
+
+.monolith:hover .icon-container svg {
+  stroke: #fff;
+}
+
+.monolith-active {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.8),
+    inset 0 1px 2px rgba(255, 255, 255, 0.08);
+}
+
+/* Icon Container */
+.icon-container {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 16px;
+  transition: var(--transition-smooth);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.15));
+  z-index: 3;
+}
+
+.icon-container svg {
+  width: 100%;
+  height: 100%;
+  stroke: var(--etch-color);
+  fill: none;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: var(--transition-smooth);
+}
+
+/* Label - Small uppercase text */
+.monolith-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  transition: var(--transition-smooth);
+  z-index: 3;
+  position: relative;
+}
+
+/* Name - JetBrains Mono */
+.monolith-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: -0.02em;
+  transition: var(--transition-smooth);
+  z-index: 3;
+  position: relative;
+}
+
+.monolith:hover .monolith-name {
+  color: #fff;
+  transform: translateZ(10px);
+}
+
+/* ============================================
+   REFRACTIVE SHEEN ANIMATION - THE KEY EFFECT
+   This creates the spectral color gradient sweep
+   ============================================ */
+.sheen {
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(45deg,
+      transparent 40%,
+      var(--spectral-1) 45%,
+      rgba(255, 255, 255, 0.12) 50%,
+      var(--spectral-2) 55%,
+      transparent 60%);
+  transition: 0s;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.monolith:hover .sheen {
+  top: 150%;
+  left: 150%;
+  transition: 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ============================================
+   MONOLITH CANVAS GRID - 2 COLUMNS
+   ============================================ */
+.monolith-canvas-refined {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px !important;
+  width: 100%;
+  padding: 0 !important;
+  perspective: 1000px;
+}
+
+@media (max-width: 768px) {
+  .monolith-canvas {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 20px;
+    gap: 16px;
+  }
+}
+
+/* ============================================
+   BACKGROUND EFFECTS - Contained within sidebar
+   ============================================ */
+
+/* Dot Grid Pattern - absolute to sidebar only */
+.monolith-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.02) 1px, transparent 0);
+  background-size: 40px 40px;
+  z-index: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Radial Glow - absolute to sidebar only */
+.monolith-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #111 0%, #000 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Container with Background Color - DARK MODE - Pitch Black */
+.monolith-container {
+  position: relative;
+  min-height: 100%;
+  background-color: transparent;
+  /* Let parent sidebar color show */
+  /* overflow removed to allow scrolling */
+}
+
+/* ============================================
+   LIGHT MODE OVERRIDES FOR MONOLITH
+   ============================================ */
+
+/* Light mode container - FORCE DARK */
+.light .monolith-container {
+  background-color: transparent !important;
+  /* Let parent #060606 show through */
+}
+
+/* Light mode card */
+.light .monolith {
+  background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.light .monolith:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Light mode icon */
+.light .icon-container svg {
+  stroke: rgba(0, 0, 0, 0.4);
+}
+
+.light .monolith:hover .icon-container svg {
+  stroke: #000;
+}
+
+.light .monolith:hover .icon-container {
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.2));
+}
+
+/* Light mode typography */
+.light .monolith-label {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .monolith-name {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.light .monolith:hover .monolith-name {
+  color: #000;
+}
+
+/* Light mode sheen */
+.light .sheen {
+  background: linear-gradient(45deg,
+      transparent 40%,
+      rgba(0, 100, 200, 0.08) 45%,
+      rgba(0, 0, 0, 0.05) 50%,
+      rgba(200, 0, 100, 0.08) 55%,
+      transparent 60%);
+}
+
+/* Light mode backgrounds - subtle */
+.light .monolith-bg {
+  background-image:
+    radial-gradient(circle at 2px 2px, rgba(0, 0, 0, 0.03) 1px, transparent 0);
+  opacity: 0.3;
+}
+
+.light .monolith-glow {
+  background: radial-gradient(circle at center, #fafafa 0%, #f0f0f0 70%);
+}
+
+
+/* ============================================
+   OBSIDIAN INSTRUMENT CARDS - Horizontal Variant
+   Email, Contact, Calendar, Meeting Cards
+   ============================================ */
+
+/* Horizontal Monolith Card */
+.monolith-horizontal {
+  position: relative;
+  background: linear-gradient(165deg, #111113 0%, #050505 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.monolith-horizontal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent, rgba(255, 255, 255, 0.05)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+  border-radius: 0.5rem;
+}
+
+.monolith-horizontal:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+}
+
+.monolith-horizontal .sheen {
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(45deg,
+      transparent 45%,
+      var(--spectral-1) 48%,
+      rgba(255, 255, 255, 0.15) 50%,
+      var(--spectral-2) 52%,
+      transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+  transition: 0s;
+}
+
+.monolith-horizontal:hover .sheen {
+  top: 150%;
+  left: 150%;
+  transition: 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Instrument Label */
+.instrument-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.instrument-label::after {
+  content: '';
+  height: 1px;
+  flex-grow: 1;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent);
+}
+
+/* Icon Box */
+.instrument-icon-box {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.instrument-icon-box svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+/* Email Item */
+.email-item-instrument {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.email-content-instrument {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.email-sender-instrument {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.email-subject-instrument {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.email-time-instrument {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 4px;
+}
+
+/* Contact Profile */
+.contact-profile-instrument {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.contact-name-instrument {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.contact-title-instrument {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 20px;
+}
+
+/* Social Buttons Row */
+.social-row-instrument {
+  display: flex;
+  gap: 12px;
+}
+
+.social-btn-instrument {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  background: transparent;
+  cursor: pointer;
+}
+
+.social-btn-instrument:hover {
+  background: #fff;
+}
+
+.social-btn-instrument:hover svg {
+  stroke: #000;
+}
+
+.social-btn-instrument svg {
+  width: 18px;
+  height: 18px;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1.5;
+  fill: none;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Calendar View */
+.calendar-view-instrument {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.calendar-date-big {
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, 0.1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.calendar-month-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+/* Meeting List */
+.meeting-list-instrument {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.meeting-item-instrument {
+  padding-left: 15px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.meeting-item-instrument.active {
+  border-left-color: #fff;
+}
+
+.meeting-item-instrument.active::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  background: #fff;
+  box-shadow: 0 0 10px #fff;
+  border-radius: 50%;
+}
+
+.meeting-time-instrument {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+}
+
+.meeting-name-instrument {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+/* ============================================
+   LIGHT MODE FOR INSTRUMENT CARDS
+   ============================================ */
+
+.light .monolith-horizontal {
+  background: linear-gradient(165deg, #ffffff 0%, #f5f5f5 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.light .monolith-horizontal:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.light .monolith-horizontal::after {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), transparent, rgba(0, 0, 0, 0.02)) border-box;
+}
+
+.light .monolith-horizontal .sheen {
+  background: linear-gradient(45deg,
+      transparent 45%,
+      rgba(0, 100, 200, 0.06) 48%,
+      rgba(0, 0, 0, 0.04) 50%,
+      rgba(200, 0, 100, 0.06) 52%,
+      transparent 55%);
+}
+
+.light .instrument-label {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .instrument-label::after {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent);
+}
+
+.light .instrument-icon-box {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.light .instrument-icon-box svg {
+  stroke: #000;
+}
+
+.light .email-sender-instrument,
+.light .contact-name-instrument,
+.light .meeting-name-instrument {
+  color: #000;
+}
+
+.light .email-subject-instrument,
+.light .email-time-instrument,
+.light .contact-title-instrument,
+.light .meeting-time-instrument {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .calendar-date-big {
+  background: linear-gradient(180deg, #000 30%, rgba(0, 0, 0, 0.2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.light .calendar-month-name {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .social-btn-instrument {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .social-btn-instrument:hover {
+  background: #000;
+}
+
+.light .social-btn-instrument:hover svg {
+  stroke: #fff;
+}
+
+.light .social-btn-instrument svg {
+  stroke: rgba(0, 0, 0, 0.4);
+}
+
+.light .meeting-item-instrument {
+  border-left-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .meeting-item-instrument.active {
+  border-left-color: #000;
+}
+
+.light .meeting-item-instrument.active::before {
+  background: #000;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   NEW AI INTERFACE CARD STYLES
+   Horizontal Email, Contact, Meeting Row Cards
+   ============================================ */
+
+/* Section Header with Gradient Line */
+.section-header-instrument {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.section-header-instrument::after {
+  content: '';
+  height: 1px;
+  flex-grow: 1;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent);
+}
+
+/* ============================================
+   COMMAND SUITE V2 CARD STYLES
+   Email with Avatar, Contact with Photo, Calendar with Status
+   ============================================ */
+
+/* Base Monolith Card */
+.monolith-card {
+  position: relative;
+  background: linear-gradient(165deg, #111113 0%, #050505 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+}
+
+.monolith-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.monolith-card .sheen {
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(45deg,
+      transparent 45%,
+      rgba(255, 0, 128, 0.2) 48%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(0, 200, 255, 0.2) 52%,
+      transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.monolith-card:hover .sheen {
+  top: 150%;
+  left: 150%;
+  transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Label Tag */
+.label-tag {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 8px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* --- EMAIL CARD V2 --- */
+.email-card-v2 {
+  min-height: 80px;
+}
+
+.email-avatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(45deg, #222, #111);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+}
+
+.email-avatar.unread {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.email-info-v2 {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.email-sender-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.sender-name {
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.email-time-v2 {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.email-subject-v2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- CONTACT CARD V2 --- */
+.contact-card-v2 {
+  min-height: 80px;
+}
+
+.contact-photo-v2 {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: linear-gradient(45deg, #222, #111);
+}
+
+.contact-photo-v2 img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(1);
+}
+
+.contact-initials {
+  font-weight: 800;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.contact-details-v2 {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.contact-name-v2 {
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.contact-role-v2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+.contact-actions-v2 {
+  display: flex;
+  gap: 8px;
+}
+
+.social-link {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0.25rem;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+}
+
+.social-link:hover {
+  border-color: #fff;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.social-link.whatsapp:hover {
+  border-color: #25D366;
+  color: #25D366;
+}
+
+.social-link svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.social-link.whatsapp svg {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* --- CALENDAR CARD V2 --- */
+.calendar-card-v2 {
+  min-height: 80px;
+}
+
+.calendar-date-v2 {
+  text-align: center;
+  min-width: 60px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding-right: 20px;
+  flex-shrink: 0;
+}
+
+.date-day-v2 {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+}
+
+.date-month-v2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.meeting-info-v2 {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.meeting-title-v2 {
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+.meeting-title-v2.active {
+  color: #00c8ff;
+}
+
+.meeting-meta-v2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 4px;
+}
+
+.meeting-status-v2 {
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 9px;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.meeting-status-v2.in-progress {
+  border-color: #00c8ff;
+  color: #00c8ff;
+}
+
+.meeting-status-v2.upcoming {
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.meeting-status-v2.completed {
+  border-color: #25D366;
+  color: #25D366;
+}
+
+/* --- LIGHT MODE V2 CARDS --- */
+.light .monolith-card {
+  background: linear-gradient(165deg, #ffffff 0%, #f5f5f5 100%);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.light .monolith-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.light .monolith-card .sheen {
+  background: linear-gradient(45deg,
+      transparent 45%,
+      rgba(0, 100, 200, 0.06) 48%,
+      rgba(0, 0, 0, 0.04) 50%,
+      rgba(200, 0, 100, 0.06) 52%,
+      transparent 55%);
+}
+
+.light .label-tag {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .email-avatar {
+  background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .email-avatar.unread {
+  color: #333333;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.light .sender-name,
+.light .contact-name-v2,
+.light .date-day-v2 {
+  color: #000;
+}
+
+.light .email-time-v2,
+.light .email-subject-v2,
+.light .contact-role-v2,
+.light .date-month-v2,
+.light .meeting-meta-v2 {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .contact-photo-v2 {
+  background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+}
+
+.light .contact-initials {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .social-link {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .social-link:hover {
+  border-color: #000;
+  color: #000;
+}
+
+.light .calendar-date-v2 {
+  border-right-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .meeting-title-v2 {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .meeting-title-v2.active {
+  color: #0077cc;
+}
+
+.light .meeting-status-v2 {
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .meeting-status-v2.in-progress {
+  border-color: #0077cc;
+  color: #0077cc;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .monolith-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .calendar-date-v2 {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0 0 10px 0;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .light .calendar-date-v2 {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .email-sender-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .email-time-v2 {
+    margin-left: 0;
+  }
+
+  .contact-actions-v2 {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .meeting-status-v2 {
+    align-self: flex-start;
+  }
+}
+
+/* Horizontal Email Card - Status Dot Style - Slim Wide */
+.card-horizontal-email {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  min-height: 72px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #888888;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.status-dot.read {
+  background: #555;
+  box-shadow: none;
+}
+
+.card-content-email {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.card-title-email {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+
+.card-subtext-email {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Contact Card - Circle Buttons Style - Slim Wide */
+.contact-card-horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.contact-info-horizontal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-name-horizontal {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.contact-role-horizontal {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+.contact-actions-horizontal {
+  display: flex;
+  gap: 8px;
+}
+
+/* Circle Action Button */
+.circle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.circle-btn:hover {
+  background: #fff;
+}
+
+.circle-btn:hover svg {
+  stroke: #000;
+  fill: #000;
+}
+
+.circle-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.circle-btn.whatsapp-btn:hover svg {
+  fill: #25D366;
+  stroke: #25D366;
+}
+
+/* Meeting Row Card */
+.meeting-row-card {
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.meeting-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.meeting-time-row {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  width: 80px;
+}
+
+.meeting-details-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.meeting-label-row {
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+}
+
+.meeting-tag-row {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  background: linear-gradient(135deg, #555555 0%, #888888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.meeting-attendees {
+  display: flex;
+  -webkit-mask-image: linear-gradient(to right, black 50%, transparent);
+}
+
+.avatar-mini {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #050505;
+  background: #222;
+  margin-left: -8px;
+}
+
+.avatar-mini:first-child {
+  margin-left: 0;
+}
+
+/* Quick Action Buttons */
+.quick-action-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  padding: 12px 20px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.quick-action-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.quick-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.quick-action-btn.ai-accent {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.quick-action-btn.ai-accent svg {
+  stroke: #888888;
+}
+
+/* Search Container */
+.search-container-instrument {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  padding: 8px;
+}
+
+.search-container-instrument input {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  padding: 10px;
+}
+
+.search-container-instrument input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Icon Button */
+.icon-btn-instrument {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-btn-instrument:hover {
+  background: #fff;
+}
+
+.icon-btn-instrument:hover svg {
+  stroke: #000;
+}
+
+.icon-btn-instrument svg {
+  width: 20px;
+  height: 20px;
+  stroke: rgba(255, 255, 255, 0.4);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.icon-btn-instrument.send-btn {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================
+   LIGHT MODE FOR NEW AI INTERFACE CARDS
+   ============================================ */
+
+.light .section-header-instrument {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .section-header-instrument::after {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent);
+}
+
+.light .card-title-email,
+.light .contact-name-horizontal,
+.light .meeting-label-row {
+  color: #000;
+}
+
+.light .card-subtext-email,
+.light .contact-role-horizontal,
+.light .meeting-time-row {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .circle-btn {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .circle-btn:hover {
+  background: #000;
+}
+
+.light .circle-btn:hover svg {
+  stroke: #fff;
+  fill: #fff;
+}
+
+.light .circle-btn svg {
+  stroke: rgba(0, 0, 0, 0.4);
+}
+
+.light .quick-action-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .quick-action-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #000;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.light .search-container-instrument {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .search-container-instrument input {
+  color: #000;
+}
+
+.light .search-container-instrument input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .icon-btn-instrument {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .icon-btn-instrument:hover {
+  background: #000;
+}
+
+.light .icon-btn-instrument:hover svg {
+  stroke: #fff;
+}
+
+.light .icon-btn-instrument svg {
+  stroke: rgba(0, 0, 0, 0.4);
+}
+
+.light .avatar-mini {
+  border-color: #f5f5f5;
+  background: #ddd;
+}
+
+
+.editor-area {
+  flex-grow: 1;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border: 1px solid var(--glass-border);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: var(--text-main);
+  outline: none;
+  resize: none;
+  min-height: 300px;
+}
+
+.btn-send {
+  background: var(--text-main);
+  color: var(--bg-deep);
+  padding: 1rem 2.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+
+.btn-send:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+}
+
+.btn-send:active {
+  transform: translateY(0);
+}
+
+@keyframes status-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 170, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 255, 170, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 170, 0);
+  }
+}
+
+.status-pulse-anim {
+  animation: status-pulse 2s infinite;
+}
+
+/* Vitreous Card Specifics */
+.avatar-vessel {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #1a1a1a, #000);
+  border: 1px solid var(--vitreous-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--vitreous-glow);
+  position: relative;
+  border-radius: 0.5rem;
+}
+
+.status-pulse {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background: #00ffaa;
+  border-radius: 50%;
+  border: 2px solid #050505;
+  box-shadow: 0 0 10px #00ffaa;
+}
+
+.email-meta-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
+  position: relative;
+  z-index: 10;
+}
+
+.email-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+  z-index: 10;
+}
+
+.email-sender {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--vitreous-secondary);
+}
+
+.email-subject {
+  font-size: 0.85rem;
+  color: var(--vitreous-text);
+  font-weight: 600;
+}
+
+.email-preview {
+  font-size: 0.75rem;
+  color: var(--vitreous-dim);
+}
+
+.email-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--vitreous-dim);
+  min-width: 80px;
+  text-align: right;
+  position: relative;
+  z-index: 10;
+}
+
+.unread-indicator {
+  width: 6px;
+  height: 6px;
+  background: var(--vitreous-glow);
+  border-radius: 50%;
+  margin-top: 10px;
+  box-shadow: 0 0 8px var(--vitreous-glow);
+}
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--vitreous-dim);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-label::after {
+  content: '';
+  height: 1px;
+  flex-grow: 1;
+  background: linear-gradient(90deg, var(--vitreous-border), transparent);
+}
+
+/* Vitreous Alloy Design Tokens */
+.transmission-field {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--vitreous-border);
+  color: var(--vitreous-text);
+  padding: 0.75rem 0;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.transmission-field:focus {
+  border-bottom-color: var(--vitreous-secondary);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.action-node {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  min-height: 120px;
+}
+
+.node-icon-vessel {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--vitreous-border);
+  color: var(--vitreous-glow);
+  transition: all 0.3s ease;
+}
+
+.action-node:hover .node-icon-vessel {
+  border-color: var(--vitreous-glow);
+  box-shadow: 0 0 15px rgba(176, 133, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.meeting-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--vitreous-glow);
+  letter-spacing: 0.1em;
+}
+
+.compose-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--vitreous-secondary);
+  margin-bottom: 0.25rem;
+  display: block;
+  opacity: 0.8;
+}
+
+.temporal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+
+.temporal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  color: var(--vitreous-dim);
+}
+
+.temporal-cell:hover {
+  border-color: var(--vitreous-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--vitreous-text);
+}
+
+.temporal-cell.active {
+  color: var(--vitreous-glow);
+  font-weight: bold;
+  border-color: var(--vitreous-glow);
+}
+
+.temporal-cell.today {
+  background: var(--vitreous-secondary);
+  color: #000;
+  font-weight: 900;
+}
+
+.meeting-sync-card {
+  padding: 1.5rem;
+  border-left: 3px solid var(--vitreous-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.meeting-sync-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--vitreous-secondary), transparent);
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.transmit-btn {
+  background: var(--vitreous-glow);
+  color: #000;
+  border: none;
+  padding: 0.8rem 2.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.transmit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(176, 133, 255, 0.4);
+  filter: brightness(1.1);
+}
+
+.transmit-btn:active {
+  transform: translateY(-1px);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
   /* Global Focus Ring for Keyboard Navigation */
@@ -296,7 +2539,27 @@ html {
 }
 
 html.light body {
-  background-color: #f8fafc;
+  background-color: #f1f1f1;
+  color: #3d3b3a;
+  background-image: none;
+  /* Clear any previous patterns */
+}
+
+/* Light Theme Aesthetic Override */
+html.light {
+  --primary-gradient: linear-gradient(90deg, #000000, #737373);
+}
+
+.light .btn-primary,
+.light .active-indicator,
+.light .accent-gradient {
+  background: var(--primary-gradient) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.light .text-primary {
+  color: #3d3b3a !important;
 }
 
 /* Dot Grid Canvas Pattern - Light Mode Only */
@@ -321,6 +2584,45 @@ html.dark .dot-grid-canvas-dark {
   background-color: #0f172a;
 }
 
+/* Glass Module CSS Logic */
+.glass-active-dark {
+  background: linear-gradient(to bottom, #141416, #0a0a0a);
+  border: 0.5px solid rgba(255, 26, 26, 0.4);
+  box-shadow: 0 0 30px rgba(255, 26, 26, 0.15);
+  z-index: 10;
+  position: relative;
+}
+
+.glass-inactive-dark {
+  background: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-inactive-dark:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Vitrine overrides for Glass Module (Since Vitrine uses dark mode logic) */
+.vitrine .glass-active-dark {
+  background: linear-gradient(135deg, rgba(230, 243, 255, 0.08), rgba(230, 243, 255, 0.02));
+  /* Sapphire tint */
+  border: 0.5px solid var(--palladium-edge);
+  box-shadow: inset 0 0 30px rgba(230, 243, 255, 0.05), 0 0 20px rgba(194, 255, 216, 0.1);
+  backdrop-filter: blur(40px);
+}
+
+.vitrine .glass-inactive-dark {
+  background: rgba(230, 243, 255, 0.01);
+  border: 0.5px solid rgba(209, 217, 221, 0.3);
+  /* Palladium opacity */
+}
+
+.vitrine .glass-inactive-dark:hover {
+  background: rgba(230, 243, 255, 0.04);
+  border-color: var(--lume-green);
+}
 
 /* New Utilities from Attached Design */
 @layer utilities {
@@ -373,29 +2675,62 @@ html.dark .dot-grid-canvas-dark {
     animation: neural-pulse 3s infinite ease-in-out;
   }
 
-  /* Glass effects */
+  /* Glass effects - Obsidian/Gold Leaf Theme */
   .glass {
-    @apply bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgb(226, 232, 240);
+  }
+
+  .dark .glass {
+    background: rgba(20, 20, 22, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .glass-strong {
-    @apply bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border border-slate-200 dark:border-slate-800;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgb(226, 232, 240);
+  }
+
+  .dark .glass-strong {
+    background: rgba(20, 20, 22, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .glass-card {
-    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-lg;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    border-radius: 0.5rem;
+    position: relative;
   }
 
-  /* Glass sexy - for command bar */
+  .dark .glass-card {
+    background: rgba(20, 20, 22, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Glass sexy - for command bar with luxury theme */
   .glass-sexy {
-    @apply bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(48px);
+    -webkit-backdrop-filter: blur(48px);
     border: 1px solid rgba(148, 163, 184, 0.2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   }
 
   .dark .glass-sexy {
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    background: rgba(20, 20, 22, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 175, 55, 0.05) inset;
   }
 
   /* Glow effects */
@@ -560,58 +2895,326 @@ body {
   }
 
   /* Thin Title - Inter Tight font */
-  .thin-title {
+  .font-title {
     font-family: 'Inter Tight', sans-serif;
     font-weight: 200;
-    letter-spacing: -0.02em;
   }
 
-  /* Hide scrollbar utility */
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Scrollbar Styling - Minimal Industrial */
-  ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-slate-400/50;
-    border-radius: 2px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-600/80;
+  /* Glass Active Dark - Vitrine "Super Dark Gradient" Spec */
+  html.vitrine .glass-active-dark {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.6), rgba(2, 44, 34, 0.8)) !important;
+    /* Emerald 900 to 950 */
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    /* Emerald 500 border low opacity */
+    box-shadow: inset 0 0 30px rgba(6, 78, 59, 0.5), 0 4px 20px rgba(0, 0, 0, 0.5) !important;
   }
 }
 
-/* Override dark mode for now to enforce blueprint aesthetic */
+.thin-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scrollbar Styling - Minimal Industrial */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-400/50;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-600/80;
+}
+
+
+/* Override dark mode for Crimson Red theme */
 html.dark body {
-  background-color: #0F172A;
-  /* Dark Slate base */
-  background-image:
-    radial-gradient(#1E293B 1px, transparent 1px),
-    linear-gradient(to right, rgba(30, 41, 59, 0.5) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(30, 41, 59, 0.5) 1px, transparent 1px);
-  color: #F8FAFC;
+  background-color: #0A0A0B;
+  /* Pure obsidian */
+  background-image: none;
+  /* Clean luxury aesthetic */
+  color: #FFFFFF;
+  /* Platinum */
+  font-family: 'Tenor Sans', serif;
+  /* Luxury editorial font */
 }
 
-/* Button & Action Overrides */
-.btn-blueprint-primary {
-  @apply bg-slate-900 text-white hover:bg-slate-800 transition-colors rounded-2xl px-6 py-2 text-xs font-bold tracking-widest uppercase shadow-lg;
+/* Vitrine Theme Override - Radial Gradient Background */
+/* Vitrine Theme Override - Deep Dark Gradient Background & Cleanup */
+html.vitrine body {
+  background-color: #020617;
+  background-image:
+    radial-gradient(circle at center, #064E3B 0%, #020617 70%),
+    linear-gradient(to bottom, #020617, #000000);
+  background-blend-mode: overlay, normal;
+  background-attachment: fixed;
+  font-family: 'Inter Tight', sans-serif;
+  /* Global Technical Font */
+  font-weight: 200;
+  /* Thin */
+  letter-spacing: 0.05em;
+  /* Technical spacing */
+  color: #FFFFFF;
+}
+
+/* Monolith Design System */
+.monolith {
+  position: relative;
+  aspect-ratio: 0.8 / 1;
+  background: linear-gradient(145deg, #151515 0%, #050505 100%);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.monolith::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.02) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+.monolith:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.8),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.icon-container {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 24px;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
+}
+
+.icon-container svg {
+  width: 100%;
+  height: 100%;
+  stroke: rgba(255, 255, 255, 0.4);
+  fill: none;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.monolith .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+}
+
+.monolith .name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: #fff;
+}
+
+.sheen {
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.05) 50%, transparent 55%);
+  transition: 0.8s;
+  pointer-events: none;
+}
+
+/* ============================================
+   MOLTEN LOGIC EDITION - GLOBAL OVERRIDES
+   Pure black void with glass components
+   ============================================ */
+
+.dark {
+  background-color: #000000 !important;
+}
+
+.dark body {
+  background: #000000;
+}
+
+/* Glass Card Overrides */
+.dark .card,
+.dark [class*="card"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .card:hover,
+.dark [class*="card"]:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Module cards - Glass style */
+.dark .module-card,
+.dark [class*="MonolithSidebarCard"],
+.dark .monolith-inner-container {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .module-card:hover,
+.dark [class*="MonolithSidebarCard"]:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Email cards - Pure glass */
+.dark .email-card-v2,
+.dark .email-card-v2-refined {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .email-card-v2:hover,
+.dark .email-card-v2-refined:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Avatar - Metallic reflect gradient */
+.dark .avatar,
+.dark .email-avatar,
+.dark .contact-photo-v2,
+.dark [class*="avatar"] {
+  background: linear-gradient(135deg, #fff 0%, #888 50%, #000 100%) !important;
+  color: #000000 !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Calendar widget - Glass */
+.dark .calendar-widget,
+.dark [class*="calendar"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Sidebar background override */
+.dark .sidebar,
+.dark [class*="sidebar"],
+.dark .bg-sidebar {
+  background: #000000 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Text colors */
+.dark .text-muted,
+.dark [class*="muted"] {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Module labels */
+.dark .module-label,
+.dark [class*="sublabel"] {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Module names - White */
+.dark .module-name,
+.dark [class*="uppercase"] {
+  color: #ffffff !important;
+}
+
+/* Buttons - Glass style */
+.dark button,
+.dark [class*="btn"] {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark button:hover,
+.dark [class*="btn"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Remove all color accents - White only */
+.dark .text-primary,
+.dark [class*="accent"] {
+  color: #ffffff !important;
+}
+
+/* Input fields - Glass */
+.dark input,
+.dark textarea,
+.dark select {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Scan line animation */
+.dark .scan-line {
+  position: fixed;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  top: 0;
+  animation: scan 8s linear infinite;
+  z-index: 100;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  0% {
+    top: 0%
+  }
+
+  100% {
+    top: 100%
+  }
+}
+
+/* Dock - Glass style */
+.dark .dock,
+.dark [class*="dock"] {
+  background: rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(40px) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Right sidebar widgets */
+.dark .widget,
+.dark [class*="widget"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }

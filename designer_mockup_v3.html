@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            background: #050505;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 240px 400px 1fr;
+            height: 100vh;
+            gap: 1px;
+            background: #1a0505;
+        }
+
+        .panel {
+            background: #080808;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, #b81d24, transparent);
+        }
+
+        .glass-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(25px);
+            border: 0.5px solid rgba(184, 29, 36, 0.4);
+            margin: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(184, 29, 36, 0.1);
+        }
+
+        .nav-link {
+            color: #d4af37;
+            font-weight: 200;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: 10px;
+            margin: 30px;
+            display: block;
+            border-bottom: 0.5px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .subject {
+            font-weight: 100;
+            letter-spacing: 3px;
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .meta {
+            color: #b81d24;
+            font-size: 9px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .glow-line {
+            height: 1px;
+            width: 100%;
+            background: #b81d24;
+            box-shadow: 0 0 10px #b81d24;
+            margin-top: 10px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='workspace'>
+        <div class='panel'>
+            <div class='nav-link' style='color:#fff; font-size:20px; border:none;'>I.AM</div>
+            <div class='nav-link'>Archive</div>
+            <div class='nav-link'>Priority</div>
+            <div class='nav-link' style='color:#b81d24;'>Encrypted</div>
+        </div>
+
+        <div class='panel'>
+            <div class='glass-card'>
+                <div class='meta'>Transmission / 001</div>
+                <div class='subject'>Carbon Monocoque</div>
+                <div class='glow-line'></div>
+            </div>
+            <div class='glass-card' style='opacity:0.5'>
+                <div class='meta'>Transmission / 002</div>
+                <div class='subject'>Kinetic Recovery</div>
+                <div class='glow-line'></div>
+            </div>
+        </div>
+
+        <div class='panel'>
+            <div style='padding: 60px;'>
+                <span class='meta' style='font-size:14px; color:#d4af37'>SYSTEM LOG // PLATINUM STATUS</span>
+                <h2 style='font-weight:100; font-size:64px; letter-spacing: -2px; margin: 20px 0;'>
+                    The Art of <span style='color:#b81d24'>Frictionless</span>
+                </h2>
+                <p style='color:#555; letter-spacing: 1px; line-height: 2;'>
+                    Suspended in a vacuum of deep charcoal, this interface utilizes a kinetic conduit logic. Information
+                    flows through ultra-thin crimson titanium borders, illuminated by the internal pressure of
+                    high-performance data streams.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
