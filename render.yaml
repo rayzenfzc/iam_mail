@@ -1,4 +1,5 @@
 # Render deployment configuration for i.AM Mail
+# Last updated: 2026-01-03 - Production deployment
 
 services:
   - type: web
