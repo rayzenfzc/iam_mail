@@ -94,8 +94,8 @@
   --elevate-2: rgba(0, 0, 0, .08);
 
   /* Light Theme - Industrial Industrial Greyscale */
-  --background: 0 0% 95%;
-  /* #f1f1f1 */
+  --background: 0 0% 100%;
+  /* Pure white */
   --foreground: 15 2% 23%;
   /* #3d3b3a */
   --border: 0 0% 88%;
@@ -106,7 +106,7 @@
   --card-border: 0 0% 88%;
 
   /* Sidebar */
-  --sidebar: 0 0% 93%;
+  --sidebar: 0 0% 100%;
   --sidebar-foreground: 15 2% 40%;
   --sidebar-border: 0 0% 88%;
   --sidebar-primary: 0 0% 0%;
@@ -995,7 +995,7 @@ html.prismatic.light {
 }
 
 .light .monolith-glow {
-  background: radial-gradient(circle at center, #fafafa 0%, #f0f0f0 70%);
+  background: #ffffff;
 }
 
 
@@ -2539,8 +2539,8 @@ html {
 }
 
 html.light body {
-  background-color: #f1f1f1;
-  color: #3d3b3a;
+  background-color: #ffffff;
+  color: #1a1a1a;
   background-image: none;
   /* Clear any previous patterns */
 }

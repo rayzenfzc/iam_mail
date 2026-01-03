@@ -30,9 +30,12 @@ export const Dock: React.FC<DockProps> = ({ onAiAction, className = "" }) => {
             case 'picker_view': return 'Search items...';
             case 'home_view': return 'Ask anything...';
             case 'settings_view': return 'Search settings...';
+            case 'calendar_view': return 'Schedule meeting or find time...';
+            case 'contacts_view': return 'Email Sarah or find contact...';
             default: return 'Search or Command...';
         }
     };
+
 
     // Handle input based on dock mode
     const handleInputChange = (value: string) => {

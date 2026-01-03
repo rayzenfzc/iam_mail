@@ -5,7 +5,7 @@ import React, { createContext, useContext, useReducer, ReactNode, useMemo } from
 // ============================================
 
 export type ActiveView = 'inbox' | 'compose' | 'settings' | 'homeHub' | 'calendar' | 'contacts' | 'tasks' | 'files';
-export type DockMode = 'list_view' | 'thread_view' | 'compose_view' | 'picker_view' | 'settings_view' | 'home_view';
+export type DockMode = 'list_view' | 'thread_view' | 'compose_view' | 'picker_view' | 'settings_view' | 'home_view' | 'calendar_view' | 'contacts_view';
 export type InboxFilter = 'all' | 'unread' | 'urgent';
 export type PickerType = 'contacts' | 'attachments' | 'date' | null;
 export type SendStatus = 'pending' | 'sending' | 'sent' | 'failed' | 'queued_offline';
@@ -117,13 +117,19 @@ export function deriveDockMode(state: AppState): DockMode {
     // 3) Home Hub
     if (state.activeView === 'homeHub') return 'home_view';
 
-    // 4) Compose (primary action screen)
+    // 4) Calendar view
+    if (state.activeView === 'calendar') return 'calendar_view';
+
+    // 5) Contacts view
+    if (state.activeView === 'contacts') return 'contacts_view';
+
+    // 6) Compose (primary action screen)
     if (state.activeView === 'compose') return 'compose_view';
 
-    // 5) Thread ONLY when inbox + item selected
+    // 7) Thread ONLY when inbox + item selected
     if (state.activeView === 'inbox' && state.selectedItemId != null) return 'thread_view';
 
-    // 6) Default list view
+    // 8) Default list view
     return 'list_view';
 }
 

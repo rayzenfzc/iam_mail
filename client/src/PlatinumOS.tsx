@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMouseRefraction } from './hooks/useMouseRefraction';
+import { useKeyboardHeight } from './hooks/useKeyboardHeight';
 import { GoogleGenAI } from "@google/genai";
 import AuthPage from './components/AuthPage';
 import NexusSettings from './components/NexusSettings';
@@ -20,6 +21,7 @@ import { EmailCardHorizontal, ContactCardHorizontal, CalendarDayCard, MeetingRow
 import LiquidModuleCard from './components/ui/LiquidModuleCard';
 import LiquidEmailCard from './components/ui/LiquidEmailCard';
 import LiquidCalendarWidget from './components/ui/LiquidCalendarWidget'; // Added import
+import Dock from './components/Dock';
 import {
     InboxIcon, ComposeIcon, NeuralAIIcon, SendIcon, UnreadIcon,
     ReturnIcon, SurfaceIcon, QueryIcon, TimelineIcon, DirectoryIcon,
@@ -338,15 +340,29 @@ function ProductPage() {
     const [zohoConfigured, setZohoConfigured] = useState(false);
     const [zohoStatus, setZohoStatus] = useState<zohoService.ZohoStatus | null>(null);
 
-    // ========== UI STATE ==========
-    // MOLTEN LOGIC - DARK MODE ONLY (no other themes)
-    const themeMode = 'dark';
-    const darkMode = true;
+    // ========== KEYBOARD DETECTION ==========
+    const keyboardHeight = useKeyboardHeight();
 
-    // Apply dark mode on mount
+    // ========== UI STATE ==========
+    // THEME MODE - Now supports Light/Dark toggle with persistence
+    const [darkMode, setDarkMode] = useState<boolean>(() => {
+        const saved = localStorage.getItem('iam_theme');
+        return saved ? saved === 'dark' : true; // Default to dark
+    });
+
+    // Apply theme class on mount and when changed
     useEffect(() => {
-        document.documentElement.classList.add('dark');
-    }, []);
+        if (darkMode) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+        } else {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('iam_theme', darkMode ? 'dark' : 'light');
+    }, [darkMode]);
+
+    const toggleTheme = () => setDarkMode(!darkMode);
 
     const [activeAccountId, setActiveAccountId] = useState(1);
     const [activeView, setActiveView] = useState('inbox');
@@ -366,6 +382,11 @@ function ProductPage() {
     const [composeBody, setComposeBody] = useState('');
     const [recipients, setRecipients] = useState<string[]>([]);
     const [isSending, setIsSending] = useState(false);
+
+    // ========== DOCK-COMPOSE SYNC STATE ==========
+    const [activeInputMode, setActiveInputMode] = useState<'dock' | 'compose' | null>(null);
+    const [enableDockSync, setEnableDockSync] = useState(true);
+
 
     // ========== SEND QUEUE ==========
     // ========== SEND QUEUE ==========
@@ -506,23 +527,131 @@ function ProductPage() {
         setThreadPageIndex(0);
     }, [selectedMailId]);
 
-    // Keyboard Navigation for Thread
+    // ========== SUPERHUMAN-STYLE KEYBOARD SHORTCUTS ==========
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (!selectedMailId || composeMode) return;
-
-            if (e.key === 'j' || e.key === 'ArrowDown') {
-                const thread = MOCK_THREADS[selectedMailId] || [MOCK_INBOX.find(m => m.id === selectedMailId)];
-                if (threadPageIndex < (thread?.length || 1) - 1) setThreadPageIndex(prev => prev + 1);
+            // 1. GLOBAL SHORTCUTS
+            // Cmd+K: Focus Dock (Works everywhere)
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                const dockInput = document.querySelector('input[placeholder*="Ask"]') as HTMLInputElement;
+                dockInput?.focus();
+                return;
             }
-            if (e.key === 'k' || e.key === 'ArrowUp') {
-                if (threadPageIndex > 0) setThreadPageIndex(prev => prev - 1);
+
+            // Ignore if typing in input/textarea (for other shortcuts)
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+            // NAVIGATION: j/k for thread navigation (only when email is selected)
+            if (selectedMailId && !composeMode) {
+                if (e.key === 'j' || e.key === 'ArrowDown') {
+                    const thread = MOCK_THREADS[selectedMailId] || [MOCK_INBOX.find(m => m.id === selectedMailId)];
+                    if (threadPageIndex < (thread?.length || 1) - 1) setThreadPageIndex(prev => prev + 1);
+                    return;
+                }
+                if (e.key === 'k' || e.key === 'ArrowUp') {
+                    if (threadPageIndex > 0) setThreadPageIndex(prev => prev - 1);
+                    return;
+                }
+            }
+
+            // COMPOSE: c = new, r = reply, a = reply all, f = forward
+            // Allow 'c' to work anywhere (not just when email selected)
+            if (e.key === 'c' && !composeMode) {
+                e.preventDefault();
+                setComposeMode('new');
+                setRecipients([]);
+                setComposeSubject('');
+                setComposeBody('');
+                return;
+            }
+            if (selectedMailId) {
+                const mail = MOCK_INBOX.find(m => m.id === selectedMailId);
+                if (mail) {
+                    if (e.key === 'r') {
+                        e.preventDefault();
+                        setComposeMode('reply');
+                        setRecipients([mail.sender]);
+                        setComposeSubject(`RE: ${mail.subject}`);
+                        return;
+                    }
+                    if (e.key === 'a') {
+                        e.preventDefault();
+                        setComposeMode('reply');
+                        setRecipients([mail.sender, 'team@iam.os']); // Mock 'Reply All' behavior
+                        setComposeSubject(`RE: ${mail.subject}`);
+                        return;
+                    }
+                    if (e.key === 'f') {
+                        e.preventDefault();
+                        setComposeMode('new');
+                        setComposeSubject(`Fwd: ${mail.subject}`);
+                        setComposeBody(`\n\n---------- Forwarded message ---------\nFrom: ${mail.sender}\nDate: ${mail.time}\nSubject: ${mail.subject}\n\n${mail.body}`);
+                        return;
+                    }
+                    if (e.key === 'u') {
+                        e.preventDefault();
+                        console.log('Mark as unread:', selectedMailId);
+                        // In a real app: updateMail(selectedMailId, { read: false })
+                        return;
+                    }
+                }
+            }
+
+            // ACTIONS: e = archive, # = delete, s = star
+            if (e.key === 'e' && selectedMailId) {
+                e.preventDefault();
+                console.log('Archive:', selectedMailId);
+                setSelectedMailId(null);
+                return;
+            }
+            if ((e.key === '#' || e.key === 'Backspace') && selectedMailId) {
+                e.preventDefault();
+                console.log('Delete:', selectedMailId);
+                setSelectedMailId(null);
+                return;
+            }
+            if (e.key === 's' && selectedMailId) {
+                e.preventDefault();
+                console.log('Star toggle:', selectedMailId);
+                return;
+            }
+
+            // NAVIGATION: g+i = goto inbox, g+s = goto sent, g+c = goto calendar
+            if (e.key === 'g') {
+                const handleSecondKey = (e2: KeyboardEvent) => {
+                    if (e2.key === 'i') setActiveView('inbox');
+                    if (e2.key === 's') setActiveView('sent');
+                    if (e2.key === 'c') handleNav('calendar');
+                    if (e2.key === 't') handleNav('tasks');
+                    window.removeEventListener('keydown', handleSecondKey);
+                };
+                window.addEventListener('keydown', handleSecondKey);
+                setTimeout(() => window.removeEventListener('keydown', handleSecondKey), 2000);
+                return;
+            }
+
+            // SEARCH: / = focus search
+            if (e.key === '/') {
+                e.preventDefault();
+                // Focus on dock input
+                const dockInput = document.querySelector('input[placeholder*="Ask"]') as HTMLInputElement;
+                dockInput?.focus();
+                return;
+            }
+
+            // ESCAPE: close current view
+            if (e.key === 'Escape') {
+                if (selectedMailId) setSelectedMailId(null);
+                else if (selectedContactId) setSelectedContactId(null);
+                return;
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedMailId, threadPageIndex, composeMode]);
+    }, [selectedMailId, threadPageIndex, composeMode, activeView]);
 
     // ========== MODALS & FEATURES ==========
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -785,6 +914,129 @@ function ProductPage() {
         }
     };
 
+    // ========== DOCK-COMPOSE SYNC FUNCTIONS ==========
+
+    // Detect if user intends to compose an email
+    const detectComposeIntent = (text: string): boolean => {
+        const composeKeywords = [
+            /^email .+ about/i,
+            /^draft .+ to/i,
+            /^write to/i,
+            /^send .+ to/i,
+            /^reply to/i,
+            /^tell .+ that/i,
+            /^ask .+ about/i,
+            /^follow up with/i,
+            /^compose/i,
+            /^message .+ about/i
+        ];
+        return composeKeywords.some(pattern => pattern.test(text.trim()));
+    };
+
+    // Parse natural language for recipient and subject
+    interface ParsedIntent {
+        recipient?: string;
+        subject?: string;
+        action?: 'compose' | 'reply' | 'forward';
+    }
+
+    const parseComposeIntent = (text: string): ParsedIntent => {
+        const result: ParsedIntent = {};
+
+        // Extract recipient (look for capitalized names)
+        const recipientMatch = text.match(/(?:email|write to|tell|ask|message|send to) ([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+        if (recipientMatch) {
+            result.recipient = recipientMatch[1].trim();
+        }
+
+        // Extract subject
+        const subjectMatch = text.match(/about\s+(.+?)(?:\s+(?:and|that|saying|mentioning|asking)|\.|$)/i);
+        if (subjectMatch) {
+            result.subject = subjectMatch[1].trim();
+        }
+
+        // Determine action
+        if (/reply/i.test(text)) {
+            result.action = 'reply';
+        } else if (/forward/i.test(text)) {
+            result.action = 'forward';
+        } else {
+            result.action = 'compose';
+        }
+
+        return result;
+    };
+
+    // Handle dock input with compose sync
+    const handleDockInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const text = e.target.value;
+        setDockInput(text);
+
+        // If compose window is open AND dock sync is enabled
+        if (composeMode && enableDockSync) {
+            setComposeBody(text);
+            setActiveInputMode('dock');
+
+            // Parse for recipient/subject hints
+            const parsed = parseComposeIntent(text);
+            if (parsed.recipient && recipients.length === 0) {
+                // Auto-suggest recipient (don't force it)
+                setRecipients([parsed.recipient]);
+            }
+            if (parsed.subject && !composeSubject) {
+                setComposeSubject(parsed.subject);
+            }
+        }
+    };
+
+    // Handle compose body direct typing
+    const handleComposeBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const text = e.target.value;
+        setComposeBody(text);
+
+        // Disable dock sync when typing directly in compose
+        setEnableDockSync(false);
+        setActiveInputMode('compose');
+    };
+
+    // Re-enable dock sync when user focuses back on dock
+    const handleDockFocus = () => {
+        if (composeMode) {
+            setEnableDockSync(true);
+            setActiveInputMode('dock');
+        }
+    };
+
+    // Auto-open compose on intent detection
+    useEffect(() => {
+        if (!composeMode && dockInput && detectComposeIntent(dockInput)) {
+            // Auto-open compose window
+            setComposeMode('new');
+            setEnableDockSync(true);
+            setActiveInputMode('dock');
+
+            // Parse and pre-fill
+            const parsed = parseComposeIntent(dockInput);
+            if (parsed.recipient) {
+                setRecipients([parsed.recipient]);
+            }
+            if (parsed.subject) {
+                setComposeSubject(parsed.subject);
+            }
+            // Body will be synced via handleDockInput
+            setComposeBody(dockInput);
+        }
+    }, [dockInput, composeMode]);
+
+    // Reset sync state when compose closes
+    useEffect(() => {
+        if (!composeMode) {
+            setEnableDockSync(true);
+            setActiveInputMode(null);
+        }
+    }, [composeMode]);
+
+
     // ========== EMAIL SENDING ==========
     // ========== EMAIL SENDING (WITH QUEUE) ==========
     const handleSendEmail = async () => {
@@ -926,6 +1178,17 @@ function ProductPage() {
     };
 
     const handleNav = (view: string) => {
+        // Special case: Compose is not a view, it's a mode
+        if (view === 'compose') {
+            setComposeMode('new');
+            setRecipients([]);
+            setComposeSubject('');
+            setComposeBody('');
+            setCurrentDraftId(null);
+            setMobileMenuOpen(false);
+            return;
+        }
+
         setActiveView(view);
         setMobileMenuOpen(false);
         // Reset selections when changing main module
@@ -942,56 +1205,55 @@ function ProductPage() {
         if (mobileMenuOpen) return ['INBOX', 'DRAFTS', 'CALENDAR', 'COMPOSE', 'AI'];
 
         // 1. Compose Mode
-        if (composeMode === 'new') return ['CONTACTS', 'RECIPIENT', 'DRAFT', 'SEND'];
-        if (composeMode === 'reply') return ['RECIPIENT', 'FORMAL', 'FRIENDLY', 'SEND'];
+        if (composeMode === 'new') return ['SEND', 'SCHEDULE', 'AI DRAFT', 'ATTACH', 'SAVE'];
+        if (composeMode === 'reply') return ['SEND', 'SCHEDULE', 'AI DRAFT', 'ATTACH', 'SAVE'];
 
         // 2. Inbox Context
         if (activeView === 'inbox') {
             if (selectedMailId) {
-                // Check if selected email is read/unread
-                const selectedEmail = realEmails.find(e => e.id === selectedMailId);
-                const isRead = selectedEmail?.isRead;
-                return ['ARCHIVE', 'DELETE', 'REPLY', isRead ? 'MARK UNREAD' : 'MARK READ'];
+                // Reading Mode - Show Reply, Forward, Archive, Star, Delete
+                return ['REPLY', 'FORWARD', 'ARCHIVE', 'STAR', 'DELETE'];
             }
-            // HOME DOCK STATE (Inbox List) -> INBOX, DRAFTS, COMPOSE, AI
-            return ['INBOX', 'DRAFTS', 'COMPOSE', 'AI'];
+            // List Mode - Show Select, Archive, Star, Delete, Compose
+            return ['SELECT', 'ARCHIVE', 'STAR', 'DELETE', 'COMPOSE'];
         }
 
         // 2b. Other Mail Folders
         if (['sent', 'archive', 'trash'].includes(activeView)) {
-            if (activeView === 'trash' && selectedMailId) return ['DELETE'];
+            if (activeView === 'trash' && selectedMailId) return ['DELETE', 'RESTORE'];
             if (activeView === 'trash' && !selectedMailId) return ['EMPTY TRASH'];
-            if (selectedMailId) return ['DELETE'];
+            if (selectedMailId) return ['REPLY', 'FORWARD', 'DELETE'];
             return ['INBOX', 'COMPOSE'];
         }
 
         // 2c. Drafts View
         if (activeView === 'drafts' || composeMode === 'new' || composeMode === 'reply') {
             // In draft mode or viewing drafts
-            if (composeMode === 'new' || composeMode === 'reply') return ['CONTACTS', 'DELETE', 'DRAFT', 'SEND'];
-            if (activeView === 'drafts' && selectedMailId) return ['DELETE'];
+            if (composeMode === 'new' || composeMode === 'reply') return ['SEND', 'SCHEDULE', 'AI DRAFT', 'ATTACH', 'SAVE'];
+            if (activeView === 'drafts' && selectedMailId) return ['EDIT', 'DELETE'];
             return ['INBOX', 'COMPOSE'];
         }
 
         // 3. Contacts Context
         if (activeView === 'contacts') {
-            if (selectedContactId) return ['DELETE', 'EMAIL', 'CALL'];
-            return ['SEARCH', 'EMAIL', 'NEW CONTACT'];
+            if (selectedContactId) return ['EMAIL', 'CALL', 'EDIT', 'DELETE'];
+            return ['NEW CONTACT', 'EMAIL', 'CALL', 'FIND'];
         }
 
         // 4. Calendar Context
         if (activeView === 'calendar') {
-            return ['TODAY', 'NEW EVENT', 'SCHEDULE'];
+            return ['NEW EVENT', 'TODAY', 'WEEK', 'MONTH', 'FIND TIME'];
         }
 
         // 5. Settings
         if (activeView === 'settings') {
-            return ['SEARCH', 'TOGGLE', 'EXPLAIN'];
+            return ['BACK'];
         }
 
         // Default
         return ['COMPOSE', 'CALENDAR', 'CONTACTS', 'AI'];
     };
+
 
     const getActionIcon = (action: string) => {
         switch (action) {
@@ -1003,6 +1265,7 @@ function ProductPage() {
             case 'TIMELINE': return TimelineIcon;
             case 'COMPOSE': return ComposeIcon;
             case 'AI':
+            case 'AI DRAFT':
             case 'NEURAL AI': return NeuralAIIcon;
             case 'CONTACTS':
             case 'DIRECTORY': return DirectoryIcon;
@@ -1015,8 +1278,11 @@ function ProductPage() {
             case 'DELETE':
             case 'PURGE': return PurgeIcon;
             case 'REPLY': return ReplyIcon;
+            case 'FORWARD': return SendIcon;
             case 'SEARCH':
-            case 'QUERY': return QueryIcon;
+            case 'QUERY':
+            case 'FIND':
+            case 'FIND TIME': return QueryIcon;
             case 'NEW CONTACT':
             case 'PROVISION': return ProvisionIcon;
             case 'HOME':
@@ -1025,7 +1291,8 @@ function ProductPage() {
             case 'SYSTEM': return SystemIcon;
             case 'BACK':
             case 'RETURN': return ReturnIcon;
-            case 'DRAFT': return VaultIcon;
+            case 'DRAFT':
+            case 'SAVE': return VaultIcon;
             case 'RECIPIENT': return DirectoryIcon;
             case 'FORMAL':
             case 'FRIENDLY':
@@ -1034,9 +1301,21 @@ function ProductPage() {
             case 'TOGGLE': return SystemIcon;
             case 'EMAIL': return SendIcon;
             case 'URGENT': return UnreadIcon;
+            case 'STAR': return UnreadIcon;
+            case 'SELECT': return SeenIcon;
+            case 'SCHEDULE': return TimelineIcon;
+            case 'ATTACH': return ComposeIcon;
+            case 'NEW EVENT': return ComposeIcon;
+            case 'TODAY': return TimelineIcon;
+            case 'WEEK': return TimelineIcon;
+            case 'MONTH': return TimelineIcon;
+            case 'RESTORE': return InboxIcon;
+            case 'EDIT': return ComposeIcon;
+            case 'CALL': return DirectoryIcon;
             default: return undefined;
         }
     };
+
 
     const dockButtons = getDockContext();
 
@@ -1051,8 +1330,7 @@ function ProductPage() {
             return;
         }
 
-        // Home Screen Actions
-        if (action === 'COMPOSE') {
+        if (action === 'COMPOSE' || action === 'Compose' || action === 'New Event' || action === 'New') {
             setMobileMenuOpen(false); // Go to main view
             setComposeMode('new');
             // Clear state
@@ -1209,6 +1487,7 @@ function ProductPage() {
     const DEFAULT_MODULES = [
         { id: 'inbox', label: 'Inbox', sublabel: 'PRIMARY' },
         { id: 'drafts', label: 'Drafts', sublabel: 'PENDING' },
+        { id: 'compose', label: 'Compose', sublabel: 'NEW EMAIL' },
         { id: 'sent', label: 'Sent', sublabel: 'OUTBOUND' },
         { id: 'archive', label: 'Archive', sublabel: 'STORAGE' },
         { id: 'trash', label: 'Trash', sublabel: 'JUNK' },
@@ -1275,7 +1554,7 @@ function ProductPage() {
                 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
                 bg-sidebar border-r border-sidebar-border
                 `}
-                style={{ backgroundColor: '#060606' }}
+                style={{ backgroundColor: darkMode ? '#060606' : '#ffffff' }}
             >
 
                 {/* Ether Bar Header - Floating Capsule */}
@@ -1284,8 +1563,8 @@ function ProductPage() {
                         darkMode={darkMode}
                         onSettings={() => setIsSettingsOpen(true)}
                         onGenesis={() => setShowOnboarding(true)}
-                        onThemeToggle={() => { }}
-                        themeMode={themeMode}
+                        onThemeToggle={toggleTheme}
+                        themeMode={darkMode ? 'dark' : 'light'}
                     />
                 </div>
 
@@ -1297,12 +1576,12 @@ function ProductPage() {
 
                     <div className="relative z-10 p-4">
                         <div className="flex justify-between items-center mb-6 px-1">
-                            <h3 className="text-[9px] font-bold tracking-[0.3em] opacity-30 uppercase">System Modules</h3>
+                            <h3 className={`text-[9px] font-bold tracking-[0.3em] opacity-30 uppercase ${darkMode ? '' : 'text-black'}`}>System Modules</h3>
                             <button
                                 onClick={() => setIsEditMode(!isEditMode)}
                                 className={`text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-full transition-all duration-300 border ${isEditMode
-                                    ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]'
-                                    : 'bg-transparent border-white/10 text-white/40 hover:text-white hover:border-white/30'
+                                    ? (darkMode ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'bg-black text-white border-black shadow-lg')
+                                    : (darkMode ? 'bg-transparent border-white/10 text-white/40 hover:text-white hover:border-white/30' : 'bg-transparent border-black/10 text-black/40 hover:text-black hover:border-black/30')
                                     }`}
                             >
                                 {isEditMode ? 'Done' : 'Edit'}
@@ -1318,6 +1597,7 @@ function ProductPage() {
                                             label={item.sublabel}
                                             name={item.label.toUpperCase()}
                                             isActive={activeView === item.id}
+                                            theme={darkMode ? 'dark' : 'light'}
                                             onClick={() => !isEditMode && handleModuleClick(item.id)}
                                         />
                                     </div>
@@ -1355,18 +1635,18 @@ function ProductPage() {
                             {/* Add Module Button - Shows when modules are removed */}
                             {isEditMode && modules.length < DEFAULT_MODULES.length && (
                                 <div className="col-span-2 mt-4">
-                                    <div className="text-[9px] font-bold tracking-[0.2em] opacity-30 uppercase mb-3 px-1">Available Modules</div>
+                                    <div className={`text-[9px] font-bold tracking-[0.2em] opacity-30 uppercase mb-3 px-1 ${darkMode ? '' : 'text-black'}`}>Available Modules</div>
                                     <div className="grid grid-cols-2 gap-2">
                                         {DEFAULT_MODULES.filter(dm => !modules.find(m => m.id === dm.id)).map(item => (
                                             <button
                                                 key={item.id}
                                                 onClick={() => addModule(item)}
-                                                className="p-3 border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-white/50 hover:bg-white/5 transition-all duration-300 group"
+                                                className={`p-3 border border-dashed rounded-xl flex flex-col items-center justify-center gap-2 transition-all duration-300 group ${darkMode ? 'border-white/20 hover:border-white/50 hover:bg-white/5' : 'border-black/20 hover:border-black/50 hover:bg-black/5'}`}
                                             >
-                                                <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
+                                                <span className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${darkMode ? 'bg-white/10 text-white/60 group-hover:text-white' : 'bg-black/10 text-black/60 group-hover:text-black'}`}>
                                                     +
                                                 </span>
-                                                <span className="text-[9px] uppercase tracking-wider text-white/40 group-hover:text-white/80 transition-colors">
+                                                <span className={`text-[9px] uppercase tracking-wider transition-colors ${darkMode ? 'text-white/40 group-hover:text-white/80' : 'text-black/40 group-hover:text-black/80'}`}>
                                                     {item.label}
                                                 </span>
                                             </button>
@@ -1414,6 +1694,7 @@ function ProductPage() {
                                                     time={mail.time}
                                                     preview={mail.body.substring(0, 120)}
                                                     initials={initials}
+                                                    theme={darkMode ? 'dark' : 'light'}
                                                     onClick={() => setSelectedMailId(mail.id)}
                                                 />
                                             );
@@ -1568,159 +1849,151 @@ function ProductPage() {
                         }
 
                         {/* VIEW: COMPOSE - Terminal Suite Composer Monolith */}
-                        {
-                            composeMode && (
-                                <div className="w-full max-w-2xl mx-auto animate-in slide-in-from-bottom-4 duration-300">
+                        {composeMode && (
+                            <div className="w-full max-w-2xl mx-auto animate-in slide-in-from-bottom-4 duration-300">
+                                <div
+                                    className="composer-monolith relative overflow-hidden border"
+                                    onKeyDown={(e) => {
+                                        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                                            e.preventDefault();
+                                            handleSendEmail();
+                                        }
+                                    }}
+                                    style={{
+                                        background: darkMode
+                                            ? 'linear-gradient(165deg, #111113 0%, #050505 100%)'
+                                            : 'linear-gradient(165deg, #ffffff 0%, #f5f5f5 100%)',
+                                        borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                                        borderRadius: '0.5rem'
+                                    }}
+                                >
+                                    {/* Sheen Effect */}
+                                    <div className="sheen"></div>
+
+                                    {/* Composer Header - Input Rows */}
                                     <div
-                                        className="composer-monolith relative overflow-hidden border"
-                                        style={{
-                                            background: darkMode
-                                                ? 'linear-gradient(165deg, #111113 0%, #050505 100%)'
-                                                : 'linear-gradient(165deg, #ffffff 0%, #f5f5f5 100%)',
-                                            borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                                            borderRadius: '0.5rem'
-                                        }}
+                                        className="px-6"
+                                        style={{ borderBottom: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)' }}
                                     >
-                                        {/* Sheen Effect */}
-                                        <div className="sheen"></div>
-
-                                        {/* Composer Header - Input Rows */}
+                                        {/* TO Row */}
                                         <div
-                                            className="px-6"
-                                            style={{ borderBottom: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)' }}
+                                            className="flex items-center py-4"
+                                            style={{ borderBottom: darkMode ? '1px solid rgba(255,255,255,0.03)' : '1px solid rgba(0,0,0,0.03)' }}
                                         >
-                                            {/* TO Row */}
-                                            <div
-                                                className="flex items-center py-4"
-                                                style={{ borderBottom: darkMode ? '1px solid rgba(255,255,255,0.03)' : '1px solid rgba(0,0,0,0.03)' }}
+                                            <label
+                                                className="w-20 font-mono text-[11px] uppercase"
+                                                style={{ color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}
                                             >
-                                                <label
-                                                    className="w-20 font-mono text-[11px] uppercase"
-                                                    style={{ color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}
-                                                >
-                                                    To
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={recipients.join('; ')}
-                                                    onChange={(e) => setRecipients(e.target.value.split(';').map(s => s.trim()))}
-                                                    placeholder="recipient@obsidian.core"
-                                                    className="flex-1 bg-transparent outline-none text-sm"
-                                                    style={{ color: darkMode ? '#fff' : '#000' }}
-                                                />
-                                                <button
-                                                    className="font-mono text-[10px] uppercase px-2 py-1 transition-all"
-                                                    style={{
-                                                        color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-                                                        border: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)'
-                                                    }}
-                                                >
-                                                    CC/BCC
-                                                </button>
-                                            </div>
-
-                                            {/* SUBJECT Row */}
-                                            <div className="flex items-center py-4">
-                                                <label
-                                                    className="w-20 font-mono text-[11px] uppercase"
-                                                    style={{ color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}
-                                                >
-                                                    Subject
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={composeSubject}
-                                                    onChange={(e) => setComposeSubject(e.target.value)}
-                                                    placeholder="Enter command sequence title..."
-                                                    className="flex-1 bg-transparent outline-none text-sm"
-                                                    style={{ color: darkMode ? '#fff' : '#000' }}
-                                                />
-                                            </div>
+                                                To
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={recipients.join('; ')}
+                                                onChange={(e) => setRecipients(e.target.value.split(';').map(s => s.trim()))}
+                                                placeholder="email@example.com"
+                                                className="flex-1 bg-transparent outline-none text-sm"
+                                                style={{ color: darkMode ? '#fff' : '#000' }}
+                                            />
+                                            <button
+                                                className="font-mono text-[10px] uppercase px-2 py-1 transition-all"
+                                                style={{
+                                                    color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
+                                                    border: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)'
+                                                }}
+                                            >
+                                                CC/BCC
+                                            </button>
                                         </div>
 
-                                        {/* Composer Body */}
-                                        <div className="p-6 min-h-[300px]">
-                                            <textarea
-                                                value={composeBody}
-                                                onChange={(e) => setComposeBody(e.target.value)}
-                                                placeholder="Enter your command sequence..."
-                                                className="w-full min-h-[250px] bg-transparent outline-none resize-y leading-relaxed"
-                                                style={{
-                                                    color: darkMode ? '#fff' : '#000',
-                                                    fontSize: '15px'
-                                                }}
+                                        {/* SUBJECT Row */}
+                                        <div className="flex items-center py-4">
+                                            <label
+                                                className="w-20 font-mono text-[11px] uppercase"
+                                                style={{ color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}
+                                            >
+                                                Subject
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={composeSubject}
+                                                onChange={(e) => setComposeSubject(e.target.value)}
+                                                placeholder="Email subject..."
+                                                className="flex-1 bg-transparent outline-none text-sm"
+                                                style={{ color: darkMode ? '#fff' : '#000' }}
                                             />
                                         </div>
+                                    </div>
 
-                                        {/* Attachment Bar */}
-                                        <div
-                                            className="px-6 py-3 flex gap-3 flex-wrap"
-                                            style={{
-                                                background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-                                                borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)'
+                                    {/* Composer Body */}
+                                    <div className="p-6 min-h-[300px]">
+                                        <textarea
+                                            value={composeBody}
+                                            onChange={handleComposeBodyChange}
+                                            onFocus={() => {
+                                                setEnableDockSync(false);
+                                                setActiveInputMode('compose');
                                             }}
-                                        >
-                                            <div
-                                                className="flex items-center gap-2 px-3 py-1.5 font-mono text-[10px] border"
+                                            placeholder="Write your message here..."
+                                            className="w-full min-h-[250px] bg-transparent outline-none resize-y leading-relaxed"
+                                            style={{
+                                                color: darkMode ? '#fff' : '#000',
+                                                fontSize: '15px'
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Attachment Bar - Only show if there are attachments */}
+                                    {/* Hidden by default, would show when files are attached */}
+
+                                    {/* Composer Footer */}
+                                    <div
+                                        className="p-6 flex justify-between items-center"
+                                        style={{ borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)' }}
+                                    >
+                                        {/* Ghost Buttons */}
+                                        <div className="flex gap-2">
+                                            <button
+                                                className="w-11 h-11 flex items-center justify-center border transition-all"
                                                 style={{
-                                                    background: darkMode ? '#111' : '#f5f5f5',
+                                                    background: 'transparent',
                                                     borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
                                                     color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
                                                 }}
+                                                title="Attach Files"
                                             >
-                                                📎 attachment.obs
-                                            </div>
-                                        </div>
-
-                                        {/* Composer Footer */}
-                                        <div
-                                            className="p-6 flex justify-between items-center"
-                                            style={{ borderTop: darkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)' }}
-                                        >
-                                            {/* Ghost Buttons */}
-                                            <div className="flex gap-2">
-                                                <button
-                                                    className="w-11 h-11 flex items-center justify-center border transition-all"
-                                                    style={{
-                                                        background: 'transparent',
-                                                        borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                                                        color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
-                                                    }}
-                                                    title="Attach Files"
-                                                >
-                                                    📎
-                                                </button>
-                                                <button
-                                                    className="w-11 h-11 flex items-center justify-center border transition-all"
-                                                    style={{
-                                                        background: 'transparent',
-                                                        borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                                                        color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
-                                                    }}
-                                                    onClick={() => handleSaveDraft(false)}
-                                                    title="Save Draft"
-                                                >
-                                                    💾
-                                                </button>
-                                            </div>
-
-                                            {/* Send Button */}
+                                                📎
+                                            </button>
                                             <button
-                                                onClick={handleSendEmail}
-                                                disabled={isSending}
-                                                className="px-8 py-3.5 font-bold text-[12px] uppercase tracking-wider transition-all hover:opacity-90 disabled:opacity-50 rounded"
+                                                className="w-11 h-11 flex items-center justify-center border transition-all"
                                                 style={{
-                                                    background: darkMode ? '#fff' : '#000',
-                                                    color: darkMode ? '#000' : '#fff',
-                                                    border: 'none'
+                                                    background: 'transparent',
+                                                    borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                                                    color: darkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
                                                 }}
+                                                onClick={() => handleSaveDraft(false)}
+                                                title="Save Draft"
                                             >
-                                                {isSending ? 'Sending...' : 'Send'}
+                                                💾
                                             </button>
                                         </div>
+
+                                        {/* Send Button - Crimson accent for visibility */}
+                                        <button
+                                            onClick={handleSendEmail}
+                                            disabled={isSending}
+                                            className="px-8 py-3.5 font-bold text-[12px] uppercase tracking-wider transition-all hover:opacity-90 disabled:opacity-50 rounded flex items-center gap-2"
+                                            style={{
+                                                background: '#dc2626',
+                                                color: '#fff',
+                                                border: 'none'
+                                            }}
+                                        >
+                                            <span>➤</span> {isSending ? 'Sending...' : 'Send'}
+                                        </button>
                                     </div>
                                 </div>
-                            )
+                            </div>
+                        )
                         }
 
                         {/* VIEW: CONTACTS */}
@@ -1950,11 +2223,12 @@ function ProductPage() {
 
 
 
-            {/* GLOBAL DOCK CONTAINER (FIXED BOTTOM CENTERED) */}
-            < div className={`fixed bottom-0 left-0 right-0 p-6 pb-8 z-[60] flex flex-col items-center justify-end pointer-events-none`
-            }>
+            {/* DOCK - Floating Command Center with Keyboard Avoidance */}
+            <div
+                className={`fixed bottom-0 left-0 right-0 p-6 z-[60] flex flex-col items-center justify-end pointer-events-none`}
+            >
                 {/* Gradient Mask for bottom fade */}
-                < div className={`absolute inset-0 bg-gradient-to-t pointer-events-none ${darkMode ? 'from-[#050505] via-[#050505]/95 to-transparent' : 'from-[#FAFAFA] via-[#FAFAFA]/95 to-transparent'}`}></div >
+                <div className={`absolute inset-0 bg-gradient-to-t pointer-events-none ${darkMode ? 'from-[#050505] via-[#050505]/95 to-transparent' : 'from-[#FAFAFA] via-[#FAFAFA]/95 to-transparent'}`}></div>
 
                 <div className="relative z-10 w-full max-w-2xl flex flex-col gap-3 pointer-events-auto">
                     {/* Send Queue / Undo Banner */}
@@ -1981,102 +2255,21 @@ function ProductPage() {
                         </div>
                     )}
 
-                    {/* ROW 1: ACTION BUTTONS (4-COLUMN GRID) - Command Suite Style */}
-                    <div className="grid grid-cols-4 gap-2 mb-3">
-                        {dockButtons.map((btnLabel, idx) => {
-                            const Icon = getActionIcon(btnLabel);
-                            const isActive = btnLabel === 'AI';
-                            return (
-                                <button
-                                    key={idx}
-                                    onClick={() => btnLabel === 'AI' ? setIsHubOpen(true) : handleDockAction(btnLabel)}
-                                    className={`
-                                        action-btn-dock group
-                                        flex items-center justify-center gap-2 py-3 px-4
-                                        font-mono text-[11px] uppercase tracking-wider
-                                        border transition-all duration-500
-                                        ${darkMode
-                                            ? `bg-[#0d0d0f] border-white/12 text-white/50 hover:bg-[#16161a] hover:border-white/20 hover:text-white hover:-translate-y-0.5 ${isActive ? 'border-white/40 text-white' : ''}`
-                                            : `bg-white border-black/8 text-black/40 hover:bg-gray-50 hover:border-black/20 hover:text-black ${isActive ? 'border-black/40 text-black' : ''}`
-                                        }
-                                    `}
-                                    style={{ borderRadius: '0.5rem' }}
-                                >
-                                    {Icon && <Icon size={16} className="opacity-60 group-hover:opacity-100 transition-opacity" />}
-                                    <span className="hidden sm:inline">{btnLabel}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* ROW 2: SEARCH CONTAINER - Command Suite Monolith Style */}
-                    <div
-                        className={`
-                            relative flex items-center gap-3 p-1.5 overflow-hidden
-                            border shadow-xl
-                            ${darkMode
-                                ? 'border-white/8'
-                                : 'border-black/8 bg-white/80'
-                            }
-                        `}
-                        style={{
-                            borderRadius: '0.5rem',
-                            background: darkMode ? 'linear-gradient(165deg, #111113 0%, #050505 100%)' : undefined,
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-                        }}
-                    >
-                        {/* Home Button */}
-                        <button
-                            onClick={() => handleDockAction('HOME')}
-                            className={`
-                                w-11 h-11 flex items-center justify-center
-                                border transition-all duration-500
-                                ${darkMode
-                                    ? 'bg-white/3 border-white/8 text-white/40 hover:bg-white hover:text-black'
-                                    : 'bg-black/3 border-black/8 text-black/40 hover:bg-black hover:text-white'
-                                }
-                            `}
-                            style={{ borderRadius: '0.5rem' }}
-                        >
-                            <SurfaceIcon size={20} />
-                        </button>
-
-                        {/* Search Input */}
-                        <input
-                            value={dockInput}
-                            onChange={(e) => setDockInput(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleAiAction()}
-                            placeholder={isAiThinking ? "PROCESSING..." : "Inquire with AI Command..."}
-                            className={`
-                                flex-1 bg-transparent h-11 px-4 outline-none
-                                font-sans text-base
-                                ${darkMode
-                                    ? 'text-white placeholder:text-white/40'
-                                    : 'text-black placeholder:text-black/40'
-                                }
-                            `}
-                        />
-
-                        {/* Send Button */}
-                        <button
-                            onClick={handleAiAction}
-                            className={`
-                                w-11 h-11 flex items-center justify-center
-                                border transition-all duration-500
-                                ${darkMode
-                                    ? 'bg-white/5 border-white/20 text-white/50 hover:bg-white hover:text-black'
-                                    : 'bg-black/5 border-black/20 text-black/60 hover:bg-black hover:text-white'
-                                }
-                            `}
-                            style={{ borderRadius: '0.5rem' }}
-                        >
-                            <SendIcon size={20} />
-                        </button>
-                    </div>
-
-
+                    {/* NEW REDESIGNED DOCK */}
+                    <Dock
+                        activeModule={activeView}
+                        isDarkMode={darkMode}
+                        isMobile={window.innerWidth < 768}
+                        dockInput={dockInput}
+                        onDockInputChange={handleDockInput}
+                        onDockFocus={handleDockFocus}
+                        onDockSubmit={handleAiAction}
+                        onHome={() => handleDockAction('HOME')}
+                        onAction={handleDockAction}
+                        keyboardHeight={keyboardHeight}
+                    />
                 </div>
-            </div >
+            </div>
 
             {/* ========== MODALS & OVERLAYS ========== */}
 
@@ -2084,8 +2277,8 @@ function ProductPage() {
             <NexusSettings
                 isOpen={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}
-                themeMode={themeMode}
-                onThemeModeChange={() => { }}
+                themeMode={darkMode ? 'dark' : 'light'}
+                onThemeModeChange={toggleTheme}
             />
 
             {/* Hub AI Assistant */}
@@ -2114,6 +2307,7 @@ function ProductPage() {
                     <OnboardingFlow
                         onComplete={handleGenesisComplete}
                         onClose={() => setShowOnboarding(false)}
+                        isDarkMode={darkMode}
                     />
                 )
             }

@@ -28,20 +28,24 @@ export const DockChips: React.FC<DockChipsProps> = ({ onAiAction }) => {
             case 'list_view':
                 return [
                     {
-                        label: 'Unread',
-                        active: state.inboxFilter === 'unread',
-                        onClick: () => actions.setInboxFilter(state.inboxFilter === 'unread' ? 'all' : 'unread')
+                        label: 'Select',
+                        icon: <span>☑</span>,
+                        onClick: () => console.log('Toggle selection mode')  // TODO: Implement bulk select
                     },
                     {
-                        label: 'Urgent',
-                        active: state.inboxFilter === 'urgent',
-                        onClick: () => actions.setInboxFilter(state.inboxFilter === 'urgent' ? 'all' : 'urgent')
+                        label: 'Archive',
+                        icon: <span>📥</span>,
+                        onClick: () => console.log('Archive selected')  // TODO: Implement archive
                     },
                     {
-                        label: 'Summarize',
-                        icon: <span className="text-[10px]">✨</span>,
-                        onClick: () => onAiAction?.('Summarize recent emails'),
-                        aiOnly: true
+                        label: 'Star',
+                        icon: <span>⭐</span>,
+                        onClick: () => console.log('Star selected')  // TODO: Implement star
+                    },
+                    {
+                        label: 'Delete',
+                        icon: <span>🗑</span>,
+                        onClick: () => console.log('Delete selected')  // TODO: Implement delete
                     },
                     {
                         label: 'Compose',
@@ -54,51 +58,65 @@ export const DockChips: React.FC<DockChipsProps> = ({ onAiAction }) => {
             case 'thread_view':
                 return [
                     {
-                        label: 'Back',
-                        icon: <span>←</span>,
-                        onClick: () => actions.selectItem(null)
-                    },
-                    {
                         label: 'Reply',
                         primary: true,
+                        icon: <span>↩</span>,
                         onClick: () => actions.openCompose('reply')
                     },
                     {
-                        label: 'Summarize',
-                        icon: <span className="text-[10px]">✨</span>,
-                        onClick: () => onAiAction?.('Summarize this thread'),
-                        aiOnly: true
+                        label: 'Forward',
+                        icon: <span>↪</span>,
+                        onClick: () => actions.openCompose('forward')
                     },
                     {
-                        label: 'Tasks',
-                        onClick: () => onAiAction?.('Extract tasks'),
-                        aiOnly: true
+                        label: 'Archive',
+                        icon: <span>📥</span>,
+                        onClick: () => console.log('Archive this email')  // TODO: Implement archive
+                    },
+                    {
+                        label: 'Star',
+                        icon: <span>⭐</span>,
+                        onClick: () => console.log('Star this email')  // TODO: Implement star
+                    },
+                    {
+                        label: 'Delete',
+                        icon: <span>🗑</span>,
+                        onClick: () => console.log('Delete this email')  // TODO: Implement delete
                     }
                 ];
 
+
             case 'compose_view':
                 return [
+                    {
+                        label: 'Send',
+                        primary: true,
+                        icon: <span>➤</span>,
+                        onClick: () => console.log('Send email')  // TODO: Implement send
+                    },
+                    {
+                        label: 'Schedule',
+                        icon: <span>🕐</span>,
+                        onClick: () => actions.openPicker('date')
+                    },
+                    {
+                        label: 'AI Draft',
+                        icon: <span className="text-[10px]">✨</span>,
+                        onClick: () => onAiAction?.('Improve this email'),
+                        aiOnly: true
+                    },
                     {
                         label: 'Attach',
                         icon: <span>📎</span>,
                         onClick: () => actions.openPicker('attachments')
                     },
                     {
-                        label: 'Formal',
-                        onClick: () => onAiAction?.('Rewrite professionally'),
-                        aiOnly: true
-                    },
-                    {
-                        label: 'Friendly',
-                        onClick: () => onAiAction?.('Rewrite casually'),
-                        aiOnly: true
-                    },
-                    {
-                        label: 'Send',
-                        primary: true,
-                        onClick: () => console.log('Send email')  // TODO: Implement send
+                        label: 'Save',
+                        icon: <span>💾</span>,
+                        onClick: () => console.log('Save draft')  // TODO: Save as draft
                     }
                 ];
+
 
             case 'picker_view':
                 return [
@@ -151,6 +169,60 @@ export const DockChips: React.FC<DockChipsProps> = ({ onAiAction }) => {
                         label: 'Catch-Up',
                         icon: <span className="text-[10px]">✨</span>,
                         onClick: () => onAiAction?.('Summarize what I missed'),
+                        aiOnly: true
+                    }
+                ];
+
+            case 'calendar_view':
+                return [
+                    {
+                        label: 'New Event',
+                        icon: <span>+</span>,
+                        primary: true,
+                        onClick: () => console.log('Create new event')  // TODO: Open event creator
+                    },
+                    {
+                        label: 'Today',
+                        onClick: () => console.log('Jump to today')
+                    },
+                    {
+                        label: 'Week',
+                        onClick: () => console.log('Week view')
+                    },
+                    {
+                        label: 'Month',
+                        onClick: () => console.log('Month view')
+                    },
+                    {
+                        label: 'Find Time',
+                        icon: <span className="text-[10px]">✨</span>,
+                        onClick: () => onAiAction?.('Find available time slots this week'),
+                        aiOnly: true
+                    }
+                ];
+
+            case 'contacts_view':
+                return [
+                    {
+                        label: 'New',
+                        icon: <span>+</span>,
+                        primary: true,
+                        onClick: () => console.log('Add new contact')  // TODO: Open contact form
+                    },
+                    {
+                        label: 'Email',
+                        icon: <span>✉️</span>,
+                        onClick: () => actions.openCompose('new')
+                    },
+                    {
+                        label: 'Call',
+                        icon: <span>📞</span>,
+                        onClick: () => console.log('Initiate call')
+                    },
+                    {
+                        label: 'Find',
+                        icon: <span className="text-[10px]">✨</span>,
+                        onClick: () => onAiAction?.('Find contact'),
                         aiOnly: true
                     }
                 ];

@@ -1,0 +1,1258 @@
+
+# i.AM MAIL - AI-OPTIMIZED PROJECT EXECUTION DOCUMENT
+## For: Claude Opus Extended Thinking Agent
+
+---
+
+## DOCUMENT METADATA
+- **Project Name**: i.AM Mail - AI-First Email Client
+- **Project Owner**: Sales entrepreneur transitioning to tech (25 years UAE sales experience, non-technical background)
+- **Launch Target**: Q2 2026
+- **Current Date**: January 2, 2026
+- **Time to Launch**: ~5 months
+- **Document Purpose**: Comprehensive pre-launch checklist with dependency mapping for AI-assisted development
+- **Document Version**: 2.0 (AI-Optimized)
+- **Optimization Date**: January 2, 2026
+
+---
+
+## EXECUTIVE CONTEXT FOR AI AGENT
+
+### Project Vision
+i.AM Mail is an AI-first email client that revolutionizes email management through natural language interactions via the "i.AM Dock" - a context-aware command interface that morphs based on user activity.
+
+### Core Differentiator
+The **i.AM Dock** - A fixed bottom command bar that:
+- Accepts natural language commands
+- Morphs its buttons based on context (inbox, reading, composing, etc.)
+- Provides 4-6 contextual action buttons
+- Learns user patterns over time
+- Eliminates menu diving through AI understanding
+
+### Technical Stack Context
+- **Frontend**: React/Vue/Svelte (TBD) with TypeScript
+- **Backend**: Node.js/Express or FastAPI
+- **Database**: PostgreSQL or MongoDB (TBD)
+- **AI**: OpenAI/Claude API integration
+- **Design System**: Obsidian Chronos (dark theme, titanium red accent)
+- **Hosting**: Considering Firebase, Vercel, AWS
+
+### Owner Technical Profile
+- **Coding Experience**: None (learning through AI-assisted development)
+- **Strengths**: Product vision, sales, UX thinking, AI prompt engineering
+- **Development Approach**: Heavy reliance on AI agents (Claude, Gemini), Replit, Firebase
+- **Current Projects**: Multiple SaaS products in parallel development
+
+---
+
+## CRITICAL PATH ANALYSIS
+
+### Phase 1: FOUNDATION (Weeks 1-4) - MUST COMPLETE FIRST
+**Status**: 🔴 Not Started
+**Estimated Time**: 4 weeks
+**Blockers**: None
+**Dependencies**: Blocks all other phases
+
+#### 1.1 Technology Stack Decisions [CRITICAL]
+**Priority**: P0 - Must complete before any coding
+**Estimated Time**: 1 week
+**Decision Points**:
+- [ ] Frontend framework selection (React vs Vue vs Svelte)
+  - **Context**: Owner is non-technical, needs beginner-friendly with AI support
+  - **Recommendation Needed**: Framework with best AI code generation support
+  - **Deliverable**: Document rationale, setup starter project
+
+- [ ] Backend framework selection (Node.js/Express vs FastAPI vs Supabase)
+  - **Context**: Email handling requires robust SMTP/IMAP
+  - **Constraints**: Must support WebSocket for real-time sync
+  - **Deliverable**: Architecture decision record (ADR)
+
+- [ ] Database selection (PostgreSQL vs MongoDB vs Firestore)
+  - **Context**: Need to store emails, threads, contacts, calendar events
+  - **Considerations**: Query complexity, cost, hosting simplicity
+  - **Deliverable**: Database schema design document
+
+- [ ] AI provider selection (OpenAI vs Claude vs Gemini vs hybrid)
+  - **Context**: NLP for i.AM Dock is core feature
+  - **Budget Consideration**: Token costs for production scale
+  - **Deliverable**: API integration prototype
+
+**Success Criteria**:
+- All stack decisions documented with rationale
+- Starter projects initialized and deployable
+- Team (AI agents) aligned on architecture
+
+---
+
+#### 1.2 Development Environment Setup [CRITICAL]
+**Priority**: P0
+**Estimated Time**: 1 week
+**Dependencies**: Requires 1.1 complete
+**Owner Constraints**: Non-technical, needs simple setup
+
+- [ ] Code repository creation (GitHub/GitLab)
+  - **Action**: Create mono-repo or split frontend/backend
+  - **Setup**: Branch protection, PR templates
+
+- [ ] Development environment standardization
+  - **For Owner**: Replit workspace or VS Code with extensions
+  - **Required Extensions**: ESLint, Prettier, TypeScript, Git
+  - **Documentation**: Create "Getting Started" guide for owner
+
+- [ ] CI/CD pipeline basic setup
+  - **Minimum**: Auto-deploy to staging on main branch push
+  - **Tools**: GitHub Actions or GitLab CI
+  - **Testing**: Placeholder tests that must pass
+
+- [ ] API keys and secrets management
+  - **Required Keys**: Email APIs, AI APIs, database credentials
+  - **Tool**: Use environment variables + .env.example
+  - **Security**: Never commit real keys
+
+**Success Criteria**:
+- Owner can make changes and see them live in <5 minutes
+- AI agents have access to repository
+- Automated deployments working
+
+---
+
+#### 1.3 Design System Implementation [HIGH PRIORITY]
+**Priority**: P1
+**Estimated Time**: 2 weeks
+**Dependencies**: Requires 1.1 (frontend framework chosen)
+**Design Reference**: Obsidian Chronos specifications
+
+**Core Design Tokens**:
+```
+Colors:
+- Obsidian Blacks: #050505, #0d0d0f, #020202, #111113
+- Accent: #ff0080 (Titanium Red)
+- Borders: rgba(255,255,255,0.08)
+- Text: Bright, Muted, Dim variants
+
+Typography:
+- Primary: Inter (400, 700, 800)
+- Code: JetBrains Mono
+
+Spacing: 8px base unit
+Transitions: 0.3s fast, 0.6s main
+Border Radius: 4px standard
+Grid: 60×60px background pattern
+```
+
+**Implementation Checklist**:
+- [ ] CSS variables/Design tokens file created
+- [ ] Component library foundation (Button, Input, Card, Modal)
+- [ ] Icon system integrated (Hicon icons)
+- [ ] Responsive breakpoints defined (320px, 768px, 1024px, 1440px)
+- [ ] Dark theme fully implemented
+- [ ] Accessibility baseline (WCAG 2.1 AA)
+  - Color contrast: 4.5:1 for text
+  - Keyboard navigation support
+  - Screen reader ARIA labels
+
+**Deliverables**:
+- Storybook or component showcase
+- Design system documentation
+- Reusable component library
+
+**Success Criteria**:
+- All components match Obsidian Chronos spec
+- Owner can build UIs by combining components
+- No inline styles needed
+
+---
+
+### Phase 2: CORE EMAIL FUNCTIONALITY (Weeks 5-10)
+**Status**: 🟡 Blocked by Phase 1
+**Estimated Time**: 6 weeks
+**Dependencies**: Requires Phase 1 complete
+**Critical Path**: This is the product foundation
+
+#### 2.1 Email Account Integration [CRITICAL]
+**Priority**: P0
+**Estimated Time**: 2 weeks
+**Technical Complexity**: HIGH
+
+**Gmail Integration**:
+- [ ] OAuth 2.0 authentication flow
+  - **Google API Console**: Create project, enable Gmail API
+  - **Scopes needed**: gmail.readonly, gmail.send, gmail.modify
+  - **Implementation**: Authorization flow with token refresh
+  - **Testing**: Test with multiple Gmail accounts
+  - **Edge Cases**: Expired tokens, revoked access, 2FA accounts
+
+- [ ] IMAP/SMTP access (app passwords)
+  - **Fallback**: When OAuth not preferred
+  - **Security**: Store encrypted credentials
+  - **Configuration**: Custom IMAP/SMTP settings UI
+
+**Outlook/Office 365 Integration**:
+- [ ] Microsoft OAuth implementation
+  - **Azure AD**: Register app, get client ID
+  - **Scopes**: Mail.Read, Mail.Send, Mail.ReadWrite
+  - **Implementation**: MSAL.js library integration
+
+**Custom Email (IMAP/SMTP)**:
+- [ ] Generic IMAP connection
+  - **Support**: Standard IMAP servers (port 993)
+  - **Auto-detection**: Common provider settings
+  - **Manual config**: Advanced settings UI
+
+**Multi-Account Support**:
+- [ ] Account switching mechanism
+  - **UX**: Dropdown or sidebar account switcher
+  - **State**: Persist active account in localStorage
+
+- [ ] Unified inbox view
+  - **Logic**: Merge emails from all accounts, sort by date
+  - **Performance**: Paginate, lazy load
+
+- [ ] Per-account inbox view
+  - **Filter**: Show only selected account emails
+  - **Indicator**: Visual badge showing active account
+
+**Success Criteria**:
+- User can connect Gmail, Outlook, and custom IMAP accounts
+- Tokens refresh automatically
+- Account switching works seamlessly
+- No credentials stored in plain text
+
+---
+
+#### 2.2 Email CRUD Operations [CRITICAL]
+**Priority**: P0
+**Estimated Time**: 3 weeks
+**Dependencies**: Requires 2.1 complete
+
+**Reading Emails**:
+- [ ] Fetch inbox emails (IMAP)
+  - **Implementation**: Connect, authenticate, fetch messages
+  - **Parsing**: MIME message parsing
+  - **Fields**: From, To, Subject, Body (HTML/Plain), Date, Attachments
+  - **Threading**: Group by conversation ID / In-Reply-To header
+
+- [ ] Email detail view
+  - **HTML Rendering**: Sanitize and render HTML emails safely
+  - **Inline Images**: Display embedded images
+  - **Attachment List**: Show attachment names, sizes, download links
+  - **Security**: Block external resources by default (privacy)
+
+- [ ] Email threading/conversations
+  - **Algorithm**: Group by subject + references header
+  - **UI**: Show thread as expandable conversation
+  - **Sorting**: Latest reply on top
+
+**Composing Emails**:
+- [ ] Rich text editor integration
+  - **Library**: Quill, TipTap, or ProseMirror
+  - **Features**: Bold, italic, underline, lists, links, colors
+  - **Plain text mode**: Toggle option
+
+- [ ] Attachment handling
+  - **Upload**: Drag-and-drop or file picker
+  - **Limit**: 25MB per attachment
+  - **Multiple**: Support multiple attachments
+  - **Preview**: Show thumbnail for images
+
+- [ ] Draft auto-save
+  - **Frequency**: Every 5 seconds
+  - **Storage**: IndexedDB (offline) or backend API
+  - **Recovery**: Restore draft on compose window reopen
+
+- [ ] Email signature
+  - **Management**: Create/edit signatures in settings
+  - **Multiple**: Support multiple signatures per account
+  - **Auto-insert**: Append signature on compose
+
+**Sending Emails**:
+- [ ] SMTP send implementation
+  - **Library**: Nodemailer (backend) or SMTP relay
+  - **Validation**: Check recipient email format
+  - **Error handling**: Network errors, bounce detection
+
+- [ ] Send confirmation
+  - **UI**: Toast notification "Email sent"
+  - **Undo**: 10-second undo window after send
+  - **Logging**: Track sent emails
+
+**Reply / Reply All / Forward**:
+- [ ] Reply functionality
+  - **Pre-fill**: To field = original sender
+  - **Quote**: Include original message (collapsible)
+  - **Subject**: "Re: [original subject]"
+
+- [ ] Reply all functionality
+  - **Pre-fill**: To + CC fields = all recipients
+  - **Exclude**: Remove self from recipients
+
+- [ ] Forward functionality
+  - **Subject**: "Fwd: [original subject]"
+  - **Attachments**: Include original attachments
+  - **Quote**: Include full original email
+
+**Email Actions**:
+- [ ] Archive email
+  - **IMAP**: Move to "[Gmail]/All Mail" or custom archive folder
+  - **UI**: Remove from inbox, add to archive view
+
+- [ ] Delete email
+  - **Soft delete**: Move to Trash folder
+  - **Retention**: Keep in trash for 30 days
+  - **Permanent delete**: After 30 days or manual purge
+
+- [ ] Star/flag email
+  - **IMAP**: Set \Flagged flag
+  - **UI**: Visual star indicator
+
+- [ ] Mark as read/unread
+  - **IMAP**: Set/unset \Seen flag
+  - **UI**: Bold text for unread
+
+**Success Criteria**:
+- User can read, compose, send, reply, forward emails
+- Drafts auto-save and recover
+- All email actions (archive, delete, star) work
+- Email threading displays correctly
+
+---
+
+#### 2.3 Email Organization [HIGH PRIORITY]
+**Priority**: P1
+**Estimated Time**: 1 week
+**Dependencies**: Requires 2.2 complete
+
+- [ ] Search functionality
+  - **Fields**: Search in subject, sender, body
+  - **Performance**: Index emails for fast search
+  - **Filters**: Date range, has attachment, starred, etc.
+
+- [ ] Labels/folders
+  - **IMAP folders**: Sync with IMAP folder structure
+  - **Custom labels**: User-created labels (like Gmail)
+  - **Multi-label**: Email can have multiple labels
+
+- [ ] Filters and rules
+  - **Conditions**: If from X, subject contains Y, etc.
+  - **Actions**: Archive, label, star, forward, delete
+  - **Automation**: Run on new emails automatically
+
+- [ ] Sorting options
+  - **Fields**: Date, sender, subject, size
+  - **Order**: Ascending/descending
+
+- [ ] Bulk actions
+  - **Select all**: Checkbox in header
+  - **Actions**: Archive all, delete all, mark all read
+  - **Confirmation**: Prompt before destructive actions
+
+**Success Criteria**:
+- Search returns results in <2 seconds
+- Filters work automatically on new emails
+- Bulk actions handle 100+ emails without freezing
+
+---
+
+### Phase 3: i.AM DOCK - AI CORE FEATURE (Weeks 9-14)
+**Status**: 🟡 Blocked by Phase 2
+**Estimated Time**: 6 weeks
+**Critical Importance**: This is the product's key differentiator
+**Dependencies**: Requires 2.2 (email CRUD) and AI provider selected
+
+#### 3.1 Dock UI Component [CRITICAL]
+**Priority**: P0
+**Estimated Time**: 2 weeks
+**Design Reference**: Context-aware morphing command bar
+
+**Base Dock Structure**:
+- [ ] Fixed bottom container (60-80px height)
+  - **Position**: Sticky bottom, full width
+  - **Z-index**: Above all content
+  - **Background**: Obsidian black with subtle border
+
+- [ ] Natural language search bar
+  - **Width**: 60% of dock width (center)
+  - **Placeholder**: Context-aware (e.g., "Archive unread from Sarah...")
+  - **Auto-focus**: Cmd+K or Ctrl+K shortcut
+  - **Styling**: Monolith card effect with sheen
+
+- [ ] Action button row (4-6 buttons)
+  - **Position**: Flanking the search bar
+  - **Icons**: Hicon icons, 24px
+  - **Labels**: Short text labels below icons
+  - **Hover**: 3D effect, titanium red accent
+
+- [ ] Send/execute button
+  - **Position**: Right end of search bar
+  - **Icon**: Arrow or send icon
+  - **States**: Default, loading, success, error
+
+**Dock Morphing Animation**:
+- [ ] Context detection logic
+  - **Triggers**: Route change, email selected, compose open, etc.
+  - **State machine**: Define all dock states (see 3.2)
+
+- [ ] Smooth transitions (0.6s cubic-bezier)
+  - **Buttons**: Fade out old, fade in new
+  - **Labels**: Morph text content
+  - **Icons**: Cross-fade animation
+  - **Search placeholder**: Animated text change
+
+**Keyboard Shortcuts**:
+- [ ] Global dock activation: Cmd+K / Ctrl+K
+- [ ] Navigate buttons: Tab, Shift+Tab
+- [ ] Execute command: Enter
+- [ ] Close dock focus: Escape
+
+**Success Criteria**:
+- Dock morphs smoothly in <0.6s
+- Keyboard shortcuts work from anywhere
+- Dock feels responsive and magical
+
+---
+
+#### 3.2 Context-Aware Dock States [CRITICAL]
+**Priority**: P0
+**Estimated Time**: 1 week
+**Dependencies**: Requires 3.1 complete
+
+**Define All Dock Contexts**:
+
+1. **Inbox View State**:
+   - Buttons: [Select] [Archive] [Star] [Delete] [Move]
+   - Search placeholder: "Find emails, archive spam, select unread..."
+   - Trigger: User on inbox route, no email selected
+
+2. **Reading Email State**:
+   - Buttons: [Reply] [Forward] [Archive] [Star] [Delete]
+   - Search placeholder: "Reply with AI, forward to team, archive..."
+   - Trigger: User viewing an email
+
+3. **Composing Email State**:
+   - Buttons: [Send] [Schedule] [AI Draft] [Attach] [Save Draft]
+   - Search placeholder: "Send now, improve with AI, schedule for tomorrow..."
+   - Trigger: Compose window open
+
+4. **Search Mode State**:
+   - Buttons: [Filter] [Sort] [Select All] [Export] [Save Search]
+   - Search placeholder: "Refine search, filter by date, export results..."
+   - Trigger: User performed a search
+
+5. **Calendar View State**:
+   - Buttons: [New Event] [Today] [Week] [Month] [Share]
+   - Search placeholder: "Create meeting, find events, schedule call..."
+   - Trigger: Calendar module active
+
+6. **Contacts View State**:
+   - Buttons: [New Contact] [Email] [Call] [Message] [Edit]
+   - Search placeholder: "Find contact, email John, create group..."
+   - Trigger: Contacts module active
+
+7. **Bulk Selection State**:
+   - Buttons: [Archive] [Star] [Mark Read] [Delete] [Move]
+   - Search placeholder: "Archive selected, label all, delete..."
+   - Trigger: Multiple emails selected (checkbox mode)
+
+**Context Switching Logic**:
+- [ ] Implement state machine for dock contexts
+- [ ] Define transition rules (e.g., selecting email → reading state)
+- [ ] Handle edge cases (e.g., composing while reading)
+
+**Success Criteria**:
+- Dock always shows relevant actions for current context
+- Transitions feel intelligent, not jarring
+- No state conflicts or UI bugs
+
+---
+
+#### 3.3 Natural Language Processing Engine [CRITICAL]
+**Priority**: P0
+**Estimated Time**: 3 weeks
+**Technical Complexity**: VERY HIGH
+**Dependencies**: Requires AI provider selected (Phase 1)
+
+**NLP Architecture**:
+- [ ] Intent classification
+  - **Examples**:
+    - "Archive all emails from John" → Intent: ARCHIVE, Selector: from:John
+    - "Reply with meeting times" → Intent: REPLY, Enhancement: AI_DRAFT
+    - "Show unread from last week" → Intent: FILTER, Params: unread, date_range
+  - **Implementation**: Few-shot prompting or fine-tuned model
+  - **Accuracy target**: >90% intent classification
+
+- [ ] Entity extraction
+  - **Entities**: Sender name, date/time, label, folder, subject keywords
+  - **NER**: Use spaCy or LLM-based extraction
+  - **Examples**:
+    - "John" → Sender: john@example.com
+    - "last week" → Date range: 2025-12-26 to 2026-01-02
+    - "newsletters" → Label: promotions/newsletters
+
+- [ ] Command parsing
+  - **Action mapping**: Natural language → API calls
+  - **Parameters**: Extract required parameters for each action
+  - **Validation**: Ensure all required params present
+
+**AI Integration**:
+- [ ] LLM API setup (OpenAI/Claude/Gemini)
+  - **Endpoint**: Chat completion API
+  - **Context**: System prompt with i.AM Mail capabilities
+  - **Token management**: Track usage, set limits
+
+- [ ] Prompt engineering
+  - **System prompt**: Define i.AM Mail's capabilities, email context
+  - **Few-shot examples**: Provide 10-20 example commands/responses
+  - **Output format**: Structured JSON (intent, entities, confidence)
+
+- [ ] Context window management
+  - **Email context**: Include current view, selected emails, recent actions
+  - **Conversation memory**: Remember last 5 commands in session
+  - **Truncation**: Summarize if context exceeds token limit
+
+**Supported AI Actions**:
+- [ ] Email drafting ("Write professional follow-up email")
+  - **Input**: Context (who, what, tone)
+  - **Output**: Draft email body
+  - **Refinement**: "Make it more casual", "Add bullet points"
+
+- [ ] Email improvement ("Make this more concise")
+  - **Input**: Existing draft
+  - **Output**: Improved version with edits highlighted
+
+- [ ] Email summarization ("Summarize this thread")
+  - **Input**: Email thread (all messages)
+  - **Output**: 2-3 sentence summary + action items
+
+- [ ] Smart replies ("Suggest responses")
+  - **Input**: Email being read
+  - **Output**: 3 short reply options (e.g., "Sounds good!", "Can we reschedule?", "More info needed")
+
+- [ ] Bulk actions ("Archive all newsletters from last month")
+  - **Input**: Natural language selector
+  - **Output**: Execute bulk action with confirmation
+
+- [ ] Scheduling ("Send this tomorrow at 9am")
+  - **Input**: Time/date expression
+  - **Output**: Scheduled send (store in queue)
+
+**Error Handling**:
+- [ ] Ambiguous commands
+  - **Strategy**: Ask clarifying question
+  - **Example**: "Did you mean archive or delete?"
+
+- [ ] Unsupported requests
+  - **Strategy**: Explain limitation, suggest alternative
+  - **Example**: "I can't send physical mail, but I can draft an email?"
+
+- [ ] API failures
+  - **Strategy**: Graceful fallback, show manual UI
+  - **Example**: "AI unavailable. Use buttons below to archive."
+
+**Success Criteria**:
+- 90%+ of common commands work correctly
+- AI drafts are coherent and contextual
+- Response time <3 seconds for simple commands
+- User feels like dock "understands" them
+
+---
+
+### Phase 4: ADDITIONAL MODULES (Weeks 13-18)
+**Status**: 🟡 Blocked by Phase 3
+**Estimated Time**: 6 weeks
+**Priority**: P2 (Nice-to-have for launch, can be post-launch)
+
+#### 4.1 Calendar Module [MEDIUM PRIORITY]
+**Estimated Time**: 2 weeks
+
+- [ ] Calendar views (Month, Week, Day)
+- [ ] Event creation form
+- [ ] Google Calendar sync (read/write)
+- [ ] Outlook Calendar sync (read/write)
+- [ ] Meeting invites (send via email)
+- [ ] RSVP functionality (accept/decline)
+- [ ] Calendar widget in right sidebar
+
+**Success Criteria**:
+- Syncs with existing calendars
+- Can create/edit events
+- RSVP updates sync back
+
+---
+
+#### 4.2 Contacts Module [MEDIUM PRIORITY]
+**Estimated Time**: 2 weeks
+
+- [ ] Contact list view (searchable)
+- [ ] Contact detail view
+- [ ] Contact creation/editing
+- [ ] Contact groups
+- [ ] Google Contacts sync
+- [ ] Outlook Contacts sync
+- [ ] Import/export (CSV, vCard)
+- [ ] Quick actions from contact (Email, Call link, Message link)
+- [ ] Contact widget in right sidebar
+
+**Success Criteria**:
+- Syncs with existing contact sources
+- Fast search (<1s for 1000+ contacts)
+- Clean, usable interface
+
+---
+
+#### 4.3 Settings Module [MEDIUM PRIORITY]
+**Estimated Time**: 2 weeks
+
+**Account Settings**:
+- [ ] Manage connected accounts
+- [ ] Add/remove accounts
+- [ ] Default account selection
+- [ ] Signature editor (per account)
+
+**Appearance Settings**:
+- [ ] Theme toggle (currently dark only, plan light theme)
+- [ ] Font size adjustment
+- [ ] Density (comfortable, compact, expanded)
+
+**Notification Settings**:
+- [ ] Email notifications (browser push)
+- [ ] Sound preferences
+- [ ] Desktop notification permissions
+
+**Privacy Settings**:
+- [ ] External image blocking toggle
+- [ ] Read receipt sending toggle
+- [ ] Data collection preferences (analytics opt-in)
+
+**Keyboard Shortcuts**:
+- [ ] View all shortcuts
+- [ ] Customize shortcuts (advanced)
+
+**Data Management**:
+- [ ] Export all data (GDPR compliance)
+- [ ] Delete account and data
+
+**Success Criteria**:
+- Settings persist across sessions
+- Changes apply immediately or on save
+- Settings are intuitive
+
+---
+
+### Phase 5: TECHNICAL POLISH (Weeks 17-20)
+**Status**: 🟡 Blocked by Phase 4
+**Estimated Time**: 4 weeks
+**Priority**: P0 (Required before launch)
+
+#### 5.1 Performance Optimization [CRITICAL]
+**Estimated Time**: 2 weeks
+
+**Frontend Performance**:
+- [ ] Code splitting (route-based)
+- [ ] Lazy loading components
+- [ ] Image optimization (compress, lazy load)
+- [ ] Bundle size analysis
+  - **Target**: Initial bundle <200KB gzipped
+  - **Tool**: Webpack Bundle Analyzer
+- [ ] Lighthouse score optimization
+  - **Target**: >90 performance score
+  - **Target**: >95 accessibility score
+- [ ] Service Worker for offline functionality
+- [ ] IndexedDB caching strategy
+
+**Backend Performance**:
+- [ ] Database query optimization
+  - **Tool**: EXPLAIN ANALYZE for slow queries
+  - **Indexes**: Add indexes on frequently queried fields
+- [ ] API response time optimization
+  - **Target**: <200ms for list queries, <500ms for complex operations
+- [ ] Pagination for large datasets
+  - **Default**: 50 emails per page
+  - **Cursor-based**: For smooth infinite scroll
+- [ ] Caching layer (Redis)
+  - **Cache**: User settings, frequently accessed emails
+  - **TTL**: 5-15 minutes
+- [ ] Rate limiting
+  - **AI API**: Limit to prevent abuse/overspend
+  - **Email sending**: Prevent spam (e.g., 100 emails/hour)
+
+**Success Criteria**:
+- App loads in <2 seconds on 3G
+- Smooth scrolling (60fps)
+- No memory leaks (test with profiler)
+
+---
+
+#### 5.2 Security Hardening [CRITICAL]
+**Estimated Time**: 1 week
+
+**Authentication Security**:
+- [ ] Secure token storage
+  - **Method**: HttpOnly cookies or encrypted localStorage
+  - **Encryption**: AES-256
+- [ ] Token refresh mechanism
+  - **Expiry**: Access tokens expire in 15 min, refresh in 7 days
+- [ ] Session management
+  - **Timeout**: Auto-logout after 30 min inactivity (configurable)
+- [ ] 2FA support (Google Authenticator, SMS backup)
+
+**Email Security**:
+- [ ] HTML email sanitization
+  - **Library**: DOMPurify to prevent XSS
+  - **Strip**: <script>, <iframe>, event handlers
+- [ ] External resource blocking
+  - **Images**: Proxy through backend or block by default
+  - **CSS**: Strip external stylesheet links
+- [ ] Attachment scanning
+  - **Virus scan**: Integrate ClamAV or cloud scanner API
+  - **File type whitelist**: Block .exe, .bat, .scr, etc.
+- [ ] SPAM filtering
+  - **Library**: SpamAssassin or cloud API (Akismet)
+  - **Learning**: Train on user-marked spam
+
+**API Security**:
+- [ ] HTTPS only (force redirect)
+- [ ] CORS configuration (whitelist frontend domain)
+- [ ] Input validation (Zod/Joi schemas)
+- [ ] SQL injection prevention (parameterized queries)
+- [ ] Rate limiting (express-rate-limit)
+- [ ] API key rotation policy
+
+**Success Criteria**:
+- No critical vulnerabilities in security audit
+- All sensitive data encrypted at rest and in transit
+- XSS/CSRF protection verified
+
+---
+
+#### 5.3 Testing Suite [CRITICAL]
+**Estimated Time**: 1 week
+
+**Unit Tests**:
+- [ ] Test utility functions (email parsing, date formatting, etc.)
+- [ ] Test React components (Jest + React Testing Library)
+- [ ] Test API endpoints (Jest/Mocha + Supertest)
+- [ ] Coverage target: >70%
+
+**Integration Tests**:
+- [ ] Test email send/receive flow
+- [ ] Test OAuth authentication flow
+- [ ] Test AI dock command processing
+- [ ] Test calendar/contacts sync
+
+**End-to-End Tests**:
+- [ ] Setup E2E framework (Playwright or Cypress)
+- [ ] Test critical user journeys:
+  - Signup → Connect account → Read email → Reply
+  - Compose email → Attach file → Send
+  - Natural language command → AI executes action
+- [ ] Test on multiple browsers (Chrome, Firefox, Safari, Edge)
+
+**Performance Tests**:
+- [ ] Load testing (simulate 100+ concurrent users)
+- [ ] Stress testing (find breaking point)
+- [ ] Monitor memory usage (no leaks)
+
+**Success Criteria**:
+- All critical paths covered by E2E tests
+- CI pipeline runs tests automatically
+- No test is flaky (>95% pass rate)
+
+---
+
+### Phase 6: PRE-LAUNCH PREPARATION (Weeks 19-22)
+**Status**: 🟡 Blocked by Phase 5
+**Estimated Time**: 4 weeks
+**Priority**: P0
+
+#### 6.1 Content & Messaging [HIGH PRIORITY]
+**Estimated Time**: 1 week
+
+- [ ] Landing page copy
+  - **Headline**: Clear value proposition
+  - **Subheadline**: How i.AM Dock works
+  - **Features**: 3-5 key features with icons
+  - **CTA**: "Start Free Trial" or "Get Early Access"
+
+- [ ] Product tour/onboarding
+  - **First-time user flow**: Show i.AM Dock demo
+  - **Interactive tutorial**: "Try typing 'Archive all newsletters'"
+  - **Tooltips**: Highlight key UI elements
+
+- [ ] Help documentation
+  - **FAQ**: 20+ common questions
+  - **Command examples**: 50+ natural language examples
+  - **Video tutorials**: Screen recordings (3-5 min each)
+
+- [ ] Error messages
+  - **User-friendly**: No technical jargon
+  - **Actionable**: Tell user what to do next
+  - **Examples**:
+    - ❌ "IMAP connection failed: ECONNREFUSED"
+    - ✅ "Can't connect to your email. Check your password and try again."
+
+**Success Criteria**:
+- Landing page converts visitors (>2% signup rate)
+- <5% of users contact support during onboarding
+- Users complete tutorial (>60% completion rate)
+
+---
+
+#### 6.2 Legal & Compliance [CRITICAL]
+**Estimated Time**: 1 week
+
+- [ ] Privacy Policy
+  - **Sections**: Data collection, usage, sharing, retention, deletion
+  - **GDPR compliance**: Right to access, right to be forgotten
+  - **CCPA compliance** (if targeting California)
+
+- [ ] Terms of Service
+  - **Acceptable use**: No spam, no illegal activity
+  - **Liability**: Disclaimer for email delivery
+  - **Termination**: Account suspension policy
+
+- [ ] Cookie Policy
+  - **Disclosure**: What cookies are used
+  - **Consent**: Cookie banner (opt-in for EU)
+
+- [ ] GDPR compliance
+  - [ ] Data processing agreement (if using subprocessors)
+  - [ ] User consent for data processing
+  - [ ] Data export functionality (Settings → Export data)
+  - [ ] Data deletion functionality (Settings → Delete account)
+
+- [ ] Email compliance
+  - [ ] CAN-SPAM compliance (unsubscribe link, physical address)
+  - [ ] Anti-spam measures
+
+**Success Criteria**:
+- Legal docs reviewed by lawyer (if budget allows) or using templates
+- GDPR/privacy features fully functional
+- Cookie consent works correctly
+
+---
+
+#### 6.3 Marketing & Launch Plan [MEDIUM PRIORITY]
+**Estimated Time**: 2 weeks
+
+**Pre-Launch Marketing**:
+- [ ] Create social media accounts
+  - Twitter/X: @iammailapp
+  - LinkedIn: i.AM Mail company page
+  - Instagram (optional)
+
+- [ ] Build email waitlist
+  - **Landing page**: Collect emails with "Get Early Access"
+  - **Tool**: ConvertKit, Mailchimp, or custom
+  - **Goal**: 500-1000 emails before launch
+
+- [ ] Content marketing
+  - [ ] Blog post: "Why we built an AI-first email client"
+  - [ ] Blog post: "The future of email management"
+  - [ ] Video: i.AM Dock demo (2 min)
+
+- [ ] Outreach to press/influencers
+  - [ ] Product Hunt preparation (write post, get supporters)
+  - [ ] Tech blogs (TechCrunch, The Verge - pitch story)
+  - [ ] YouTube tech reviewers (send demo access)
+
+**Launch Strategy**:
+- [ ] Soft launch (beta)
+  - **Who**: Waitlist subscribers (first 100)
+  - **Feedback**: Collect feedback, fix bugs
+  - **Duration**: 2-4 weeks
+
+- [ ] Product Hunt launch
+  - **Date**: Tuesday or Wednesday (best days)
+  - **Preparation**: Thumbnail, screenshots, demo video
+  - **Engagement**: Reply to all comments on launch day
+
+- [ ] Public launch
+  - **Announcement**: Email to waitlist, social media posts
+  - **Press release**: Send to tech blogs
+  - **Monitoring**: Watch for issues, be ready to patch
+
+**Success Criteria**:
+- Product Hunt: Top 10 product of the day
+- 1000+ signups in first week
+- <2% critical bug rate
+
+---
+
+### Phase 7: POST-LAUNCH MONITORING (Week 23+)
+**Status**: 🔵 After Launch
+**Duration**: Ongoing
+**Priority**: P0
+
+#### 7.1 Monitoring & Analytics [CRITICAL]
+
+**Application Monitoring**:
+- [ ] Error tracking (Sentry)
+  - **Alerts**: Slack/email on critical errors
+  - **Grouping**: Similar errors grouped
+  - **User context**: What user was doing when error occurred
+
+- [ ] Performance monitoring (Datadog, New Relic, or Google Analytics)
+  - **Metrics**: Page load time, API response time, database queries
+  - **Alerts**: Notify if performance degrades
+
+- [ ] Uptime monitoring (Pingdom, UptimeRobot)
+  - **Checks**: Every 5 min
+  - **Alerts**: Email/SMS if site is down
+
+- [ ] Analytics (Google Analytics, Mixpanel, or PostHog)
+  - **Events**: Track key actions (signup, send email, use AI dock)
+  - **Funnels**: Signup → Connect account → Send first email
+  - **Cohorts**: Track user retention
+
+**AI Monitoring**:
+- [ ] AI command success rate
+  - **Metric**: % of commands that executed correctly
+  - **Target**: >85%
+  - **Improvement**: Retrain on failed commands
+
+- [ ] AI token usage and cost
+  - **Tracking**: Tokens used per user per day
+  - **Budget alerts**: Notify if spending exceeds forecast
+
+- [ ] AI response quality
+  - **User feedback**: 👍/👎 on AI responses
+  - **Review**: Manually review low-rated responses
+
+**Success Criteria**:
+- <0.1% error rate
+- >99.5% uptime
+- <1% user churn per week
+
+---
+
+#### 7.2 User Support [HIGH PRIORITY]
+
+- [ ] Support channel setup
+  - **Email**: support@iammail.com
+  - **In-app chat**: Intercom or Crisp
+  - **Response time**: <24 hours (goal: <4 hours)
+
+- [ ] Knowledge base
+  - **Platform**: Notion, Gitbook, or custom
+  - **Articles**: 30+ how-to guides
+  - **Search**: Full-text search
+
+- [ ] Bug reporting
+  - **In-app**: "Report a Bug" button
+  - **Template**: What happened, expected behavior, screenshots
+  - **Triage**: Prioritize by severity
+
+- [ ] Feature requests
+  - **Platform**: Canny, Productboard, or GitHub Discussions
+  - **Voting**: Users upvote requests
+  - **Roadmap**: Public roadmap showing what's next
+
+**Success Criteria**:
+- <10% of users contact support (low = good UX)
+- 4.5+ star rating on support quality
+- <5 critical bugs reported per week
+
+---
+
+## DEPENDENCY MAP
+
+```
+Phase 1 (Foundation)
+  ├─> Phase 2 (Core Email)
+  │     ├─> Phase 3 (AI Dock) ⭐ CRITICAL PATH
+  │     │     └─> Phase 4 (Modules)
+  │     │           └─> Phase 5 (Polish)
+  │     │                 └─> Phase 6 (Pre-Launch)
+  │     │                       └─> Phase 7 (Post-Launch)
+  │     │
+  │     └─> (Parallel) Design System → All UI work
+  │
+  └─> (Parallel) Legal docs → Phase 6
+```
+
+**Critical Path**: Phase 1 → Phase 2 → Phase 3 → Phase 5 → Phase 6 → Launch
+**Shortest time to MVP**: ~18 weeks (if aggressive and parallel work)
+
+---
+
+## RISK ANALYSIS
+
+### Technical Risks
+
+**Risk #1: AI Dock NLP accuracy is too low**
+- **Impact**: HIGH - This is the core differentiator
+- **Likelihood**: MEDIUM
+- **Mitigation**:
+  - Start with limited command set (20 common commands)
+  - Use few-shot prompting with clear examples
+  - Collect failed commands and retrain
+  - Fallback to manual UI buttons always visible
+- **Contingency**: If <80% accuracy, reduce scope to predefined templates instead of free-form NLP
+
+**Risk #2: Email sync performance with large mailboxes**
+- **Impact**: HIGH - Users with 10K+ emails will have slow experience
+- **Likelihood**: MEDIUM
+- **Mitigation**:
+  - Implement incremental sync (only fetch new emails)
+  - Add pagination and lazy loading
+  - Use background workers for initial sync
+  - Cache frequently accessed emails
+- **Contingency**: Add "Sync last 3 months only" option for huge mailboxes
+
+**Risk #3: AI API costs exceed budget**
+- **Impact**: HIGH - Could make product unprofitable
+- **Likelihood**: MEDIUM
+- **Mitigation**:
+  - Set per-user token limits
+  - Cache common AI responses
+  - Use cheaper models for simple commands (GPT-3.5 vs GPT-4)
+  - Offer tiered pricing (free = 20 AI commands/day, paid = unlimited)
+- **Contingency**: Reduce AI features to premium tier only
+
+**Risk #4: OAuth token refresh failures**
+- **Impact**: MEDIUM - Users get logged out unexpectedly
+- **Likelihood**: LOW
+- **Mitigation**:
+  - Implement robust token refresh logic
+  - Test with expired tokens
+  - Add clear re-authentication UI
+  - Monitor token refresh failures in Sentry
+- **Contingency**: Fallback to IMAP/SMTP with app passwords
+
+**Risk #5: Security vulnerabilities (XSS, email phishing)**
+- **Impact**: CRITICAL - Could lose user trust
+- **Likelihood**: LOW (if mitigated properly)
+- **Mitigation**:
+  - Use DOMPurify for HTML sanitization
+  - Block external resources by default
+  - Regular security audits
+  - Bug bounty program post-launch
+- **Contingency**: Emergency patch process, <24hr fix for critical bugs
+
+### Product Risks
+
+**Risk #6: Users don't understand i.AM Dock**
+- **Impact**: HIGH - Core feature goes unused
+- **Likelihood**: MEDIUM
+- **Mitigation**:
+  - Prominent onboarding tutorial
+  - Contextual tooltips
+  - Command examples shown in placeholder
+  - Video demos on landing page
+- **Contingency**: Add traditional menu/toolbar alongside dock
+
+**Risk #7: Launch timing misses Q2 2026**
+- **Impact**: MEDIUM - Delayed revenue, competitive disadvantage
+- **Likelihood**: HIGH (5 months is aggressive)
+- **Mitigation**:
+  - Focus on MVP features only (Phase 1-3, 5-6)
+  - Phase 4 (Calendar, Contacts) can be post-launch
+  - Use AI agents heavily for development velocity
+  - Consider hiring contractor for specific tasks
+- **Contingency**: Soft launch in Q2, full launch in Q3
+
+### Business Risks
+
+**Risk #8: Low user adoption / high churn**
+- **Impact**: HIGH - Product fails
+- **Likelihood**: UNKNOWN (need validation)
+- **Mitigation**:
+  - Beta test with 100 users before public launch
+  - Collect feedback and iterate
+  - Track retention cohorts daily
+  - Implement referral program
+- **Contingency**: Pivot features based on user feedback
+
+---
+
+## SUCCESS METRICS (Q2 2026 Launch Targets)
+
+### Pre-Launch (By Week 22)
+- ✅ All P0 features complete and tested
+- ✅ 500+ email waitlist signups
+- ✅ <5 critical bugs in beta
+- ✅ Lighthouse score >90 performance, >95 accessibility
+- ✅ Legal docs published and compliant
+- ✅ Landing page with demo video live
+
+### Week 1 Post-Launch
+- 🎯 1,000+ signups
+- 🎯 >60% complete onboarding (connect account)
+- 🎯 >40% send first email
+- 🎯 >20% use AI dock command
+- 🎯 99.5% uptime
+- 🎯 <10 critical bugs
+
+### Month 1 Post-Launch
+- 🎯 5,000+ signups
+- 🎯 30% DAU/MAU (daily active / monthly active)
+- 🎯 <10% churn rate
+- 🎯 4.0+ star rating (user reviews)
+- 🎯 Product Hunt: Top 10 of the day
+- 🎯 1+ tech blog feature (TechCrunch, The Verge, etc.)
+
+### Month 3 Post-Launch
+- 🎯 15,000+ signups
+- 🎯 1,000+ daily active users
+- 🎯 50+ AI commands used per user per week
+- 🎯 Convert 2-5% to paid tier (if paid plan exists)
+- 🎯 Net Promoter Score (NPS) >30
+
+---
+
+## QUESTIONS FOR AI AGENT TO RESOLVE
+
+These are open questions that need decisions or research:
+
+### Technical Decisions Needed
+1. **Frontend Framework**: React vs Vue vs Svelte? (Consider: AI code gen support, learning curve, performance)
+2. **Backend Framework**: Node.js/Express vs FastAPI vs Go? (Consider: Email library ecosystem, owner skill level)
+3. **Database**: PostgreSQL vs MongoDB vs Firestore? (Consider: Query complexity, cost, hosting)
+4. **AI Provider**: OpenAI vs Anthropic Claude vs Google Gemini vs Hybrid? (Consider: Cost, quality, rate limits)
+5. **Email Library**: Which IMAP/SMTP library? (Node: `imap`, `mailparser`. Python: `imaplib`, `email`)
+6. **Rich Text Editor**: Quill vs TipTap vs ProseMirror? (Consider: Features, bundle size, customization)
+7. **Hosting**: Vercel vs AWS vs GCP vs Railway? (Consider: Cost, scaling, database hosting)
+
+### Product Decisions Needed
+8. **Pricing Model**: Free forever? Freemium (limit AI commands)? Paid only?
+9. **MVP Scope**: Should Calendar and Contacts be post-launch? (Save 4 weeks)
+10. **AI Command Scope**: Start with 20 commands or 50? (Quality vs quantity)
+11. **Onboarding Flow**: Force tutorial or allow skip?
+12. **Mobile App**: Web-only at launch or native iOS/Android later?
+
+### Legal/Compliance Questions
+13. **GDPR Representative**: Need EU representative if targeting Europe?
+14. **Terms of Service**: Arbitration clause? (Consult lawyer)
+15. **Data Retention**: How long to keep deleted emails in trash? (30 days standard)
+
+---
+
+## HOW AI AGENT SHOULD USE THIS DOCUMENT
+
+### For Task Breakdown
+- Each checkbox is a discrete task that can be assigned/completed
+- Tasks are ordered by dependency (top-down within each phase)
+- Estimate times provided for planning
+
+### For Decision-Making
+- "Questions for AI Agent" section lists open decisions needing research
+- "Risk Analysis" section lists potential blockers to watch for
+- "Success Criteria" for each phase defines "done"
+
+### For Progress Tracking
+- Update checkboxes as tasks complete: ☐ → ✅
+- Update phase status: 🔴 Not Started → 🟡 In Progress → 🟢 Complete
+- Track current week (e.g., "Currently in Week 8 of 22")
+
+### For Asking User Questions
+- When blocked, refer to "Dependencies" to explain why
+- When clarification needed, reference specific checklist item by Phase.Section numbering
+- When proposing scope cuts, reference "Risk #7" mitigation strategy
+
+### For Code Generation
+- Use "Technical Stack Context" and decisions from Phase 1.1 as constraints
+- Reference "Design System" specs from Phase 1.3 for all UI code
+- Consider "Owner Technical Profile" - generate beginner-friendly code with comments
+
+### For Quality Assurance
+- Use "Success Criteria" at end of each phase to validate completeness
+- Check "Risk Analysis" to ensure mitigations are implemented
+- Verify "Accessibility" checklist (Phase 3) is met for all UI components
+
+---
+
+## IMMEDIATE NEXT STEPS (If Starting Today: Jan 2, 2026)
+
+### Week 1 Action Items (This Week!)
+1. **Technology Stack Decisions** (Phase 1.1)
+   - [ ] Research: Compare React vs Vue vs Svelte for AI-assisted dev
+   - [ ] Research: Node.js vs FastAPI for email handling
+   - [ ] Research: OpenAI vs Claude API for NLP (cost, quality)
+   - [ ] Decision: Document chosen stack with rationale
+   - **Owner involvement**: Review AI agent's research, make final call
+
+2. **Repository Setup** (Phase 1.2)
+   - [ ] Create GitHub repository: `i-am-mail`
+   - [ ] Initialize frontend project with chosen framework
+   - [ ] Initialize backend project with chosen framework
+   - [ ] Setup basic CI/CD (auto-deploy to staging)
+   - **Owner involvement**: Test that you can commit code and see it deploy
+
+3. **Design System Prototype** (Phase 1.3)
+   - [ ] Create design tokens file (colors, spacing, typography)
+   - [ ] Build 5 core components: Button, Input, Card, Modal, Toast
+   - [ ] Create i.AM Dock mockup (static, no functionality yet)
+   - **Owner involvement**: Review components, approve design
+
+### Week 2 Priorities
+- Complete Phase 1.1 decisions
+- Complete Phase 1.2 dev environment
+- Start Phase 1.3 design system (50% done)
+- Begin Phase 2.1 (Gmail OAuth research)
+
+**By End of Week 2**:
+- ✅ Tech stack finalized
+- ✅ Code repository live and deployable
+- ✅ Owner can make code changes and see results
+- ✅ 10+ reusable UI components built
+
+---
+
+## GLOSSARY FOR AI AGENT
+
+**Technical Terms**:
+- **i.AM Dock**: The context-aware command bar at bottom of screen (core product feature)
+- **Obsidian Chronos**: The dark design system with titanium red accent
+- **Monolith Card**: UI card style with dark background, subtle borders, 3D hover effect
+- **IMAP**: Internet Message Access Protocol (for receiving emails)
+- **SMTP**: Simple Mail Transfer Protocol (for sending emails)
+- **OAuth**: Authentication protocol (used for Gmail, Outlook login)
+- **NLP**: Natural Language Processing (AI understanding of text commands)
+- **Intent**: What the user wants to do (e.g., "archive", "reply", "search")
+- **Entity**: Specific data extracted from user input (e.g., sender name, date range)
+
+**Owner Context Terms**:
+- **Non-technical**: Owner has no coding background, needs beginner-friendly explanations
+- **AI-assisted development**: Owner relies on Claude, Gemini, Replit to write code
+- **Replit**: Online IDE, owner's primary development environment
+- **Firebase**: Google's backend platform, owner has experience with this
+
+**Project-Specific Terms**:
+- **MVP**: Minimum Viable Product (Phase 1-3, 5-6)
+- **Critical Path**: Phases that MUST complete before launch (no shortcuts)
+- **P0**: Priority 0 (must-have for launch)
+- **P1**: Priority 1 (should-have, can delay if needed)
+- **P2**: Priority 2 (nice-to-have, can be post-launch)
+- **Q2 2026**: April-June 2026 (launch target quarter)
+
+---
+
+## FINAL NOTES FOR AI AGENT
+
+**Communication Style with Owner**:
+- Explain technical concepts simply (owner is non-technical)
+- Provide code examples with extensive comments
+- Offer 2-3 options for decisions, with pros/cons
+- Celebrate small wins (completed phases, working features)
+
+**Development Philosophy**:
+- Prioritize working features over perfect code
+- Use AI tools heavily (you're building *with* AI, not from scratch)
+- Ship iteratively (get feedback fast)
+- "Done is better than perfect" for MVP
+
+**When Stuck**:
+- Check "Dependencies" - maybe you're blocked
+- Check "Risk Analysis" - maybe there's a known issue
+- Check "Questions for AI Agent" - maybe a decision is needed
+- Ask owner for clarification with specific options
+
+**Remember**:
+- i.AM Dock is the hero feature - it MUST be magical
+- Owner is learning as they build - be patient and educational
+- Q2 2026 launch is aggressive - focus on MVP, cut scope if needed
+- This is a marathon, not a sprint - sustainable pace matters
+
+---
+
+**END OF DOCUMENT**
